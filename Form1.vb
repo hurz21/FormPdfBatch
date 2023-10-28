@@ -2026,7 +2026,7 @@ Public Class Form1
         swfehlt = New IO.StreamWriter(dateifehlt)
         swfehlt.AutoFlush = True
         swfehlt.WriteLine(Now)
-        S1020dokumenteMitFullpathTabelleErstellen("DOKUFULLNAME", swfehlt) 'referenzfälleNeuZuweisen
+        ' S1020dokumenteMitFullpathTabelleErstellen("DOKUFULLNAME", swfehlt) 'referenzfälleNeuZuweisen
         swfehlt.WriteLine("wechsel")
         dokumenteMitFullpathTabelleErstellen("DOKUFULLNAME", swfehlt)
 
@@ -2229,10 +2229,15 @@ Public Class Form1
                     swfehlt.WriteLine(vid & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
                     Continue For
                 Else
-                    If clsBlob.dokufull_speichern(dokumentid, myoracle, inputfile, vid, zieltabelle) <> 0 Then
+                    'If clsBlob.dokufull_speichern(dokumentid, myoracle, inputfile, vid, zieltabelle) <> 0 Then
+                    '    MsgBox("Fehler")
+                    'Else
+
+                    'End If
+                    If clsBlob.saveDokumenteTooltip(dokumentid, myoracle, inputfile, vid) <> 0 Then
                         MsgBox("Fehler")
                     Else
-
+                        MsgBox("Fehler")
                     End If
                     idok += 1
                     swfehlt.WriteLine(idok & " eingefügt/norm")

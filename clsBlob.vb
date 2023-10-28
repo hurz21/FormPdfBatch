@@ -1,6 +1,8 @@
 ﻿Imports System.Data
 Imports System.Data.SqlClient
 Imports System.IO
+Imports System.Runtime.Remoting.Messaging
+
 Public Class clsBlob
     Public eing, ausg As String
     'Private Sub start()
@@ -62,20 +64,51 @@ Public Class clsBlob
             con.Close()
         End Try
     End Function
+
+
+    Shared Function saveDokumenteTooltip(dokumentid As Integer, myoracle As SqlConnection,
+                                 fullpath As String, vid As Integer) As Long
+
+        'myoracle = New SqlClient.SqlConnection(v)
+        'MsgBox(myoracle.ToString)
+
+        myoracle.Open()
+        'MsgBox("nach open")
+        'Dim Sql = "update dokumente set typ='xlsx' where dokumentid=" & dokumentid
+        'l(sql)
+        'Dim neuersddateiname = dateinameext.ToLower.Replace(".xls", ".xlsx")
+        'Dim com As New OracleCommand(Sql, myoracle)
+        Dim cmd As SqlClient.SqlCommand = myoracle.CreateCommand()
+        cmd.CommandType = CommandType.Text
+        cmd.CommandText = "update dokumente set tooltip = :param1  where dokumentid = :dokumentid"
+        cmd.Parameters.AddWithValue("param1", fullpath)
+        cmd.Parameters.AddWithValue("dokumentid", dokumentid)
+        Dim mycount As Integer = cmd.ExecuteNonQuery()
+
+        Try
+            cmd.Dispose()
+
+            myoracle.Close()
+            myoracle.Dispose()
+            Return mycount
+        Catch oex As SqlClient.SqlException
+            '  nachricht("Fehler in GetNewid&:" & oex.ToString & " / " & sql)
+            ' MsgBox(oex.ToString)
+
+            Return 0
+        Catch ex As Exception
+            '  nachricht("Fehler in GetNewid&:" & ex.ToString & " / " & sql)
+            '  MsgBox(ex.ToString)
+            Return 0
+        Finally
+            myoracle.Close()
+        End Try
+    End Function
     Shared Function dokufull_speichern(dokid As Integer, con As SqlConnection,
                                  fullpath As String, vid As Integer, tabname As String) As Long
 
-        'l("db_speichern  0")
-        'Dim aFS As New System.IO.FileStream(fullpath, System.IO.FileMode.Open, System.IO.FileAccess.Read)
-        ''Dim aData(Convert.ToInt32(aFS.Length )) As Byte  musste -1 ergänzen weil vb immer eins zu hoch init. dann ist word und excel kaputt
-        'Dim aData(Convert.ToInt32(aFS.Length - 1)) As Byte
         Dim newid As Long
-        'l("db_speichern  a")
-        'Try
-        '    aFS.Read(aData, 0, Convert.ToInt32(aFS.Length))
-        'Finally
-        '    aFS.Close()
-        'End Try
+
         Dim aBLObInsertCmd As New SqlClient.SqlCommand()
         'l("db_speichern  1")
         With aBLObInsertCmd
