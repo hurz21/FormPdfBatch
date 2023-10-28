@@ -2000,7 +2000,7 @@ Public Class Form1
                 mySize = myFile.Length
                 Return Format(mySize / 1024 ^ 2, "###0.000") ' & " MB"
             End If
-            'Select Case mySize
+            'Select Case mySize 
             'Case 0 To 1023
             '    Return mySize & " Bytes"
             'Case 1024 To 1048575
