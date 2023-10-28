@@ -72,7 +72,6 @@ Public Class clsBlob
         'myoracle = New SqlClient.SqlConnection(v)
         'MsgBox(myoracle.ToString)
 
-        myoracle.Open()
         'MsgBox("nach open")
         'Dim Sql = "update dokumente set typ='xlsx' where dokumentid=" & dokumentid
         'l(sql)
@@ -91,8 +90,8 @@ Public Class clsBlob
 
             cmd.Dispose()
 
-            myoracle.Close()
-            myoracle.Dispose()
+            'myoracle.Close()
+            'myoracle.Dispose()
             Return mycount
         Catch oex As SqlClient.SqlException
             '  nachricht("Fehler in GetNewid&:" & oex.ToString & " / " & sql)
@@ -104,7 +103,7 @@ Public Class clsBlob
             '  MsgBox(ex.ToString)
             Return 0
         Finally
-            myoracle.Close()
+            'myoracle.Close()
         End Try
     End Function
     Shared Function dokufull_speichern(dokid As Integer, con As SqlConnection,

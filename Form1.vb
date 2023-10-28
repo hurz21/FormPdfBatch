@@ -2206,7 +2206,7 @@ Public Class Form1
         Dim eid As Integer = 0
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
-
+        myoracle.Open()
         l("PDFumwandeln 2 ")
         l("PDFumwandeln 2 ")
         '  Using sw As New IO.StreamWriter(logfile)
