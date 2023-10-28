@@ -80,17 +80,20 @@ Public Class clsBlob
         'Dim com As New OracleCommand(Sql, myoracle)
         Dim cmd As SqlClient.SqlCommand = myoracle.CreateCommand()
         cmd.CommandType = CommandType.Text
-        cmd.CommandText = "update dokumente set tooltip = :param1  where dokumentid = :dokumentid"
-        cmd.Parameters.AddWithValue("param1", fullpath)
-        cmd.Parameters.AddWithValue("dokumentid", dokumentid)
-        Dim mycount As Integer = cmd.ExecuteNonQuery()
-
+        'cmd.CommandText = "update dokumente set tooltip = :param1  where dokumentid = :dokumentid"
+        cmd.CommandText = "update dokumente set tooltip ='" & fullpath & "'  where dokumentid = " & dokumentid & ""
+        'cmd.Parameters.AddWithValue("param1", fullpath)
+        'cmd.Parameters.AddWithValue("dokumentid", dokumentid)
         Try
+            cmd.ExecuteNonQuery()
+            'Dim mycount As Integer = cmd.ExecuteNonQuery()
+            nachricht("Fehler in GetNewid&:" & cmd.CommandText)
+
             cmd.Dispose()
 
             myoracle.Close()
             myoracle.Dispose()
-            Return mycount
+            Return -1
         Catch oex As SqlClient.SqlException
             '  nachricht("Fehler in GetNewid&:" & oex.ToString & " / " & sql)
             ' MsgBox(oex.ToString)
