@@ -2190,7 +2190,7 @@ Public Class Form1
         Dim Sql As String
         Sql = "SELECT * FROM dokumentefull where   dokumentid<2000000 and dokumentid>0  and fullname is null " &
                   "  order by dokumentid desc "
-        Sql = "SELECT * FROM dokumente where   dokumentid<2000000 and dokumentid>0  and tooltip <>'' " &
+        Sql = "SELECT * FROM dokumente where   dokumentid<2000000 and dokumentid>0  and tooltip ='' " &
                   "  order by dokumentid desc "
         DT = alleDokumentDatenHolen(Sql)
         'teil1 = pdf -----------------------------------------------
@@ -2235,9 +2235,9 @@ Public Class Form1
 
                     'End If
                     If clsBlob.saveDokumenteTooltip(dokumentid, myoracle, inputfile, vid) <> 0 Then
-                        MsgBox("Fehler")
+                        'MsgBox("Fehler")
                     Else
-                        MsgBox("Fehler")
+                        'MsgBox("Fehler")
                     End If
                     idok += 1
                     swfehlt.WriteLine(idok & " eingefügt/norm")

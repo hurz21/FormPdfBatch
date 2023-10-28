@@ -85,15 +85,15 @@ Public Class clsBlob
         'cmd.Parameters.AddWithValue("param1", fullpath)
         'cmd.Parameters.AddWithValue("dokumentid", dokumentid)
         Try
-            cmd.ExecuteNonQuery()
-            'Dim mycount As Integer = cmd.ExecuteNonQuery()
+            'cmd.ExecuteNonQuery()
+            Dim mycount As Integer = cmd.ExecuteNonQuery()
             nachricht("Fehler in GetNewid&:" & cmd.CommandText)
 
             cmd.Dispose()
 
             myoracle.Close()
             myoracle.Dispose()
-            Return -1
+            Return mycount
         Catch oex As SqlClient.SqlException
             '  nachricht("Fehler in GetNewid&:" & oex.ToString & " / " & sql)
             ' MsgBox(oex.ToString)
