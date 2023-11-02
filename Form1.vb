@@ -2188,9 +2188,9 @@ Public Class Form1
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
         If vid = "fehler" Then End
         Dim Sql As String
-        Sql = "SELECT * FROM dokumentefull where   dokumentid<2000000 and dokumentid>0  and fullname is null " &
+        Sql = "SELECT * FROM dokumentefull where   dokumentid<20000000 and dokumentid>0  and fullname is null " &
                   "  order by dokumentid desc "
-        Sql = "SELECT * FROM dokumente where   dokumentid<2000000 and dokumentid>0  and tooltip ='' " &
+        Sql = "SELECT * FROM dokumente where   dokumentid<20000000 and dokumentid>0  and (tooltip ='' or    tooltip is null) " &
                   "  order by dokumentid desc "
         DT = alleDokumentDatenHolen(Sql)
         'teil1 = pdf -----------------------------------------------
