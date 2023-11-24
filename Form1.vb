@@ -2266,7 +2266,7 @@ Public Class Form1
         swfehlt = New IO.StreamWriter(dateifehlt)
         swfehlt.AutoFlush = True
         swfehlt.WriteLine(Now)
-        MsgBox("Bitte zuerst die Tabelle DOKUFULLNAME  löschen oder leeren  delete   FROM [Paradigma].[dbo].[DOKUFULLNAME]", "bla", "")
+        MsgBox("Bitte zuerst die Tabelle DOKUFULLNAME  löschen oder leeren  delete   FROM [Paradigma].[dbo].[DOKUFULLNAME]")
         S1020dokumenteMitFullpathTabelleErstellen("DOKUFULLNAME", swfehlt) 'referenzfälleNeuZuweisen
         swfehlt.WriteLine("feddich")
         'dokumenteMitFullpathTabelleErstellen(swfehlt) 

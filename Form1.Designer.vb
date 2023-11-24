@@ -250,10 +250,10 @@ Partial Class Form1
         '
         'Button16
         '
-        Me.Button16.Location = New System.Drawing.Point(221, 84)
+        Me.Button16.Location = New System.Drawing.Point(24, 450)
         Me.Button16.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.Button16.Name = "Button16"
-        Me.Button16.Size = New System.Drawing.Size(121, 33)
+        Me.Button16.Size = New System.Drawing.Size(139, 33)
         Me.Button16.TabIndex = 21
         Me.Button16.Text = "fullpath ergä"
         Me.Button16.UseVisualStyleBackColor = True
@@ -269,7 +269,7 @@ Partial Class Form1
         '
         'Button19
         '
-        Me.Button19.Location = New System.Drawing.Point(372, 98)
+        Me.Button19.Location = New System.Drawing.Point(24, 486)
         Me.Button19.Name = "Button19"
         Me.Button19.Size = New System.Drawing.Size(139, 23)
         Me.Button19.TabIndex = 23
