@@ -2028,7 +2028,7 @@ Public Class Form1
         swfehlt.WriteLine(Now)
         ' S1020dokumenteMitFullpathTabelleErstellen("DOKUFULLNAME", swfehlt) 'referenzfälleNeuZuweisen
         swfehlt.WriteLine("wechsel")
-        dokumenteMitFullpathTabelleErstellen("DOKUFULLNAME", swfehlt)
+        dokumenteMitFullpathTabelleErstellen(swfehlt)
 
         swfehlt.Close()
         l("fertig  " & dateifehlt)
@@ -2178,7 +2178,7 @@ Public Class Form1
         End If
         swfehlt.WriteLine(idok & " Teil1 fertig  --------------------- " & igesamt)
     End Sub
-    Private Sub dokumenteMitFullpathTabelleErstellen(zieltabelle As String, swfehlt As IO.StreamWriter)
+    Private Sub dokumenteMitFullpathTabelleErstellen(swfehlt As IO.StreamWriter)
 
         Dim DT As DataTable
         Dim idok As Integer = 0
@@ -2257,6 +2257,22 @@ Public Class Form1
 
         End If
         swfehlt.WriteLine(idok & "Teil2 fertig  --------------------- " & igesamt)
+    End Sub
+
+    Private Sub Button19_Click(sender As Object, e As EventArgs) Handles Button19.Click
+
+        Dim dateifehlt As String = "\\file-paradigma\paradigma\test\thumbnails\referenzdokus" & Environment.UserName & ".txt"
+        dateifehlt = "L:\system\batch\margit\referenzdokus" & Environment.UserName & ".txt"
+        swfehlt = New IO.StreamWriter(dateifehlt)
+        swfehlt.AutoFlush = True
+        swfehlt.WriteLine(Now)
+        MsgBox("Bitte zuerst die Tabelle DOKUFULLNAME  löschen oder leeren  delete   FROM [Paradigma].[dbo].[DOKUFULLNAME]", "bla", "")
+        S1020dokumenteMitFullpathTabelleErstellen("DOKUFULLNAME", swfehlt) 'referenzfälleNeuZuweisen
+        swfehlt.WriteLine("feddich")
+        'dokumenteMitFullpathTabelleErstellen(swfehlt) 
+        swfehlt.Close()
+        l("fertig  " & dateifehlt)
+        Process.Start(dateifehlt)
     End Sub
 
     'Private Sub Button16_Click_1(sender As Object, e As EventArgs) Handles Button16.Click
