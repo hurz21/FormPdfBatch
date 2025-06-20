@@ -1,5 +1,6 @@
 ﻿Imports System.Drawing.Imaging
 Imports System.Runtime.InteropServices
+Imports Acrobat
 
 Public Class Form1
     Public wordVorlagen As New Microsoft.Office.Interop.Word.Application 'habe hier new ergänzt ????
@@ -196,13 +197,14 @@ Public Class Form1
         Dim relativpfad, dateinameext, typ, dokumentid, inputfile As String
         Dim newsavemode As Boolean
         Dim istRevisionssicher As Boolean
+        Dim beschreibung As String
         Dim dbdatum As Date
         Dim initial As String
         '  Using sw As New IO.StreamWriter(logfile)
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid)
+                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid, beschreibung)
                 '   l(vid & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
                 '   sw.WriteLine(vid & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
                 If newsavemode Then
@@ -337,6 +339,7 @@ Public Class Form1
         Dim istRevisionssicher As Boolean
         Dim dbdatum As Date
         Dim initial As String
+        Dim beschreibung As String
 
         l("PDFumwandeln 2 ")
         l("PDFumwandeln 2 ")
@@ -344,7 +347,7 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid)
+                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid, beschreibung)
                 l(vid & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
                 sw.WriteLine(vid & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
 
@@ -1072,6 +1075,7 @@ Public Class Form1
         Dim istRevisionssicher As Boolean
         Dim dbdatum As Date
         Dim initial As String
+        Dim beschreibung As String
         Dim eid As Integer = 0
         '  Using sw As New IO.StreamWriter(logfile)
         For Each drr As DataRow In DT.Rows
@@ -1080,7 +1084,7 @@ Public Class Form1
                     Debug.Print("")
                 End If
                 igesamt += 1
-                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid)
+                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid, beschreibung)
                 l(vid & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
 
                 sw.WriteLine(vid & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
@@ -1674,6 +1678,7 @@ Public Class Form1
         Dim istRevisionssicher As Boolean
         Dim dbdatum As Date
         Dim initial As String
+        Dim beschreibung As String
         Dim eid As Integer = 0
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
@@ -1684,7 +1689,7 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid)
+                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid, beschreibung)
                 l(vid & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
 
                 If newsavemode Then
@@ -1798,6 +1803,7 @@ Public Class Form1
         Dim ic As Integer = 0
 
         Dim myoracle As SqlClient.SqlConnection
+        Dim beschreibung As String
         myoracle = getMSSQLCon()
 
         For Each drr As DataRow In DT.Rows
@@ -1806,7 +1812,7 @@ Public Class Form1
                 If igesamt > 500 Then
                     Debug.Print("top")
                 End If
-                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid)
+                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid, beschreibung)
                 l(vid & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
                 sw.WriteLine(vid & " did: " & CStr(dokumentid) & " " & ic & " (count: " & DT.Rows.Count & ")")
                 If istFoto(dateinameext) Then
@@ -1829,7 +1835,7 @@ Public Class Form1
     Shared Function getMSSQLCon() As SqlClient.SqlConnection
         Dim myoracle As SqlClient.SqlConnection
         Dim host, datenbank, schema, tabelle, dbuser, dbpw, dbport As String
-        host = "kh-w-sql02" : schema = "Paradigma" : dbuser = "sgis" : dbpw = " WinterErschranzt.74"
+        host = "kh-w-sql02" : schema = "Paradigma" : dbuser = "sgis" : dbpw = "Grunt8-Cornhusk-Reporter"
         Dim conbuil As New SqlClient.SqlConnectionStringBuilder
         Dim v = "Data Source=" & host & ";User ID=" & dbuser & ";Password=" & dbpw & ";" +
                 "Initial Catalog=" & schema & ";"
@@ -1932,6 +1938,7 @@ Public Class Form1
         Dim newsavemode As Boolean
         Dim istRevisionssicher As Boolean
         Dim dbdatum As Date
+        Dim beschreibung As String
         Dim str As String
 
         Dim initial As String
@@ -1939,7 +1946,7 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid)
+                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid, beschreibung)
                 '   l(vid & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
                 '   sw.WriteLine(vid & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
                 If newsavemode Then
@@ -2086,7 +2093,7 @@ Public Class Form1
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
         '
-
+        Dim beschreibung As String
         Dim aktVID As Integer = 0
         Dim fremdvorgangsid As Integer = 0
         Dim fremddokumentid As Integer = 0
@@ -2128,7 +2135,7 @@ Public Class Form1
                                 Debug.Print(CStr(fremddokumentid))
 
 
-                                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, fremddokus, dbdatum, istRevisionssicher, initial, eid)
+                                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, fremddokus, dbdatum, istRevisionssicher, initial, eid, beschreibung)
                                 vid = aktVID
                                 'l(vid & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
 
@@ -2202,6 +2209,7 @@ Public Class Form1
         Dim newsavemode As Boolean
         Dim istRevisionssicher As Boolean
         Dim dbdatum As Date
+        Dim beschreibung As String
         Dim initial As String
         Dim eid As Integer = 0
         Dim myoracle As SqlClient.SqlConnection
@@ -2213,7 +2221,7 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid)
+                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid, beschreibung)
                 l(vid & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
 
                 If newsavemode Then
@@ -2226,7 +2234,7 @@ Public Class Form1
                 Application.DoEvents()
                 Dim fi As New IO.FileInfo(inputfile.Replace(Chr(34), ""))
                 If Not fi.Exists Then
-                    swfehlt.WriteLine(vid & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
+                    swfehlt.WriteLine("FEhlt: " & vid & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
                     Continue For
                 Else
                     'If clsBlob.dokufull_speichern(dokumentid, myoracle, inputfile, vid, zieltabelle) <> 0 Then
@@ -2274,6 +2282,151 @@ Public Class Form1
         l("fertig  " & dateifehlt)
         Process.Start(dateifehlt)
     End Sub
+
+    Private Sub Button20_Click(sender As Object, e As EventArgs) Handles Button20.Click
+        Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_ausgabeDoku" & Environment.UserName & ".txt"
+        Dim puAusgabe As String = "D:\probaug_Ausgabe\" & "dokumente" & ".csv"
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".txt"
+        swfehlt = New IO.StreamWriter(puFehler)
+        swfehlt.AutoFlush = True
+        '  swfehlt.WriteLine(Now)
+        ' S1020dokumenteMitFullpathTabelleErstellen("DOKUFULLNAME", swfehlt) 'referenzfälleNeuZuweisen
+        ' swfehlt.WriteLine("wechsel")
+        ' dokumenteMitFullpathTabelleErstellen(swfehlt)
+        Dim Sql As String
+        Sql = "SELECT * FROM dokumente   order by dokumentid desc "
+        writeDokumentePU(puFehler, puAusgabeStream, Sql)
+    End Sub
+
+    Private Sub writeDokumentePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String)
+        '####
+        Dim DT As DataTable
+        Dim idok As Integer = 0
+        puAusgabeStream.AutoFlush = True
+        'puAusgabeStream.WriteLine(Now)
+        l("PDFumwandeln ")
+        swfehlt.WriteLine("Teil2 normale Dokumente ausschreiben ---------------------")
+
+        inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
+        If vid = "fehler" Then End
+
+        DT = alleDokumentDatenHolen(sql)
+        l("vor csvverarbeiten")
+        Dim ic As Integer = 0
+        Dim igesamt As Integer = 0
+        Dim relativpfad, dateinameext, typ, dokumentid, inputfile, outfile As String
+        Dim newsavemode As Boolean
+        Dim istRevisionssicher As Boolean
+        Dim dbdatum As Date
+        Dim initial As String
+        Dim beschreibung As String
+        Dim eid As Integer = 0
+        Dim myoracle As SqlClient.SqlConnection
+        myoracle = getMSSQLCon()
+        myoracle.Open()
+        Dim zeile As New Text.StringBuilder
+        Dim t As String = ";"
+        l("PDFumwandeln 2 ")
+        l("PDFumwandeln 2 ")
+        '  Using sw As New IO.StreamWriter(logfile)
+        For Each drr As DataRow In DT.Rows
+            Try
+                igesamt += 1
+                DbMetaDatenHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid, beschreibung)
+                l(vid & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
+
+                If newsavemode Then
+                    inputfile = GetInputfilename(inndir, relativpfad, CInt(dokumentid))
+                Else
+                    inputfile = GetInputfile1Name(inndir, relativpfad, dateinameext)
+                End If
+
+                TextBox3.Text = igesamt & " von " & DT.Rows.Count
+                Application.DoEvents()
+                Dim fi As New IO.FileInfo(inputfile.Replace(Chr(34), ""))
+
+                If Not fi.Exists Then
+                    swfehlt.WriteLine("FEhlt: " & vid & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
+                    Continue For
+                Else
+                    'If clsBlob.dokufull_speichern(dokumentid, myoracle, inputfile, vid, zieltabelle) <> 0 Then
+                    '    MsgBox("Fehler")
+                    'Else
+
+                    'End If
+                    'zeilebilden
+                    zeile.Append(vid & t) 'Az
+                    zeile.Append(dbdatum.ToString("yyyy") & t) 'jahr
+                    zeile.Append(dbdatum.ToString("yyyyMMdd") & t) 'datum
+                    zeile.Append(typ & t) 'oberbegriff Protokolle
+                    zeile.Append(CSVFormat(cleanString(beschreibung)) & t) 'bezeichnung beschreibung
+                    zeile.Append(CSVFormat(inputfile) & t) 'pfad
+                    zeile.Append("dokumente" & t) 'ordner im mediencenter
+
+
+                    If csvzeileSpeichern(vid, zeile.ToString, puAusgabeStream) Then
+                    Else
+                    End If
+                    zeile.Clear()
+                    'If clsBlob.saveDokumenteTooltip(dokumentid, myoracle, inputfile, vid) <> 0 Then
+                    '    'MsgBox("Fehler")
+                    'Else
+                    '    'MsgBox("Fehler")
+                    'End If
+                    idok += 1
+                    swfehlt.WriteLine(idok & " eingefügt/norm")
+                End If
+            Catch ex As Exception
+                l("fehler2: " & ex.ToString)
+                TextBox2.Text = ic.ToString & Environment.NewLine & " " &
+                       inputfile & Environment.NewLine &
+                       vid & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       TextBox2.Text
+                Application.DoEvents()
+            End Try
+            GC.Collect()
+            GC.WaitForFullGCComplete()
+        Next
+        If batchmode = True Then
+
+        End If
+        swfehlt.WriteLine(idok & "Teil2 fertig  --------------------- " & igesamt)
+
+        '####
+        swfehlt.Close()
+        l("fertig  " & puFehler)
+        Process.Start(puFehler)
+    End Sub
+
+    Private Function cleanString(cand As String) As String
+        Try
+            If cand Is Nothing Then cand = " "
+            cand = cand.Replace(Chr(34), " ")
+            cand = cand.Replace(";", " ")
+            Return cand
+        Catch ex As Exception
+            Return "clean_error"
+        End Try
+    End Function
+
+    Private Function csvzeileSpeichern(vid As String, zeile As String, puausgabestream As IO.StreamWriter) As Boolean
+        Try
+            puausgabestream.WriteLine(zeile)
+        Catch ex As Exception
+            Debug.Print("error " & ex.ToString)
+        End Try
+    End Function
+    ' Funktion zum Escapen von CSV-Feldern
+    Function CSVFormat(text As String) As String
+        If text.Contains(";") OrElse text.Contains("""") OrElse text.Contains(vbCrLf) Then
+            ' Doppelte Anführungszeichen verdoppeln
+            text = text.Replace("""", """""")
+            ' In doppelte Anführungszeichen einschließen
+            text = $"""{text}"""
+        End If
+        Return text
+    End Function
 
     'Private Sub Button16_Click_1(sender As Object, e As EventArgs) Handles Button16.Click
 
@@ -2329,7 +2482,7 @@ Public Class Form1
     Private Shared Function getSQLConnection() As SqlClient.SqlConnection
         Dim myoracle As SqlClient.SqlConnection
         Dim host, datenbank, schema, tabelle, dbuser, dbpw, dbport As String
-        host = "kh-w-sql02" : schema = "Paradigma" : dbuser = "sgis" : dbpw = " WinterErschranzt.74"
+        host = "kh-w-sql02" : schema = "Paradigma" : dbuser = "sgis" : dbpw = "Grunt8-Cornhusk-Reporter"
         'Dim conbuil As New SqlClient.SqlConnectionStringBuilder
         Dim v = "Data Source=" & host & ";User ID=" & dbuser & ";Password=" & dbpw & ";" +
                 "Initial Catalog=" & schema & ";"
