@@ -184,6 +184,7 @@
   <ItemGroup>
     <Compile Include="clsBlob.vb" />
     <Compile Include="clsExcel.vb" />
+    <Compile Include="clsstring.vb" />
     <Compile Include="clsWordTest.vb" />
     <Compile Include="Form1.vb">
       <SubType>Form</SubType>

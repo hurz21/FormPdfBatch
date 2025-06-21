@@ -2403,7 +2403,8 @@ Public Class Form1
         Try
             If cand Is Nothing Then cand = " "
             cand = cand.Replace(Chr(34), " ")
-            cand = cand.Replace(";", " ")
+            Text = Text.Replace(";", "_")
+            Text = Text.Replace(vbCrLf, "")
             Return cand
         Catch ex As Exception
             Return "clean_error"
@@ -2422,6 +2423,7 @@ Public Class Form1
         If text.Contains(";") OrElse text.Contains("""") OrElse text.Contains(vbCrLf) Then
             ' Doppelte Anführungszeichen verdoppeln
             text = text.Replace("""", """""")
+
             ' In doppelte Anführungszeichen einschließen
             text = $"""{text}"""
         End If
