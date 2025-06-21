@@ -2305,10 +2305,27 @@ Public Class Form1
         ' dokumenteMitFullpathTabelleErstellen(swfehlt)
         Dim Sql As String
         Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_vorgang]  order by dokumentid desc "
-        writeDokumentePU(puFehler, puAusgabeStream, Sql)
+        TextBox2.Text = puAusgabe
+        TextBox2.Text = Sql
+
+        writeDokumentePU(puFehler, puAusgabeStream, Sql, 1000)
+        puAusgabeStream.Close()
+        puAusgabeStream.Dispose()
+        Process.Start(puAusgabe)
+        '######
+        puAusgabe = "D:\probaug_Ausgabe\" & "dokumente_referenz" & ".csv"
+        puAusgabeStream = New IO.StreamWriter(puAusgabe)
+        Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_referenz]  order by dokumentid desc "
+        TextBox1.Text = TextBox1.Text & Environment.NewLine & puAusgabe
+        TextBox2.Text = TextBox2.Text & Environment.NewLine & Sql
+        writeDokumentePU(puFehler, puAusgabeStream, Sql, 1000)
+        swfehlt.Close()
+        l("fertig  " & puFehler)
+
+        Process.Start(puAusgabe)
     End Sub
 
-    Private Sub writeDokumentePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String)
+    Private Sub writeDokumentePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxrows As Integer)
         '####
         Dim DT As DataTable
         Dim idok As Integer = 0
@@ -2343,6 +2360,7 @@ Public Class Form1
         l("PDFumwandeln 2 ")
         l("PDFumwandeln 2 ")
         '  Using sw As New IO.StreamWriter(logfile)
+
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
@@ -2380,6 +2398,7 @@ Public Class Form1
 
                 zeile.Clear()
                 idok += 1
+                If idok > maxrows Then Exit For
             Catch ex As Exception
                 l("fehler2: " & ex.ToString)
                 TextBox2.Text = ic.ToString & Environment.NewLine & " " &
@@ -2391,15 +2410,14 @@ Public Class Form1
             GC.Collect()
             GC.WaitForFullGCComplete()
         Next
-        If batchmode = True Then
+        csvzeileSpeichern(vid, block.ToString, puAusgabeStream)
 
-        End If
-        swfehlt.WriteLine(idok & "Teil2 fertig  --------------------- " & igesamt)
+        swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
 
         '####
-        swfehlt.Close()
+        'swfehlt.Close()
         l("fertig  " & puFehler)
-        Process.Start(puFehler)
+        ' Process.Start(puFehler)
     End Sub
 
     Private Function cleanString(cand As String) As String
