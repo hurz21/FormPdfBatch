@@ -46,6 +46,9 @@ Partial Class Form1
         Me.Button18 = New System.Windows.Forms.Button()
         Me.Button19 = New System.Windows.Forms.Button()
         Me.Button20 = New System.Windows.Forms.Button()
+        Me.Button21 = New System.Windows.Forms.Button()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button1
@@ -64,7 +67,7 @@ Partial Class Form1
         Me.TextBox1.Location = New System.Drawing.Point(18, 104)
         Me.TextBox1.Multiline = True
         Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(585, 233)
+        Me.TextBox1.Size = New System.Drawing.Size(585, 121)
         Me.TextBox1.TabIndex = 1
         '
         'TextBox2
@@ -72,7 +75,7 @@ Partial Class Form1
         Me.TextBox2.Location = New System.Drawing.Point(619, 102)
         Me.TextBox2.Multiline = True
         Me.TextBox2.Name = "TextBox2"
-        Me.TextBox2.Size = New System.Drawing.Size(587, 233)
+        Me.TextBox2.Size = New System.Drawing.Size(587, 123)
         Me.TextBox2.TabIndex = 2
         '
         'Button2
@@ -151,7 +154,7 @@ Partial Class Form1
         'Button8
         '
         Me.Button8.Location = New System.Drawing.Point(948, 17)
-        Me.Button8.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Button8.Margin = New System.Windows.Forms.Padding(2)
         Me.Button8.Name = "Button8"
         Me.Button8.Size = New System.Drawing.Size(113, 23)
         Me.Button8.TabIndex = 11
@@ -161,7 +164,7 @@ Partial Class Form1
         'Button9
         '
         Me.Button9.Location = New System.Drawing.Point(706, 48)
-        Me.Button9.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Button9.Margin = New System.Windows.Forms.Padding(2)
         Me.Button9.Name = "Button9"
         Me.Button9.Size = New System.Drawing.Size(128, 21)
         Me.Button9.TabIndex = 12
@@ -171,7 +174,7 @@ Partial Class Form1
         'Button10
         '
         Me.Button10.Location = New System.Drawing.Point(838, 50)
-        Me.Button10.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Button10.Margin = New System.Windows.Forms.Padding(2)
         Me.Button10.Name = "Button10"
         Me.Button10.Size = New System.Drawing.Size(80, 21)
         Me.Button10.TabIndex = 13
@@ -181,7 +184,7 @@ Partial Class Form1
         'Button11
         '
         Me.Button11.Location = New System.Drawing.Point(933, 48)
-        Me.Button11.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Button11.Margin = New System.Windows.Forms.Padding(2)
         Me.Button11.Name = "Button11"
         Me.Button11.Size = New System.Drawing.Size(108, 21)
         Me.Button11.TabIndex = 14
@@ -191,7 +194,7 @@ Partial Class Form1
         'Button12
         '
         Me.Button12.Location = New System.Drawing.Point(159, 10)
-        Me.Button12.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Button12.Margin = New System.Windows.Forms.Padding(2)
         Me.Button12.Name = "Button12"
         Me.Button12.Size = New System.Drawing.Size(98, 52)
         Me.Button12.TabIndex = 15
@@ -200,8 +203,8 @@ Partial Class Form1
         '
         'Button13
         '
-        Me.Button13.Location = New System.Drawing.Point(480, 366)
-        Me.Button13.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Button13.Location = New System.Drawing.Point(876, 396)
+        Me.Button13.Margin = New System.Windows.Forms.Padding(2)
         Me.Button13.Name = "Button13"
         Me.Button13.Size = New System.Drawing.Size(134, 23)
         Me.Button13.TabIndex = 16
@@ -211,7 +214,7 @@ Partial Class Form1
         'Button14
         '
         Me.Button14.Location = New System.Drawing.Point(871, 342)
-        Me.Button14.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Button14.Margin = New System.Windows.Forms.Padding(2)
         Me.Button14.Name = "Button14"
         Me.Button14.Size = New System.Drawing.Size(170, 23)
         Me.Button14.TabIndex = 17
@@ -220,8 +223,8 @@ Partial Class Form1
         '
         'Button15
         '
-        Me.Button15.Location = New System.Drawing.Point(480, 341)
-        Me.Button15.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Button15.Location = New System.Drawing.Point(876, 371)
+        Me.Button15.Margin = New System.Windows.Forms.Padding(2)
         Me.Button15.Name = "Button15"
         Me.Button15.Size = New System.Drawing.Size(364, 24)
         Me.Button15.TabIndex = 18
@@ -230,8 +233,8 @@ Partial Class Form1
         '
         'Button17
         '
-        Me.Button17.Location = New System.Drawing.Point(610, 366)
-        Me.Button17.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Button17.Location = New System.Drawing.Point(1006, 396)
+        Me.Button17.Margin = New System.Windows.Forms.Padding(2)
         Me.Button17.Name = "Button17"
         Me.Button17.Size = New System.Drawing.Size(234, 23)
         Me.Button17.TabIndex = 20
@@ -240,8 +243,8 @@ Partial Class Form1
         '
         'Button16
         '
-        Me.Button16.Location = New System.Drawing.Point(18, 342)
-        Me.Button16.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Button16.Location = New System.Drawing.Point(5, 18)
+        Me.Button16.Margin = New System.Windows.Forms.Padding(2)
         Me.Button16.Name = "Button16"
         Me.Button16.Size = New System.Drawing.Size(213, 27)
         Me.Button16.TabIndex = 21
@@ -251,7 +254,7 @@ Partial Class Form1
         'Button18
         '
         Me.Button18.Location = New System.Drawing.Point(312, 52)
-        Me.Button18.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Button18.Margin = New System.Windows.Forms.Padding(2)
         Me.Button18.Name = "Button18"
         Me.Button18.Size = New System.Drawing.Size(56, 19)
         Me.Button18.TabIndex = 22
@@ -260,8 +263,8 @@ Partial Class Form1
         '
         'Button19
         '
-        Me.Button19.Location = New System.Drawing.Point(18, 371)
-        Me.Button19.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Button19.Location = New System.Drawing.Point(5, 47)
+        Me.Button19.Margin = New System.Windows.Forms.Padding(2)
         Me.Button19.Name = "Button19"
         Me.Button19.Size = New System.Drawing.Size(213, 19)
         Me.Button19.TabIndex = 23
@@ -270,22 +273,42 @@ Partial Class Form1
         '
         'Button20
         '
-        Me.Button20.Location = New System.Drawing.Point(18, 396)
+        Me.Button20.Location = New System.Drawing.Point(5, 72)
         Me.Button20.Name = "Button20"
         Me.Button20.Size = New System.Drawing.Size(213, 23)
         Me.Button20.TabIndex = 24
         Me.Button20.Text = "3. ProBgAusgabe_dokumente"
         Me.Button20.UseVisualStyleBackColor = True
         '
+        'Button21
+        '
+        Me.Button21.Location = New System.Drawing.Point(232, 20)
+        Me.Button21.Name = "Button21"
+        Me.Button21.Size = New System.Drawing.Size(226, 23)
+        Me.Button21.TabIndex = 25
+        Me.Button21.Text = "4. Stammdaten>PG"
+        Me.Button21.UseVisualStyleBackColor = True
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.Button16)
+        Me.GroupBox1.Controls.Add(Me.Button21)
+        Me.GroupBox1.Controls.Add(Me.Button19)
+        Me.GroupBox1.Controls.Add(Me.Button20)
+        Me.GroupBox1.Location = New System.Drawing.Point(18, 231)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(853, 211)
+        Me.GroupBox1.TabIndex = 26
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "ProbauG Umsetzung"
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1251, 457)
-        Me.Controls.Add(Me.Button20)
-        Me.Controls.Add(Me.Button19)
+        Me.ClientSize = New System.Drawing.Size(1251, 489)
+        Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.Button18)
-        Me.Controls.Add(Me.Button16)
         Me.Controls.Add(Me.Button17)
         Me.Controls.Add(Me.Button15)
         Me.Controls.Add(Me.Button14)
@@ -308,7 +331,8 @@ Partial Class Form1
         Me.Controls.Add(Me.Button1)
         Me.Name = "Form1"
         Me.Text = "Form1"
-        Me.ResumeLayout(false)
+        Me.GroupBox1.ResumeLayout(False)
+        Me.ResumeLayout(False)
         Me.PerformLayout
 
 End Sub
@@ -337,4 +361,6 @@ End Sub
     Friend WithEvents Button18 As Button
     Friend WithEvents Button19 As Button
     Friend WithEvents Button20 As Button
+    Friend WithEvents Button21 As Button
+    Friend WithEvents GroupBox1 As GroupBox
 End Class
