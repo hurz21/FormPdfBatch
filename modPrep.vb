@@ -24,7 +24,7 @@
 
 
 
-    Public Sub DbMetaDatenHolen(ByRef vid As String, ByRef relativpfad As String, ByRef dateinameext As String,
+    Public Sub DbMetaDatenDokumentHolen(ByRef vid As String, ByRef relativpfad As String, ByRef dateinameext As String,
                            ByRef typ As String, ByRef newsavemode As Boolean, ByRef dokumentid As String,
                            ByVal drr As DataRow, ByRef datumDB As Date, ByRef istRevisionssicher As Boolean,
 ByRef initial As String, ByRef eid As Integer, ByRef beschreibung As String, ByRef eingang As Date, ByRef fullfilename As String)
@@ -43,7 +43,7 @@ ByRef initial As String, ByRef eid As Integer, ByRef beschreibung As String, ByR
             fullfilename = CStr(drr.Item("tooltip"))
             typ = CStr(drr.Item("typ"))
         Catch ex As Exception
-            l("fehler in DbMetaDatenHolen:" & vid & ex.ToString)
+            l("fehler in DbMetaDatenDokumentHolen:" & vid & ex.ToString)
         End Try
     End Sub
     Public Function GetInputfilename(ByVal innDir As String, ByVal relativpfad As String, ByVal dokumentid As Integer) As String
