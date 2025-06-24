@@ -48,6 +48,7 @@ Partial Class Form1
         Me.Button20 = New System.Windows.Forms.Button()
         Me.Button21 = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.Button22 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -291,6 +292,7 @@ Partial Class Form1
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.Button22)
         Me.GroupBox1.Controls.Add(Me.Button16)
         Me.GroupBox1.Controls.Add(Me.Button21)
         Me.GroupBox1.Controls.Add(Me.Button19)
@@ -301,6 +303,15 @@ Partial Class Form1
         Me.GroupBox1.TabIndex = 26
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "ProbauG Umsetzung"
+        '
+        'Button22
+        '
+        Me.Button22.Location = New System.Drawing.Point(232, 50)
+        Me.Button22.Name = "Button22"
+        Me.Button22.Size = New System.Drawing.Size(226, 23)
+        Me.Button22.TabIndex = 26
+        Me.Button22.Text = "Button22"
+        Me.Button22.UseVisualStyleBackColor = True
         '
         'Form1
         '
@@ -363,4 +374,5 @@ End Sub
     Friend WithEvents Button20 As Button
     Friend WithEvents Button21 As Button
     Friend WithEvents GroupBox1 As GroupBox
+    Friend WithEvents Button22 As Button
 End Class

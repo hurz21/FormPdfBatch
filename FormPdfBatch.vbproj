@@ -182,6 +182,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Class1.vb" />
     <Compile Include="clsBlob.vb" />
     <Compile Include="clsExcel.vb" />
     <Compile Include="clsstring.vb" />

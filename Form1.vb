@@ -28,9 +28,9 @@ Public Class Form1
     Public Sub protokoll()
         With My.Application.Log.DefaultFileLogWriter
 #If DEBUG Then
-            .CustomLocation = "L:\system\batch\margit\" & ""
+            .CustomLocation = "D:\probaug_Ausgabe\logs\" & ""
 #Else
-            .CustomLocation = "L:\system\batch\margit\" & ""
+            .CustomLocation = "D:\probaug_Ausgabe\logs\" & ""
 #End If
 
             .BaseFileName = "form2pdf" & "_" & Environment.UserName
@@ -2305,7 +2305,7 @@ Public Class Form1
 
     Private Sub Button20_Click(sender As Object, e As EventArgs) Handles Button20.Click
         Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_ausgabeDoku" & Environment.UserName & ".txt"
-        Dim puAusgabe As String = "D:\probaug_Ausgabe\" & "dokumente" & ".csv"
+        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "dokumente" & ".csv"
         Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
         '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".txt"
         swfehlt = New IO.StreamWriter(puFehler)
@@ -2486,12 +2486,12 @@ Public Class Form1
     Private Sub Button21_Click(sender As Object, e As EventArgs) Handles Button21.Click
         'probaugstammdaten
         Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_Stammdaten" & Environment.UserName & ".txt"
-        Dim puAusgabe As String = "D:\probaug_Ausgabe\" & "Stammdaten" & ".csv"
+        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "Stammdaten" & ".csv"
         Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
-        Dim maxobj As Integer = 500
+        Dim maxobj As Integer = 190000
         Sql = "SELECT * FROM [Paradigma].[dbo].[stammdaten_tutti]  order by vorgangsid desc "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
@@ -2499,27 +2499,22 @@ Public Class Form1
         writeStammdatenPU(puFehler, puAusgabeStream, Sql, maxobj)
         puAusgabeStream.Close()
         puAusgabeStream.Dispose()
+        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
     End Sub
 
     Private Sub writeStammdatenPU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
         Dim DT As DataTable
         Dim idok As Integer = 0
         puAusgabeStream.AutoFlush = True
-        'puAusgabeStream.WriteLine(Now)
-        l("PDFumwandeln ")
-        swfehlt.WriteLine("Teil2 normale Dokumente ausschreiben ---------------------")
-
-        inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
-        If vid = "fehler" Then End
-
+        swfehlt.WriteLine("writeStammdatenPU---")
         DT = alleDokumentDatenHolen(sql)
-        l("vor csvverarbeiten")
+
         Dim ic As Integer = 0
         Dim igesamt As Integer = 0
-        Dim sachgebiet, Verfahrensart, Vorhaben, Bezeichnung, Vorhabensmerkmal, Notiz, Hauptaktenjahr, sachbearbeiter As String
+        Dim sachgebiet, Verfahrensart, Vorhaben, Bezeichnung, Vorhabensmerkmal, Notiz, sachbearbeiter As String
         Dim newsavemode As Boolean
         Dim istRevisionssicher As Boolean
-        Dim dbdatum As Date
+        Dim dbdatum, hauptaktenjahr As Date
         Dim Hauptaktenzeichen As String
         Dim beschreibung As String
         Dim eingang, antrag, vollstaendig, bescheid, abgeschlossen As Date
@@ -2530,6 +2525,7 @@ Public Class Form1
         Dim zeile As New Text.StringBuilder
         Dim fullfilename As String
         Dim t As String = ";"
+        Dim geschlossen As String = "0"
         l("stammdaten")
 
         'kopfzeile
@@ -2552,30 +2548,39 @@ Public Class Form1
         zeile.Append("Hauptaktenzeichen" & t) ' (Hauptaktenzeichen) 
         zeile.Append("Hauptaktenjahr" & t) '
         zeile.Append("Notiz" & t) '             (az2 +  altaz + internenr + beschreibung)
+        'zeile.Append("geschlossen" & t) '  
+
 
         csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
 
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                vid = CStr(drr.Item("vid"))
-                eingang = CDate(drr.Item("eingangsdatum"))
-                Bezeichnung = makeStammBezeichnung(CStr(drr.Item("sgtext")), CStr(drr.Item("paragraf")), CStr(drr.Item("vorgangsgegenstand")))
-                eingang = CDate(drr.Item("eingangsdatum"))
-                antrag = CDate(drr.Item("aufnahme"))
-                vollstaendig = CDate(drr.Item("aufnahme"))
-                bescheid = CDate(drr.Item("aufnahme"))
-                abgeschlossen = CDate(drr.Item("aufnahme"))
-                aktenstandort = CStr(drr.Item("aktenstandort"))
-                sachgebiet = CStr(drr.Item("sachgebiet"))
-                Verfahrensart = CStr(drr.Item("Verfahrensart"))
-                Vorhaben = CStr(drr.Item("Verfahrensart"))
-                Vorhabensmerkmal = CStr(drr.Item("Verfahrensart"))
-                sachbearbeiter = CStr(drr.Item("bearbeiter"))
-                Hauptaktenzeichen = CStr(drr.Item("probaugaz"))
-                Hauptaktenjahr = CStr(drr.Item("probaugaz"))
 
-                Notiz = makeStammNotiz(CStr(drr.Item("az2")), CStr(drr.Item("altaz")), CStr(drr.Item("internenr")), CStr(drr.Item("beschreibung")))
+                vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+                Bezeichnung = cleanString(makeStammBezeichnung(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), CStr(clsDBtools.fieldvalue(drr.Item("PARAGRAF"))),
+                                                               CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSGEGENSTAND")))))
+                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+                antrag = CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
+                vollstaendig = CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG")))
+                bescheid = CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
+                abgeschlossen = makeAbgeschlossen(CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG"))),
+                                                  CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))) 'falls erledigt
+                aktenstandort = CStr(clsDBtools.fieldvalue(drr.Item("STORAUMNR")))
+                sachgebiet = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 1))
+                Verfahrensart = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 2))
+                Vorhaben = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 3))
+                Vorhabensmerkmal = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 4))
+                sachbearbeiter = CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter")))
+                Hauptaktenzeichen = CStr(clsDBtools.fieldvalue(drr.Item("probaugaz")))
+                hauptaktenjahr = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+                geschlossen = CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))
+
+                Notiz = cleanString(makeStammNotiz(CStr(clsDBtools.fieldvalue(drr.Item("az2"))),
+                                                   CStr(clsDBtools.fieldvalue(drr.Item("altaz"))),
+                                                   CStr(clsDBtools.fieldvalue(drr.Item("internenr"))),
+                                                   CStr(clsDBtools.fieldvalue(drr.Item("beschreibung")))))
 
 
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
@@ -2598,9 +2603,9 @@ Public Class Form1
                 zeile.Append(sachbearbeiter & t) ' 
                 zeile.Append("" & t) ' 
                 zeile.Append((cleanString(Hauptaktenzeichen)) & t) '   
-                zeile.Append(Hauptaktenjahr.ToString("yyyyMMdd") & t) 'datum 
-                zeile.Append(cleanString(Notiz).Trim & t) ' 
-
+                zeile.Append(hauptaktenjahr.ToString("yyyyMMdd") & t) 'datum 
+                zeile.Append(cleanString(Notiz) & t) ' 
+                'zeile.Append(geschlossen)
                 'If iblock < blockMAX Then
                 '    block.AppendLine(zeile.ToString)
                 '    zeile.Clear()
@@ -2629,7 +2634,7 @@ Public Class Form1
             GC.Collect()
             GC.WaitForFullGCComplete()
         Next
-        csvzeileSpeichern(zeile.ToString, puAusgabeStream)
+        'csvzeileSpeichern(zeile.ToString, puAusgabeStream)
         zeile.Clear()
 
         swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
@@ -2640,12 +2645,123 @@ Public Class Form1
         ' Process.Start(puFehler)
     End Sub
 
-    Private Function makeStammNotiz(v1 As String, v2 As String, v3 As String, v4 As String) As String
-        Throw New NotImplementedException()
+    Private Function makeAbgeschlossen([date] As Date, erledigt As String) As Date
+        Try
+            If erledigt = 1 Then
+                Return [date]
+            Else
+                Return Nothing
+            End If
+        Catch ex As Exception
+            l("fehler  " & ex.ToString)
+            Return "error"
+        End Try
     End Function
 
-    Private Function makeStammBezeichnung(v1 As String, v2 As String, v3 As String) As String
-        Throw New NotImplementedException()
+    Private Function makeSachgebiet(sachgebietnr As String, sachgebiettext As String, modus As Integer) As String
+        Dim t As Char = ","
+        Dim a() As String
+        Try
+            sachgebietnr = Trim(sachgebietnr)
+            sachgebiettext = Trim(sachgebiettext)
+            sachgebiettext = sachgebiettext.Replace(sachgebietnr, "")
+            If sachgebietnr.Contains("-") Then '
+                'a = sachgebietnr.Split("-"c)
+                If modus = "1" Then
+                    If sachgebietnr.Substring(0, 1) Then
+                        Return "4-Wasser und Bodenschutz"
+                    End If
+                Else
+                    Return sachgebietnr & " - " & sachgebiettext
+                End If
+            End If
+            If sachgebietnr.Count < 4 Then
+                Return sachgebietnr & " - " & sachgebiettext
+            End If
+            If sachgebietnr.Count = 4 Then
+                'normalfall
+                If modus = "1" Then
+                    Select Case sachgebietnr.Substring(0, 1)
+                        Case "1"
+                            Return "1-FD Umwelt Allgemein"
+                        Case "2"
+                            Return "2-Grafische Datenverarbeitung"
+                        Case "3"
+                            Return "3-Naturschutz"
+                        Case "4"
+                            Return "4-Wasser und Bodenschutz"
+                        Case "5"
+                            Return "5-Immissionsschutz"
+                        Case "6"
+                            Return "6-Umweltschutz"
+                        Case "7"
+                            Return "7-Abfallwirtschaft"
+                        Case Else
+                            Return sachgebietnr
+                    End Select
+                    Return sachgebietnr & " - " & sachgebiettext
+                End If
+                If modus = "2" Then
+                    Return sachgebietnr.Substring(1, 3) & " - " & sachgebiettext
+                End If
+                If modus = "3" Then
+                    Return sachgebietnr.Substring(2, 2) & " - " & sachgebiettext
+                End If
+                If modus = "4" Then
+                    Return sachgebietnr.Substring(3, 1) & " - " & sachgebiettext
+                End If
+            End If
+            l("oooo")
+        Catch ex As Exception
+            l("fehler  " & ex.ToString)
+            Return "error"
+        End Try
+    End Function
+
+    Private Function makeStammNotiz(az As String, altaz As String, interne As String, beschreibung As String) As String
+        Dim t As Char = ","
+        Dim ret As String = ""
+        Try
+            az = az.Trim
+            altaz = altaz.Trim
+            interne = interne.Trim
+            beschreibung = beschreibung.Trim
+            If altaz.Length < 1 Then
+                altaz = ""
+            Else
+                altaz = ", AltAz: " & altaz
+            End If
+            If interne.Length < 1 Then
+                interne = ""
+            Else
+                interne = ", IntNr: " & interne
+            End If
+            Return az & altaz & interne & t & " " & beschreibung
+
+        Catch ex As Exception
+            l("fehler  " & ex.ToString)
+            Return "error"
+        End Try
+    End Function
+
+    Private Function makeStammBezeichnung(sgtext As String, paragraf As String, vgGegenstand As String) As String
+        Dim t As Char = ","
+        Dim ret As String = ""
+        Try
+            sgtext = Trim(sgtext)
+            paragraf = Trim(paragraf)
+            vgGegenstand = Trim(vgGegenstand)
+            If paragraf.Length < 1 Then
+                paragraf = ""
+            Else
+                paragraf = t & " $: " & paragraf
+            End If
+            ret = sgtext & paragraf & t & " " & vgGegenstand
+            Return ret
+        Catch ex As Exception
+            l("fehler  " & ex.ToString)
+            Return "error"
+        End Try
     End Function
 
 
