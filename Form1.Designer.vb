@@ -310,7 +310,7 @@ Partial Class Form1
         Me.Button22.Name = "Button22"
         Me.Button22.Size = New System.Drawing.Size(226, 23)
         Me.Button22.TabIndex = 26
-        Me.Button22.Text = "Button22"
+        Me.Button22.Text = "5.Lage-Adresse"
         Me.Button22.UseVisualStyleBackColor = True
         '
         'Form1

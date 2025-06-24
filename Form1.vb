@@ -67,8 +67,8 @@ Public Class Form1
         Dim Sql As String
         Dim dt As New DataTable
         Try
-            Sql = "SELECT * FROM dokumente where   Bezeichnung<2000000 and Bezeichnung>0  " &
-                  " and ( Vorhaben='pdf') order by Bezeichnung desc "
+            Sql = "SELECT * FROM dokumente where   ort<2000000 and ort>0  " &
+                  " and ( Vorhaben='pdf') order by ort desc "
             'MsgBox(Sql)
             dt = getDT(Sql)
             'MsgBox(dt.Rows.Count)
@@ -96,9 +96,9 @@ Public Class Form1
         Dim Sql As String
         Dim dt As New DataTable
         Try
-            Sql = "SELECT * FROM dokumente where   Bezeichnung<2000000 and Bezeichnung>0  " &
+            Sql = "SELECT * FROM dokumente where   ort<2000000 and ort>0  " &
                   "  and mb =0 " &
-                  "  order by Bezeichnung desc "
+                  "  order by ort desc "
             'MsgBox(Sql)
             dt = getDT(Sql)
             'MsgBox(dt.Rows.Count)
@@ -186,8 +186,8 @@ Public Class Form1
         sw.WriteLine(Now)
         If vid = "fehler" Then End
         Dim Sql As String
-        Sql = "SELECT * FROM dokumente where   Bezeichnung<2000000 and Bezeichnung>0  " &
-                  "  order by Bezeichnung desc "
+        Sql = "SELECT * FROM dokumente where   ort<2000000 and ort>0  " &
+                  "  order by ort desc "
         DT = alleDokumentDatenHolen(Sql)
         l("vor prüfung")
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
@@ -208,8 +208,8 @@ Public Class Form1
                 igesamt += 1
                 DbMetaDatenDokumentHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
                                  beschreibung, eingang, fullfilename)
-                '   l(vid & " " & CStr(Bezeichnung) & " " & ic & " (" & DT.Rows.Count & ")")
-                '   sw.WriteLine(vid & " " & CStr(Bezeichnung) & " " & ic & " (" & DT.Rows.Count & ")")
+                '   l(vid & " " & CStr(ort) & " " & ic & " (" & DT.Rows.Count & ")")
+                '   sw.WriteLine(vid & " " & CStr(ort) & " " & ic & " (" & DT.Rows.Count & ")")
                 If newsavemode Then
                     inputfile = GetInputfilename(inndir, relativpfad, CInt(dokumentid))
                 Else
@@ -271,19 +271,19 @@ Public Class Form1
     '    Dim newsavemode As Boolean
     '    Dim dbdatum As Date
     '    Dim Vorhabensmerkmal, checkoutfile, bearbeiter As String
-    '    Dim Bezeichnung As String
+    '    Dim ort As String
     '    For Each drr As DataRow In dt.Rows
     '        Try
     '            ic += 1
-    '            DbMetaDatenDokumentHolen(vid, sachgebiet, Verfahrensart, Vorhaben, newsavemode, Bezeichnung, drr, dbdatum)
-    '            l(vid & " " & Bezeichnung.ToString & " " & ic & " (" & dt.Rows.Count & ")")
-    '            TextBox1.Text = TextBox1.Text & vid & " " & Bezeichnung.ToString & " " & ic & " (" & dt.Rows.Count & ")"
+    '            DbMetaDatenDokumentHolen(vid, sachgebiet, Verfahrensart, Vorhaben, newsavemode, ort, drr, dbdatum)
+    '            l(vid & " " & ort.ToString & " " & ic & " (" & dt.Rows.Count & ")")
+    '            TextBox1.Text = TextBox1.Text & vid & " " & ort.ToString & " " & ic & " (" & dt.Rows.Count & ")"
     '            If newsavemode Then
-    '                Vorhabensmerkmal = GetInputfile(inndir, sachgebiet, CInt(Bezeichnung))
+    '                Vorhabensmerkmal = GetInputfile(inndir, sachgebiet, CInt(ort))
     '            Else
     '                Vorhabensmerkmal = GetInputfile1(inndir, sachgebiet, Verfahrensart)
     '            End If
-    '            bearbeiter = modPrep.GetOutfile(CInt(vid), outdir, CInt(Bezeichnung), ".jpg")
+    '            bearbeiter = modPrep.GetOutfile(CInt(vid), outdir, CInt(ort), ".jpg")
     '            Dim fi As New IO.FileInfo(bearbeiter.Replace(Chr(34), ""))
 
     '            If fi.Exists Then
@@ -391,9 +391,9 @@ Public Class Form1
                     'Continue For
                     Debug.Print("")
                 End If
-                'If Bezeichnung = "77828" Then Continue For
-                'If Bezeichnung = "80043" Then Continue For
-                'If Bezeichnung = "80071" Then Continue For
+                'If ort = "77828" Then Continue For
+                'If ort = "80043" Then Continue For
+                'If ort = "80071" Then Continue For
                 Dim fi As New IO.FileInfo(inputfile.Replace(Chr(34), ""))
                 If Not fi.Exists Then
                     swfehlt.WriteLine(vid & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
@@ -660,12 +660,12 @@ Public Class Form1
         'oben = "134133" : unten = "0"
         'oben = "40777" : unten = "0"
 
-        Sql = "SELECT * FROM dokumente where   Bezeichnung > " & unten & "  and Bezeichnung < " & oben & "  " &
+        Sql = "SELECT * FROM dokumente where   ort > " & unten & "  and ort < " & oben & "  " &
               "and ( Vorhaben='docx' or  Vorhaben='doc'  or  Vorhaben='rtf' )  " &
-              "order by Bezeichnung desc"
+              "order by ort desc"
         'Sql = "SELECT * FROM dokumente where   vid=9609 " &
         '      "and ( Vorhaben='docx' or  Vorhaben='doc' or  Vorhaben='rtf')  " &
-        '      "order by Bezeichnung desc"
+        '      "order by ort desc"
         l(Sql)
 
         immerUeberschreiben = True
@@ -716,7 +716,7 @@ Public Class Form1
 
                 Dim fi As New IO.FileInfo(inputfile.Replace(Chr(34), ""))
                 If Not fi.Exists Then
-                    'swfehlt.WriteLine(vid & "," & Bezeichnung & ", " & dbdatum & "," & initial & ", " & Vorhabensmerkmal & "")
+                    'swfehlt.WriteLine(vid & "," & ort & ", " & dbdatum & "," & initial & ", " & Vorhabensmerkmal & "")
                     swfehlt.WriteLine(vid & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
                     Continue For
                 Else
@@ -883,12 +883,12 @@ Public Class Form1
         'oben = "134133" : unten = "0"
         'oben = "40777" : unten = "0"
 
-        Sql = "SELECT * FROM dokumente where   Bezeichnung > " & unten & "  and Bezeichnung < " & oben & "  " &
+        Sql = "SELECT * FROM dokumente where   ort > " & unten & "  and ort < " & oben & "  " &
               "and (  lower(Verfahrensart) like '%.xls' )  " &
-              "order by Bezeichnung desc"
+              "order by ort desc"
         'Sql = "SELECT * FROM dokumente where   vid=9609 " &
         '      "and ( Vorhaben='docx' or  Vorhaben='doc' or  Vorhaben='rtf')  " &
-        '      "order by Bezeichnung desc"
+        '      "order by ort desc"
 
 
         immerUeberschreiben = True
@@ -926,7 +926,7 @@ Public Class Form1
 
                 End If
                 Console.Write(vid & "/" & dokumentid & "----")
-                'sw.WriteLine(vid & "/" & Bezeichnung & "----")
+                'sw.WriteLine(vid & "/" & ort & "----")
                 If newsavemode Then
                     inputfile = GetInputfileWordFullPath(innDir, relativpfad, dokumentid)
                 Else
@@ -960,7 +960,7 @@ Public Class Form1
 
                 fi = New IO.FileInfo(inputfile.Replace(Chr(34), ""))
                 If Not fi.Exists Then
-                    'swfehlt.WriteLine(vid & "," & Bezeichnung & ", " & dbdatum & "," & initial & ", " & Vorhabensmerkmal & "")
+                    'swfehlt.WriteLine(vid & "," & ort & ", " & dbdatum & "," & initial & ", " & Vorhabensmerkmal & "")
                     swfehlt.WriteLine(vid & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
                     Continue For
                 Else
@@ -1028,7 +1028,7 @@ Public Class Form1
         End Try
     End Function
     Private Function db_eintragExcelAendern(vid As Integer, relativpfad As String, dateinameext As String, typ As String, newsavemode As Boolean, dokumentid As Integer, drr As DataRow) As Boolean
-        'modOracle.setExcelAttribute2(vid, sachgebiet, Verfahrensart, Vorhaben, newsavemode, Bezeichnung, drr)
+        'modOracle.setExcelAttribute2(vid, sachgebiet, Verfahrensart, Vorhaben, newsavemode, ort, drr)
     End Function
     Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
         'doc2docx
@@ -1122,9 +1122,9 @@ Public Class Form1
                     'Continue For
                     Debug.Print("")
                 End If
-                'If Bezeichnung = "77828" Then Continue For
-                'If Bezeichnung = "80043" Then Continue For
-                'If Bezeichnung = "80071" Then Continue For
+                'If ort = "77828" Then Continue For
+                'If ort = "80043" Then Continue For
+                'If ort = "80071" Then Continue For
                 If convertPDF2(inputfile, outfile) Then
                     l("erfolg")
                     ic += 1
@@ -1420,7 +1420,7 @@ Public Class Form1
 
                 End If
                 Console.Write(vid & "/" & dokumentid & "----")
-                'sw.WriteLine(vid & "/" & Bezeichnung & "----")
+                'sw.WriteLine(vid & "/" & ort & "----")
                 If newsavemode Then
                     inputfile = GetInputfileWordFullPath(innDir, relativpfad, dokumentid)
                 Else
@@ -1516,7 +1516,7 @@ Public Class Form1
                 summe2 += Sql
 
                 Console.Write(vid & "/" & initial_ & "----")
-                'sw.WriteLine(vid & "/" & Bezeichnung & "----")
+                'sw.WriteLine(vid & "/" & ort & "----")
 
                 'sizeSumme += fi.Length
                 'TextBox1.Text = TextBox1.Text & ic & " " & Vorhabensmerkmal & " " & fi.Length & Environment.NewLine
@@ -1614,7 +1614,7 @@ Public Class Form1
 
 
 
-                'sw.WriteLine(vid & "/" & Bezeichnung & "----")
+                'sw.WriteLine(vid & "/" & ort & "----")
 
                 'sizeSumme += fi.Length
                 'TextBox1.Text = TextBox1.Text & ic & " " & Vorhabensmerkmal & " " & fi.Length & Environment.NewLine
@@ -1673,8 +1673,8 @@ Public Class Form1
 
         If vid = "fehler" Then End
         Dim Sql As String
-        Sql = "SELECT * FROM dokumente where   Bezeichnung<2000000 and Bezeichnung>0  " &
-                  "  order by Bezeichnung desc "
+        Sql = "SELECT * FROM dokumente where   ort<2000000 and ort>0  " &
+                  "  order by ort desc "
         DT = alleDokumentDatenHolen(Sql)
         'teil1 = pdf -----------------------------------------------
 
@@ -1707,7 +1707,7 @@ Public Class Form1
                 Else
                     inputfile = GetInputfile1Name(inndir, relativpfad, dateinameext)
                 End If
-                'clsBlob.dokufull_speichern(Bezeichnung, myoracle, Vorhabensmerkmal)
+                'clsBlob.dokufull_speichern(ort, myoracle, Vorhabensmerkmal)
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count
                 Application.DoEvents()
                 Dim fi As New IO.FileInfo(inputfile.Replace(Chr(34), ""))
@@ -1802,8 +1802,8 @@ Public Class Form1
         sw.WriteLine(vid)
         If vid = "fehler" Then End
         Dim Sql As String
-        Sql = "SELECT * FROM dokumente where   Bezeichnung<2000000 and Bezeichnung>0  " &
-                  " and (revisionssicher=1) order by Bezeichnung desc "
+        Sql = "SELECT * FROM dokumente where   ort<2000000 and ort>0  " &
+                  " and (revisionssicher=1) order by ort desc "
         Sql = "SELECT * FROM dokumente " &
             " LEFT JOIN t08 " &
             " ON dokumente.DOKUMENTID = t08.DOKID " &
@@ -1961,8 +1961,8 @@ Public Class Form1
                 igesamt += 1
                 DbMetaDatenDokumentHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
                                  beschreibung, eingang, fullfilename)
-                '   l(vid & " " & CStr(Bezeichnung) & " " & ic & " (" & DT.Rows.Count & ")")
-                '   sw.WriteLine(vid & " " & CStr(Bezeichnung) & " " & ic & " (" & DT.Rows.Count & ")")
+                '   l(vid & " " & CStr(ort) & " " & ic & " (" & DT.Rows.Count & ")")
+                '   sw.WriteLine(vid & " " & CStr(ort) & " " & ic & " (" & DT.Rows.Count & ")")
                 If newsavemode Then
                     inputfile = GetInputfilename(inndir, relativpfad, CInt(dokumentid))
                 Else
@@ -1988,7 +1988,7 @@ Public Class Form1
                         str = "0,00001"
                     End If
                     sw.WriteLine("update dokumente set MB=" & str.Replace(",", ".") &
-                         " where Bezeichnung=" & dokumentid & ";")
+                         " where ort=" & dokumentid & ";")
                 Else
                     Continue For
                     ic += 1
@@ -2090,8 +2090,8 @@ Public Class Form1
         ' proVorgang:  referenzverwandte zum vorgang
         ' proVorgang:  alle referenzdokus zu einem vorgang
 
-        'Sql = "SELECT * FROM dokumentefull where   Bezeichnung<2000000 and Bezeichnung>0  and fullname is null " &
-        '          "  order by Bezeichnung desc "
+        'Sql = "SELECT * FROM dokumentefull where   ort<2000000 and ort>0  and fullname is null " &
+        '          "  order by ort desc "
         'DT = alleDokumentDatenHolen(Sql)
         'teil1 = pdf -----------------------------------------------
 
@@ -2154,7 +2154,7 @@ Public Class Form1
                                 DbMetaDatenDokumentHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, fremddokus, dbdatum, istRevisionssicher, initial, eid, beschreibung,
                                                 eingang, fullfilename)
                                 vid = aktVID
-                                'l(vid & " " & CStr(Bezeichnung) & " " & ic & " (" & DT.Rows.Count & ")")
+                                'l(vid & " " & CStr(ort) & " " & ic & " (" & DT.Rows.Count & ")")
 
                                 If newsavemode Then
                                     inputfile = GetInputfilename(inndir, relativpfad, CInt(dokumentid))
@@ -2212,10 +2212,10 @@ Public Class Form1
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
         If vid = "fehler" Then End
         Dim Sql As String
-        Sql = "SELECT * FROM dokumentefull where   Bezeichnung<20000000 and Bezeichnung>0  and fullname is null " &
-                  "  order by Bezeichnung desc "
-        Sql = "SELECT * FROM dokumente where   Bezeichnung<20000000 and Bezeichnung>0  and (tooltip ='' or    tooltip is null) " &
-                  "  order by Bezeichnung desc "
+        Sql = "SELECT * FROM dokumentefull where   ort<20000000 and ort>0  and fullname is null " &
+                  "  order by ort desc "
+        Sql = "SELECT * FROM dokumente where   ort<20000000 and ort>0  and (tooltip ='' or    tooltip is null) " &
+                  "  order by ort desc "
         DT = alleDokumentDatenHolen(Sql)
         'teil1 = pdf -----------------------------------------------
 
@@ -2257,7 +2257,7 @@ Public Class Form1
                     swfehlt.WriteLine("FEhlt: " & vid & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext) '& ", " & Vorhabensmerkmal & "")
                     Continue For
                 Else
-                    'If clsBlob.dokufull_speichern(Bezeichnung, myoracle, Vorhabensmerkmal, vid, zieltabelle) <> 0 Then
+                    'If clsBlob.dokufull_speichern(ort, myoracle, Vorhabensmerkmal, vid, zieltabelle) <> 0 Then
                     '    MsgBox("Fehler")
                     'Else
 
@@ -2316,7 +2316,7 @@ Public Class Form1
         ' dokumenteMitFullpathTabelleErstellen(swfehlt)
         Dim Sql As String
         Dim maxobj As Integer = 500
-        Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_vorgang]  order by Bezeichnung desc "
+        Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_vorgang]  order by ort desc "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         'MsgBox("max. objekte für test: " & maxobj)
@@ -2327,7 +2327,7 @@ Public Class Form1
         '######
         puAusgabe = "D:\probaug_Ausgabe\" & "dokumente_referenz" & ".csv"
         puAusgabeStream = New IO.StreamWriter(puAusgabe)
-        Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_referenz]  order by Bezeichnung desc "
+        Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_referenz]  order by ort desc "
         TextBox1.Text = TextBox1.Text & Environment.NewLine & puAusgabe
         TextBox2.Text = TextBox2.Text & Environment.NewLine & Sql
         writeDokumentePU(puFehler, puAusgabeStream, Sql, 500)
@@ -2393,7 +2393,7 @@ Public Class Form1
                 l(vid & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
 
                 'If newsavemode Then
-                '    Vorhabensmerkmal = GetInputfilename(inndir, sachgebiet, CInt(Bezeichnung))
+                '    Vorhabensmerkmal = GetInputfilename(inndir, sachgebiet, CInt(ort))
                 'Else
                 '    Vorhabensmerkmal = GetInputfile1Name(inndir, sachgebiet, Verfahrensart)
                 'End If
@@ -2532,7 +2532,7 @@ Public Class Form1
         zeile.Append("az" & t) '                           (VID)
         zeile.Append("jahr" & t) '                       (eingang)
         zeile.Append("Fachschale" & t) '                  PROUMWELT
-        zeile.Append("Bezeichnung" & t) '                 (sgtext + / + paragraf + / + vorgangsgegenstand + ) Überwachung einer Kleinkläranlage
+        zeile.Append("ort" & t) '                 (sgtext + / + paragraf + / + vorgangsgegenstand + ) Überwachung einer Kleinkläranlage
         zeile.Append("Eingangsdatum" & t) '              (eingang)
         zeile.Append("Antragsdatum" & t) '               (aufnahme)
         zeile.Append("Datum Vollständigkeit geprüft" & t) '(letztebearbeitung)
@@ -2764,6 +2764,131 @@ Public Class Form1
         End Try
     End Function
 
+    Private Sub Button22_Click(sender As Object, e As EventArgs) Handles Button22.Click
+        'probaugstammdaten
+        Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_LageAdresse" & Environment.UserName & ".txt"
+        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "PU_LageAdresse" & ".csv"
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        swfehlt = New IO.StreamWriter(puFehler)
+        swfehlt.AutoFlush = True
+        Dim Sql As String
+        Dim maxobj As Integer = 9999999 '000
+        Sql = "SELECT  *  FROM [Paradigma].[dbo].[PA_SEKID2VID] c inner join [Paradigma].[dbo].PARAADRESSE a  " &
+               "     ON c.SEKID = a.ID  " &
+               "     order by VORGANGSID desc "
+        Sql = "select * from  [Paradigma].[dbo].[PA_mitRH]      order by VORGANGSID desc "
+        TextBox1.Text = puAusgabe
+        TextBox2.Text = Sql
+        'writeDokumentePU(puFehler, puAusgabeStream, Sql, maxobj)
+        writeAdresseausgabePU(puFehler, puAusgabeStream, Sql, maxobj)
+        puAusgabeStream.Close()
+        puAusgabeStream.Dispose()
+        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
+    End Sub
+
+    Private Sub writeAdresseausgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
+        Dim DT As DataTable
+        Dim idok As Integer = 0
+        puAusgabeStream.AutoFlush = True
+        swfehlt.WriteLine("writeStammdatenPU---")
+        DT = alleDokumentDatenHolen(sql)
+
+        Dim ic As Integer = 0
+        Dim igesamt As Integer = 0
+        Dim ortsteil, strasse, gemeindenr, ort, nummer, freitext, funktion, strcode As String
+        Dim newsavemode As Boolean
+        Dim istRevisionssicher As Boolean
+        Dim dbdatum, hauptaktenjahr As Date
+        Dim spalte1 As String
+        Dim veraltet As String
+        Dim eingang, antrag, vollstaendig, bescheid, abgeschlossen As Date
+        Dim aktenstandort As String
+        Dim myoracle As SqlClient.SqlConnection
+        myoracle = getMSSQLCon()
+        myoracle.Open()
+        Dim zeile As New Text.StringBuilder
+        Dim fullfilename As String
+        Dim t As String = ";"
+        Dim geschlossen As String = "0"
+        l("stammdaten")
+
+        'kopfzeile
+        zeile.Append("az" & t) '       
+        zeile.Append("jahr" & t) '     
+        zeile.Append("Ort" & t) '      
+        zeile.Append("Ortsteil" & t) ' 
+        zeile.Append("Strasse" & t) '  
+        zeile.Append("nr" & t) '       
+        zeile.Append("veraltet" & t) '
+        zeile.Append("spalte1" & t) '
+        zeile.Append("gemeindenr" & t)
+        zeile.Append("strassencode" & t) ' 
+        zeile.Append("rechtswert" & t)
+        zeile.Append("hochwert" & t) '
+        zeile.Append("freitext" & t) '
+        zeile.Append("funktion" & t) '
+        'zeile.Append("Funktion" & t) ' 
+        'zeile.Append("Freitext" & t) ' 
+        csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
+        For Each drr As DataRow In DT.Rows
+            Try
+                igesamt += 1
+                vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+                ort = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemeindetext"))))
+                ortsteil = ""
+                strasse = (clsDBtools.fieldvalue(drr.Item("strassenname")))
+                nummer = CStr(clsDBtools.fieldvalue(drr.Item("hausnrkombi")))
+                veraltet = ""
+                spalte1 = ""
+                gemeindenr = CStr(clsDBtools.fieldvalue(drr.Item("gemeindenr")))
+                strcode = CStr(clsDBtools.fieldvalue(drr.Item("strcode")))
+                'freitext = CDate(clsDBtools.fieldvalueDate(drr.Item("freitext")))
+                'funktion = CDate(clsDBtools.fieldvalueDate(drr.Item("funktion"))) 
+                TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
+                Application.DoEvents()
+                'zeilebilden
+                zeile.Append(vid & t) 'Az
+                zeile.Append(eingang.ToString("yyyy") & t) 'jahr 
+                zeile.Append(ort & t) ' 
+                zeile.Append(ortsteil & t) ' 
+                zeile.Append(strasse & t) ' 
+                zeile.Append(nummer & t) ' 
+                zeile.Append(veraltet & t) ' 
+                zeile.Append(spalte1 & t) '    
+                zeile.Append(gemeindenr & t) '    
+                zeile.Append(strcode & t) '    
+
+                If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
+
+                    zeile.Clear()
+                Else
+                    Debug.Print("oooo")
+                End If
+                idok += 1
+                If idok > maxobj Then Exit For
+            Catch ex As Exception
+                l("fehler2: " & ex.ToString)
+                TextBox2.Text = ic.ToString & Environment.NewLine & " " &
+                          Environment.NewLine &
+                       vid & "/" & ort & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       TextBox2.Text
+                Application.DoEvents()
+            End Try
+            GC.Collect()
+            GC.WaitForFullGCComplete()
+        Next
+        'csvzeileSpeichern(zeile.ToString, puAusgabeStream)
+        zeile.Clear()
+
+        swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
+
+        '####
+        'swfehlt.Close()
+        l("fertig  " & puFehler)
+        ' Process.Start(puFehler)
+    End Sub
+
 
 
     'Private Sub Button16_Click_1(sender As Object, e As EventArgs) Handles Button16.Click
@@ -2796,8 +2921,8 @@ Public Class Form1
 
         If vid = "fehler" Then End
         Dim Sql As String
-        Sql = "SELECT * FROM dokumente where   Bezeichnung<2000000 and Bezeichnung>0  " &
-                  " and (revisionssicher=1) order by Bezeichnung desc "
+        Sql = "SELECT * FROM dokumente where   ort<2000000 and ort>0  " &
+                  " and (revisionssicher=1) order by ort desc "
         Sql = "SELECT * FROM dokumente " &
             " LEFT JOIN t08 " &
             " ON dokumente.DOKUMENTID = t08.DOKID " &
