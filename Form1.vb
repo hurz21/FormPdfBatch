@@ -2227,6 +2227,8 @@ Public Class Form1
         Dim istRevisionssicher As Boolean
         Dim dbdatum As Date
         Dim beschreibung As String
+        Dim maxobj As Integer = 0
+        maxobj = setMaxObj(maxobj)
         Dim eingang As Date
         Dim initial As String
         Dim fullfilename As String
@@ -2268,6 +2270,7 @@ Public Class Form1
                         'MsgBox("Fehler")
                     End If
                     idok += 1
+                    If idok > maxobj Then Exit For
                     swfehlt.WriteLine(idok & " eingefügt/norm")
                 End If
             Catch ex As Exception
@@ -2315,7 +2318,8 @@ Public Class Form1
         ' swfehlt.WriteLine("wechsel")
         ' dokumenteMitFullpathTabelleErstellen(swfehlt)
         Dim Sql As String
-        Dim maxobj As Integer = 500
+        Dim maxobj As Integer = 0
+        maxobj = setMaxObj(maxobj)
         Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_vorgang]  order by ort desc "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
@@ -2336,6 +2340,18 @@ Public Class Form1
 
         'Process.Start(puAusgabe)
     End Sub
+
+    Private Function setMaxObj(maxobj As Integer) As Integer
+        If (TextBox4.Text) = 0 Or TextBox4.Text = "" Then
+            maxobj = 10000000
+        Else
+            If IsNumeric(TextBox4.Text) Then
+                maxobj = CInt(TextBox4.Text)
+            End If
+        End If
+
+        Return maxobj
+    End Function
 
     Private Sub writeDokumentePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
         '####
@@ -2491,7 +2507,8 @@ Public Class Form1
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
-        Dim maxobj As Integer = 190000
+        Dim maxobj As Integer = 0
+        maxobj = setMaxObj(maxobj)
         Sql = "SELECT * FROM [Paradigma].[dbo].[stammdaten_tutti]  order by vorgangsid desc "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
@@ -2772,7 +2789,8 @@ Public Class Form1
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
-        Dim maxobj As Integer = 9999999 '000
+        Dim maxobj As Integer = 0
+        maxobj = setMaxObj(maxobj)
         Sql = "SELECT  *  FROM [Paradigma].[dbo].[PA_SEKID2VID] c inner join [Paradigma].[dbo].PARAADRESSE a  " &
                "     ON c.SEKID = a.ID  " &
                "     order by VORGANGSID desc "
@@ -2889,6 +2907,18 @@ Public Class Form1
         ' Process.Start(puFehler)
     End Sub
 
+    Private Sub Button26_Click(sender As Object, e As EventArgs) Handles Button26.Click
+        'kataster
+        Dim maxobj As Integer = 0
+        maxobj = setMaxObj(maxobj)
+    End Sub
+
+    Private Sub Button23_Click(sender As Object, e As EventArgs) Handles Button23.Click
+        'beteiligte
+        Dim maxobj As Integer = 0
+        maxobj = setMaxObj(maxobj)
+    End Sub
+
 
 
     'Private Sub Button16_Click_1(sender As Object, e As EventArgs) Handles Button16.Click
@@ -2918,7 +2948,8 @@ Public Class Form1
         checkoutRoot = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) & "\paradigma\muell\"
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
         '  vid = modPrep.getVid()
-
+        Dim maxobj As Integer = 0
+        maxobj = setMaxObj(maxobj)
         If vid = "fehler" Then End
         Dim Sql As String
         Sql = "SELECT * FROM dokumente where   ort<2000000 and ort>0  " &

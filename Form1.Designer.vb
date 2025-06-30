@@ -48,13 +48,16 @@ Partial Class Form1
         Me.Button20 = New System.Windows.Forms.Button()
         Me.Button21 = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.Button28 = New System.Windows.Forms.Button()
+        Me.Button27 = New System.Windows.Forms.Button()
+        Me.Button26 = New System.Windows.Forms.Button()
+        Me.Button25 = New System.Windows.Forms.Button()
         Me.Button24 = New System.Windows.Forms.Button()
         Me.Button23 = New System.Windows.Forms.Button()
         Me.Button22 = New System.Windows.Forms.Button()
-        Me.Button25 = New System.Windows.Forms.Button()
-        Me.Button26 = New System.Windows.Forms.Button()
-        Me.Button27 = New System.Windows.Forms.Button()
-        Me.Button28 = New System.Windows.Forms.Button()
+        Me.TextBox4 = New System.Windows.Forms.TextBox()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.Button29 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -298,6 +301,9 @@ Partial Class Form1
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.Button29)
+        Me.GroupBox1.Controls.Add(Me.Label1)
+        Me.GroupBox1.Controls.Add(Me.TextBox4)
         Me.GroupBox1.Controls.Add(Me.Button28)
         Me.GroupBox1.Controls.Add(Me.Button27)
         Me.GroupBox1.Controls.Add(Me.Button26)
@@ -315,6 +321,42 @@ Partial Class Form1
         Me.GroupBox1.TabIndex = 26
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "ProbauG Umsetzung"
+        '
+        'Button28
+        '
+        Me.Button28.Location = New System.Drawing.Point(251, 101)
+        Me.Button28.Name = "Button28"
+        Me.Button28.Size = New System.Drawing.Size(179, 23)
+        Me.Button28.TabIndex = 32
+        Me.Button28.Text = "11. Synthetische Dokus"
+        Me.Button28.UseVisualStyleBackColor = True
+        '
+        'Button27
+        '
+        Me.Button27.Location = New System.Drawing.Point(251, 20)
+        Me.Button27.Name = "Button27"
+        Me.Button27.Size = New System.Drawing.Size(179, 23)
+        Me.Button27.TabIndex = 31
+        Me.Button27.Text = "8. Wiedervorlagen"
+        Me.Button27.UseVisualStyleBackColor = True
+        '
+        'Button26
+        '
+        Me.Button26.Location = New System.Drawing.Point(7, 154)
+        Me.Button26.Name = "Button26"
+        Me.Button26.Size = New System.Drawing.Size(211, 23)
+        Me.Button26.TabIndex = 30
+        Me.Button26.Text = "6. Kataster-Flurstück"
+        Me.Button26.UseVisualStyleBackColor = True
+        '
+        'Button25
+        '
+        Me.Button25.Location = New System.Drawing.Point(251, 72)
+        Me.Button25.Name = "Button25"
+        Me.Button25.Size = New System.Drawing.Size(179, 23)
+        Me.Button25.TabIndex = 29
+        Me.Button25.Text = "10. Sachbearbeiter"
+        Me.Button25.UseVisualStyleBackColor = True
         '
         'Button24
         '
@@ -343,41 +385,31 @@ Partial Class Form1
         Me.Button22.Text = "5.Lage-Adresse"
         Me.Button22.UseVisualStyleBackColor = True
         '
-        'Button25
+        'TextBox4
         '
-        Me.Button25.Location = New System.Drawing.Point(251, 72)
-        Me.Button25.Name = "Button25"
-        Me.Button25.Size = New System.Drawing.Size(179, 23)
-        Me.Button25.TabIndex = 29
-        Me.Button25.Text = "10. Sachbearbeiter"
-        Me.Button25.UseVisualStyleBackColor = True
+        Me.TextBox4.Location = New System.Drawing.Point(75, 222)
+        Me.TextBox4.Name = "TextBox4"
+        Me.TextBox4.Size = New System.Drawing.Size(107, 20)
+        Me.TextBox4.TabIndex = 33
+        Me.TextBox4.Text = "100"
         '
-        'Button26
+        'Label1
         '
-        Me.Button26.Location = New System.Drawing.Point(7, 154)
-        Me.Button26.Name = "Button26"
-        Me.Button26.Size = New System.Drawing.Size(211, 23)
-        Me.Button26.TabIndex = 30
-        Me.Button26.Text = "6. Kataster-Flurstück"
-        Me.Button26.UseVisualStyleBackColor = True
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(4, 225)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(70, 13)
+        Me.Label1.TabIndex = 34
+        Me.Label1.Text = "Max. Objekte"
         '
-        'Button27
+        'Button29
         '
-        Me.Button27.Location = New System.Drawing.Point(251, 20)
-        Me.Button27.Name = "Button27"
-        Me.Button27.Size = New System.Drawing.Size(179, 23)
-        Me.Button27.TabIndex = 31
-        Me.Button27.Text = "8. Wiedervorlagen"
-        Me.Button27.UseVisualStyleBackColor = True
-        '
-        'Button28
-        '
-        Me.Button28.Location = New System.Drawing.Point(251, 101)
-        Me.Button28.Name = "Button28"
-        Me.Button28.Size = New System.Drawing.Size(179, 23)
-        Me.Button28.TabIndex = 32
-        Me.Button28.Text = "11. Synthetische Dokus"
-        Me.Button28.UseVisualStyleBackColor = True
+        Me.Button29.Location = New System.Drawing.Point(174, 220)
+        Me.Button29.Name = "Button29"
+        Me.Button29.Size = New System.Drawing.Size(44, 23)
+        Me.Button29.TabIndex = 35
+        Me.Button29.Text = "X"
+        Me.Button29.UseVisualStyleBackColor = True
         '
         'Form1
         '
@@ -409,6 +441,7 @@ Partial Class Form1
         Me.Name = "Form1"
         Me.Text = "Form1"
         Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout
 
@@ -447,4 +480,7 @@ End Sub
     Friend WithEvents Button25 As Button
     Friend WithEvents Button28 As Button
     Friend WithEvents Button27 As Button
+    Friend WithEvents Button29 As Button
+    Friend WithEvents Label1 As Label
+    Friend WithEvents TextBox4 As TextBox
 End Class
