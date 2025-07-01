@@ -2782,7 +2782,7 @@ Public Class Form1
     End Function
 
     Private Sub Button22_Click(sender As Object, e As EventArgs) Handles Button22.Click
-        'probaugstammdaten
+        'adresse
         Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_LageAdresse" & Environment.UserName & ".txt"
         Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "PU_LageAdresse" & ".csv"
         Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
@@ -2797,7 +2797,6 @@ Public Class Form1
         Sql = "select * from  [Paradigma].[dbo].[PA_mitRH]      order by VORGANGSID desc "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        'writeDokumentePU(puFehler, puAusgabeStream, Sql, maxobj)
         writeAdresseausgabePU(puFehler, puAusgabeStream, Sql, maxobj)
         puAusgabeStream.Close()
         puAusgabeStream.Dispose()
@@ -2908,9 +2907,141 @@ Public Class Form1
     End Sub
 
     Private Sub Button26_Click(sender As Object, e As EventArgs) Handles Button26.Click
-        'kataster
+        'kataster 
+        Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_kataster" & Environment.UserName & ".txt"
+        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "PU_kataster" & ".csv"
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        swfehlt = New IO.StreamWriter(puFehler)
+        swfehlt.AutoFlush = True
+        Dim Sql As String
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
+
+        Sql = "select * from PF_mitRH as a, raumbezug as r  where a.id=r.sekid and typ=2      order by vid desc  "
+        TextBox1.Text = puAusgabe
+        TextBox2.Text = Sql
+        'writeAdresseausgabePU(puFehler, puAusgabeStream, Sql, maxobj)
+        writeKatasterausgabePU(puFehler, puAusgabeStream, Sql, maxobj)
+        puAusgabeStream.Close()
+        puAusgabeStream.Dispose()
+        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
+    End Sub
+
+    Private Sub writeKatasterausgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
+        Dim DT As DataTable
+        Dim idok As Integer = 0
+        puAusgabeStream.AutoFlush = True
+        swfehlt.WriteLine("writeKatasterausgabePU---")
+        DT = alleDokumentDatenHolen(sql)
+
+        Dim ic As Integer = 0
+        Dim igesamt As Integer = 0
+        Dim gemarkung, flur, flurstueck, ost, nord, freitext, funktion, gemcode, abstrakt, FS, flaecheqm As String
+        Dim newsavemode As Boolean
+        Dim istRevisionssicher As Boolean
+        Dim dbdatum, hauptaktenjahr As Date
+        Dim spalte1 As String
+        Dim veraltet As String
+        Dim eingang, antrag, vollstaendig, bescheid, abgeschlossen As Date
+        Dim aktenstandort As String
+        Dim myoracle As SqlClient.SqlConnection
+        myoracle = getMSSQLCon()
+        myoracle.Open()
+        Dim zeile As New Text.StringBuilder
+        Dim fullfilename As String
+        Dim t As String = ";"
+        Dim geschlossen As String = "0"
+        l("writeKatasterausgabePU")
+
+        'kopfzeile
+        zeile.Append("az" & t) '     vid   
+        zeile.Append("jahr" & t) '     eingang
+        zeile.Append("Gemarkung" & t) '  gemarkungstext    
+        zeile.Append("flur" & t) '  flur
+        zeile.Append("flurstueck" & t) '  znkombi
+        zeile.Append("ostwert" & t) '   rechts    
+        zeile.Append("nordwert" & t) ' hoch
+        zeile.Append("veraltet" & t) '
+        zeile.Append("spalte1" & t)
+        zeile.Append("spalte2" & t) ' 
+        zeile.Append("funktion" & t) 'titel
+        zeile.Append("freitext" & t) 'freitext
+        zeile.Append("abstract" & t) 'abstrakt
+        zeile.Append("gemarkungscode" & t) 'gemcode
+        zeile.Append("FS" & t) 'fs
+        zeile.Append("flaeche" & t) 'flaecheqm
+        'zeile.Append("Funktion" & t) ' 
+        'zeile.Append("Freitext" & t) ' 
+        csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
+        For Each drr As DataRow In DT.Rows
+            Try
+                igesamt += 1
+                vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+                gemarkung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemarkungstext"))))
+                flur = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("flur"))))
+                flurstueck = cleanString((clsDBtools.fieldvalue(drr.Item("znkombi"))))
+                ost = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("rechts"))))
+                nord = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("hoch"))))
+
+                spalte1 = ""
+                spalte1 = ""
+                funktion = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("titel"))))
+                freitext = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("freitext"))))
+                abstrakt = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("abstract"))))
+                gemcode = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemcode"))))
+                FS = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fs"))))
+                flaecheqm = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("flaecheqm"))))
+                'freitext = CDate(clsDBtools.fieldvalueDate(drr.Item("freitext")))
+                'funktion = CDate(clsDBtools.fieldvalueDate(drr.Item("funktion"))) 
+                TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
+                Application.DoEvents()
+                'zeilebilden
+                zeile.Append(vid & t) 'Az
+                zeile.Append(eingang.ToString("yyyy") & t) 'jahr 
+                zeile.Append(gemarkung & t) ' 
+                zeile.Append(flur & t) ' 
+                zeile.Append(flurstueck & t) ' 
+                zeile.Append(ost & t) ' 
+                zeile.Append(nord & t) ' 
+                zeile.Append(spalte1 & t) ' veraltet
+                zeile.Append(spalte1 & t) ' 
+                zeile.Append(spalte1 & t) ' 
+                zeile.Append(funktion & t) ' 
+                zeile.Append(freitext & t) ' 
+                zeile.Append(abstrakt & t) '    
+                zeile.Append(gemcode & t) '    
+                zeile.Append(FS & t) '    
+                zeile.Append(flaecheqm & t) '    
+
+                If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
+
+                    zeile.Clear()
+                Else
+                    Debug.Print("oooo")
+                End If
+                idok += 1
+                If idok > maxobj Then Exit For
+            Catch ex As Exception
+                l("fehler2: " & ex.ToString)
+                TextBox2.Text = ic.ToString & Environment.NewLine & " " &
+                          Environment.NewLine &
+                       vid & "/" & vid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       TextBox2.Text
+                Application.DoEvents()
+            End Try
+            GC.Collect()
+            GC.WaitForFullGCComplete()
+        Next
+        'csvzeileSpeichern(zeile.ToString, puAusgabeStream)
+        zeile.Clear()
+
+        swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
+
+        '####
+        'swfehlt.Close()
+        l("fertig  " & puFehler)
+        ' Process.Start(puFehler)
     End Sub
 
     Private Sub Button23_Click(sender As Object, e As EventArgs) Handles Button23.Click
