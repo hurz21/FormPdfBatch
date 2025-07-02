@@ -59,6 +59,7 @@ Partial Class Form1
         Me.Button24 = New System.Windows.Forms.Button()
         Me.Button23 = New System.Windows.Forms.Button()
         Me.Button22 = New System.Windows.Forms.Button()
+        Me.Button31 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -302,6 +303,7 @@ Partial Class Form1
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.Button31)
         Me.GroupBox1.Controls.Add(Me.Button30)
         Me.GroupBox1.Controls.Add(Me.Button29)
         Me.GroupBox1.Controls.Add(Me.Label1)
@@ -422,6 +424,15 @@ Partial Class Form1
         Me.Button22.Text = "5.Lage-Adresse"
         Me.Button22.UseVisualStyleBackColor = True
         '
+        'Button31
+        '
+        Me.Button31.Location = New System.Drawing.Point(251, 154)
+        Me.Button31.Name = "Button31"
+        Me.Button31.Size = New System.Drawing.Size(179, 23)
+        Me.Button31.TabIndex = 37
+        Me.Button31.Text = "13. geopolygone"
+        Me.Button31.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -495,4 +506,5 @@ End Sub
     Friend WithEvents Label1 As Label
     Friend WithEvents TextBox4 As TextBox
     Friend WithEvents Button30 As Button
+    Friend WithEvents Button31 As Button
 End Class

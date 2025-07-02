@@ -2472,7 +2472,7 @@ Public Class Form1
             Text = Text.Replace(";", "_")
             Text = Text.Replace(vbCrLf, "")
             Text = clsString.noWhiteSpace(Text, " ")
-            Return Text
+            Return Text.Trim
         Catch ex As Exception
             Return "clean_error"
         End Try
@@ -3089,6 +3089,7 @@ Public Class Form1
         ausgabeAntragsteller.Dispose()
         ausgabeBeteiligte.Close()
         ausgabeBeteiligte.Dispose()
+        swfehlt.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
     End Sub
 
@@ -3136,12 +3137,24 @@ Public Class Form1
                 perscoll = getAllBeteiligte4vorgang(perstemp, vid)
                 If hatAntragsteller(perscoll) Then
                     antragsteller = getAntragsteller(perscoll)
+                    If antragsteller Is Nothing Then Exit For
                     zeileAntragsteller = bildeZeilePerson(eingang, t, antragsteller)
                     'zeile Nach antragsteller ausschreiben
                     csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
                     zeileAntragsteller.Clear()
                 Else
                     'getErstenEintragOrDummy(persocoll)
+                    antragsteller = getErstenEintrag(perscoll)
+                    If antragsteller Is Nothing Then
+                        antragsteller = New person
+                        antragsteller.Name = "dummy"
+                        antragsteller.Vorname = "dummy"
+                        antragsteller.Rolle = "dummy"
+                    End If
+                    zeileAntragsteller = bildeZeilePerson(eingang, t, antragsteller)
+                    'zeile Nach antragsteller ausschreiben
+                    csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
+                    zeileAntragsteller.Clear()
                 End If
                 For Each perso As person In perscoll
                     zeileBeteiligte = bildeZeilePerson(eingang, t, perso)
@@ -3172,6 +3185,20 @@ Public Class Form1
         l("fertig  " & puFehler)
         ' Process.Start(puFehler)
     End Sub
+
+    Private Function getErstenEintrag(perscoll As List(Of person)) As person
+        Try
+            For Each perso As person In perscoll
+                If Not (perso.Rolle.ToLower.Contains("ntragsteller") Or perso.Rolle.ToLower.Contains("eschwerde")) Then
+                    Return perso
+                End If
+            Next
+            Return Nothing
+        Catch ex As Exception
+            l("fertig  " & ex.ToString)
+            Return Nothing
+        End Try
+    End Function
 
     Private Function getAntragsteller(perscoll As List(Of person)) As person
         Try
@@ -3238,7 +3265,7 @@ Public Class Form1
         zeileAntragsteller.Append(eingang.ToString("yyyy") & t) 'jahr 
         zeileAntragsteller.Append(perso.Rolle & t) ' 
         zeileAntragsteller.Append(perso.Anrede & t) ' 
-        zeileAntragsteller.Append(perso.Kontakt.Org.Name & ", " & perso.Kontakt.Org.Zusatz & ", " & perso.Kontakt.Org.Bemerkung & ", " & perso.Kontakt.GesellFunktion & t) ' 
+        zeileAntragsteller.Append(bildeFirma(perso) & t) ' 
         zeileAntragsteller.Append(perso.Namenszusatz & t) ' 
         zeileAntragsteller.Append(perso.Vorname & t) ' 
         zeileAntragsteller.Append(perso.Name & t) ' 
@@ -3250,8 +3277,8 @@ Public Class Form1
         zeileAntragsteller.Append(perso.Kontakt.Anschrift.Gemeindename & t) ' 
         zeileAntragsteller.Append(perso.Bemerkung & t) ' zusatz1
         zeileAntragsteller.Append("" & perso.Kontakt.Anschrift.Postfach & t) ' zusatz2
-        zeileAntragsteller.Append(perso.Kontakt.elektr.Telefon1 & ", " & perso.Kontakt.elektr.Telefon2 & t) ' 
-        zeileAntragsteller.Append(perso.Kontakt.elektr.Fax1 & ", " & perso.Kontakt.elektr.Fax2 & t) ' 
+        zeileAntragsteller.Append((perso.Kontakt.elektr.Telefon1 & ", " & perso.Kontakt.elektr.Telefon2).Replace(", ", "") & t) ' 
+        zeileAntragsteller.Append((perso.Kontakt.elektr.Fax1 & ", " & perso.Kontakt.elektr.Fax2).Replace(", ", "") & t) ' 
         zeileAntragsteller.Append(perso.Kontakt.elektr.MobilFon & t) ' 
         zeileAntragsteller.Append(perso.Kontakt.elektr.Email & t) ' 
         zeileAntragsteller.Append("" & t) ' de-mail
@@ -3261,6 +3288,10 @@ Public Class Form1
         zeileAntragsteller.Append("" & t) ' spalte1
         zeileAntragsteller.Append(perso.Kassenkonto & t) '  
         Return zeileAntragsteller
+    End Function
+
+    Private Shared Function bildeFirma(perso As person) As String
+        Return (perso.Kontakt.Org.Name & ", " & perso.Kontakt.Org.Zusatz & ", " & perso.Kontakt.Org.Bemerkung & ", " & perso.Kontakt.GesellFunktion).Replace(", , , ", "")
     End Function
 
     Private Function getAllBeteiligte4vorgang(perstemp As person, vid As String) As List(Of person)
