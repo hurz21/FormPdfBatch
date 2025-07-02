@@ -48,6 +48,7 @@ Partial Class Form1
         Me.Button20 = New System.Windows.Forms.Button()
         Me.Button21 = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.Button30 = New System.Windows.Forms.Button()
         Me.Button29 = New System.Windows.Forms.Button()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.TextBox4 = New System.Windows.Forms.TextBox()
@@ -58,7 +59,6 @@ Partial Class Form1
         Me.Button24 = New System.Windows.Forms.Button()
         Me.Button23 = New System.Windows.Forms.Button()
         Me.Button22 = New System.Windows.Forms.Button()
-        Me.Button30 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -324,6 +324,15 @@ Partial Class Form1
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "ProbauG Umsetzung"
         '
+        'Button30
+        '
+        Me.Button30.Location = New System.Drawing.Point(7, 184)
+        Me.Button30.Name = "Button30"
+        Me.Button30.Size = New System.Drawing.Size(211, 23)
+        Me.Button30.TabIndex = 36
+        Me.Button30.Text = "7. Antragsteller u. Beteiligte"
+        Me.Button30.UseVisualStyleBackColor = True
+        '
         'Button29
         '
         Me.Button29.Location = New System.Drawing.Point(174, 220)
@@ -401,7 +410,7 @@ Partial Class Form1
         Me.Button23.Name = "Button23"
         Me.Button23.Size = New System.Drawing.Size(179, 22)
         Me.Button23.TabIndex = 27
-        Me.Button23.Text = "8. Beteiligte"
+        Me.Button23.Text = "8.  "
         Me.Button23.UseVisualStyleBackColor = True
         '
         'Button22
@@ -412,15 +421,6 @@ Partial Class Form1
         Me.Button22.TabIndex = 26
         Me.Button22.Text = "5.Lage-Adresse"
         Me.Button22.UseVisualStyleBackColor = True
-        '
-        'Button30
-        '
-        Me.Button30.Location = New System.Drawing.Point(7, 184)
-        Me.Button30.Name = "Button30"
-        Me.Button30.Size = New System.Drawing.Size(211, 23)
-        Me.Button30.TabIndex = 36
-        Me.Button30.Text = "7. Antragsteller"
-        Me.Button30.UseVisualStyleBackColor = True
         '
         'Form1
         '

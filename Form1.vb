@@ -2359,7 +2359,7 @@ Public Class Form1
         Dim DT As DataTable
         Dim idok As Integer = 0
         puAusgabeStream.AutoFlush = True
-        'puAusgabeStream.WriteLine(Now)
+        'ausgabeAntragsteller.WriteLine(Now)
         l("PDFumwandeln ")
         swfehlt.WriteLine("Teil2 normale Dokumente ausschreiben ---------------------")
 
@@ -2513,7 +2513,7 @@ Public Class Form1
         Sql = "SELECT * FROM [Paradigma].[dbo].[stammdaten_tutti]  order by vorgangsid desc "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        'writeDokumentePU(puFehler, puAusgabeStream, Sql, maxobj)
+        'writeDokumentePU(puFehler, ausgabeAntragsteller, Sql, maxobj)
         writeStammdatenPU(puFehler, puAusgabeStream, Sql, maxobj)
         puAusgabeStream.Close()
         puAusgabeStream.Dispose()
@@ -2652,7 +2652,7 @@ Public Class Form1
             GC.Collect()
             GC.WaitForFullGCComplete()
         Next
-        'csvzeileSpeichern(zeileAntragsteller.ToString, puAusgabeStream)
+        'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
         zeile.Clear()
 
         swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
@@ -2913,7 +2913,7 @@ Public Class Form1
             GC.Collect()
             GC.WaitForFullGCComplete()
         Next
-        'csvzeileSpeichern(zeileAntragsteller.ToString, puAusgabeStream)
+        'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
         zeile.Clear()
 
         swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
@@ -2938,7 +2938,7 @@ Public Class Form1
         Sql = "select * from PF_mitRH as a, raumbezug as r  where a.id=r.sekid and typ=2      order by vid desc  "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        'writeAdresseausgabePU(puFehler, puAusgabeStream, Sql, maxobj)
+        'writeAdresseausgabePU(puFehler, ausgabeAntragsteller, Sql, maxobj)
         writeKatasterausgabePU(puFehler, puAusgabeStream, Sql, maxobj)
         puAusgabeStream.Close()
         puAusgabeStream.Dispose()
@@ -3051,7 +3051,7 @@ Public Class Form1
             GC.Collect()
             GC.WaitForFullGCComplete()
         Next
-        'csvzeileSpeichern(zeileAntragsteller.ToString, puAusgabeStream)
+        'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
         zeile.Clear()
 
         swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
@@ -3072,7 +3072,9 @@ Public Class Form1
         'antragsteller
         Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_antragsteller" & Environment.UserName & ".txt"
         Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "PU_antragsteller" & ".csv"
-        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        Dim pubeteiligte As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "PU_beteiligte" & ".csv"
+        Dim ausgabeAntragsteller As New IO.StreamWriter(puAusgabe)
+        Dim ausgabeBeteiligte As New IO.StreamWriter(pubeteiligte)
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
@@ -3082,16 +3084,18 @@ Public Class Form1
         Sql = "select vorgangsid,eingang from stammdaten_tutti     order by vorgangsid desc   "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        writeAntragstellerausgabePU(puFehler, puAusgabeStream, Sql, maxobj)
-        puAusgabeStream.Close()
-        puAusgabeStream.Dispose()
+        writeAntragstellerausgabePU(puFehler, ausgabeAntragsteller, ausgabeBeteiligte, Sql, maxobj)
+        ausgabeAntragsteller.Close()
+        ausgabeAntragsteller.Dispose()
+        ausgabeBeteiligte.Close()
+        ausgabeBeteiligte.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
     End Sub
 
-    Private Sub writeAntragstellerausgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
+    Private Sub writeAntragstellerausgabePU(puFehler As String, ausgabeAntragsteller As IO.StreamWriter, ausgabeBeteiligte As IO.StreamWriter, sql As String, maxobj As Integer)
         Dim DT As DataTable
         Dim idok As Integer = 0
-        puAusgabeStream.AutoFlush = True
+        ausgabeAntragsteller.AutoFlush = True
         swfehlt.WriteLine("writeKatasterausgabePU---")
         DT = alleDokumentDatenHolen(sql)
 
@@ -3110,13 +3114,80 @@ Public Class Form1
         myoracle.Open()
         Dim zeileAntragsteller As New Text.StringBuilder
         Dim zeileBeteiligte As New Text.StringBuilder
-        Dim fullfilename As String
         Dim t As String = ";"
         Dim geschlossen As String = "0"
         l("writeKatasterausgabePU")
         Dim perstemp As New person
         Dim perscoll As New List(Of person)
         'kopfzeile
+        bildeKopfZeile(zeileAntragsteller, t)
+        bildeKopfZeile(zeileBeteiligte, t)
+        csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller) : zeileAntragsteller.Clear()
+        csvzeileSpeichern(zeileBeteiligte.ToString, ausgabeBeteiligte) : zeileBeteiligte.Clear()
+        Dim antragsteller As New person
+        Dim beteiligter As New person
+        For Each drr As DataRow In DT.Rows  'alle vorgänge
+            Try
+                antragsteller = New person
+                igesamt += 1
+                TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
+                vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+                eingang = CStr(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+                perscoll = getAllBeteiligte4vorgang(perstemp, vid)
+                If hatAntragsteller(perscoll) Then
+                    antragsteller = getAntragsteller(perscoll)
+                    zeileAntragsteller = bildeZeilePerson(eingang, t, antragsteller)
+                    'zeile Nach antragsteller ausschreiben
+                    csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
+                    zeileAntragsteller.Clear()
+                Else
+                    'getErstenEintragOrDummy(persocoll)
+                End If
+                For Each perso As person In perscoll
+                    zeileBeteiligte = bildeZeilePerson(eingang, t, perso)
+                    If csvzeileSpeichern(zeileBeteiligte.ToString, ausgabeBeteiligte) Then
+                        zeileBeteiligte.Clear()
+                    End If
+                Next
+            Catch ex As Exception
+                l("fehler2: " & ex.ToString)
+                TextBox2.Text = ic.ToString & Environment.NewLine & " " &
+                          Environment.NewLine &
+                       vid & "/" & vid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       TextBox2.Text
+                Application.DoEvents()
+            End Try
+            GC.Collect()
+            GC.WaitForFullGCComplete()
+            idok += 1
+            If idok > maxobj Then Exit For
+        Next
+        'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
+        zeileAntragsteller.Clear()
+
+        swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
+
+        '####
+        'swfehlt.Close()
+        l("fertig  " & puFehler)
+        ' Process.Start(puFehler)
+    End Sub
+
+    Private Function getAntragsteller(perscoll As List(Of person)) As person
+        Try
+            For Each perso As person In perscoll
+                If perso.Rolle.ToLower.Contains("ntragsteller") Or perso.Rolle.ToLower.Contains("eschwerde") Then
+                    Return perso
+                End If
+            Next
+            Return Nothing
+        Catch ex As Exception
+            l("fertig  " & ex.ToString)
+            Return Nothing
+        End Try
+    End Function
+
+    Private Shared Sub bildeKopfZeile(zeileAntragsteller As System.Text.StringBuilder, t As String)
         zeileAntragsteller.Append("az" & t) '     vid   
         zeileAntragsteller.Append("jahr" & t) '     eingang
         zeileAntragsteller.Append("Obergruppe" & t) '  rolle    
@@ -3143,73 +3214,54 @@ Public Class Form1
         zeileAntragsteller.Append("personennummer" & t) 'fs
         zeileAntragsteller.Append("spalte1" & t)
         zeileAntragsteller.Append("KASSENKONTO" & t)
-        csvzeileSpeichern(zeileAntragsteller.ToString, puAusgabeStream) : zeileAntragsteller.Clear()
-        For Each drr As DataRow In DT.Rows
-            Try
-                igesamt += 1
-                TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
-                vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                perscoll = getAllBeteiligte4vorgang(perstemp, vid)
-                For Each perso As person In perscoll
-                    zeileAntragsteller.Append(vid & t) 'Az
-                    zeileAntragsteller.Append(eingang.ToString("yyyy") & t) 'jahr 
-                    zeileAntragsteller.Append(perso.Rolle & t) ' 
-                    zeileAntragsteller.Append(perso.Anrede & t) ' 
-                    zeileAntragsteller.Append(perso.Kontakt.Org.Name & ", " & perso.Kontakt.Org.Zusatz & ", " & perso.Kontakt.Org.Bemerkung & ", " & perso.Kontakt.GesellFunktion & t) ' 
-                    zeileAntragsteller.Append(perso.Namenszusatz & t) ' 
-                    zeileAntragsteller.Append(perso.Vorname & t) ' 
-                    zeileAntragsteller.Append(perso.Name & t) ' 
-                    zeileAntragsteller.Append(perso.Kontakt.Anschrift.Strasse & t) ' 
-                    zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr
-                    zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr bis
-                    zeileAntragsteller.Append("Deutschland" & t) ' 
-                    zeileAntragsteller.Append(perso.Kontakt.Anschrift.PLZ & t) ' 
-                    zeileAntragsteller.Append(perso.Kontakt.Anschrift.Gemeindename & t) ' 
-                    zeileAntragsteller.Append(perso.Bemerkung & t) ' zusatz1
-                    zeileAntragsteller.Append("" & perso.Kontakt.Anschrift.Postfach & t) ' zusatz2
-                    zeileAntragsteller.Append(perso.Kontakt.elektr.Telefon1 & ", " & perso.Kontakt.elektr.Telefon2 & t) ' 
-                    zeileAntragsteller.Append(perso.Kontakt.elektr.Fax1 & ", " & perso.Kontakt.elektr.Fax2 & t) ' 
-                    zeileAntragsteller.Append(perso.Kontakt.elektr.MobilFon & t) ' 
-                    zeileAntragsteller.Append(perso.Kontakt.elektr.Email & t) ' 
-                    zeileAntragsteller.Append("" & t) ' de-mail
-                    zeileAntragsteller.Append(perso.Kontakt.elektr.Homepage & t) ' 
-                    zeileAntragsteller.Append(perso.Kassenkonto & t) ' ZEICHEN IHAH
-                    zeileAntragsteller.Append(perso.PersonenID & t) ' 
-                    zeileAntragsteller.Append("" & t) ' spalte1
-                    zeileAntragsteller.Append(perso.Kassenkonto & t) '  
-
-
-                    If csvzeileSpeichern(zeileAntragsteller.ToString, puAusgabeStream) Then
-
-                        zeileAntragsteller.Clear()
-                    Else
-                        Debug.Print("oooo")
-                    End If
-
-                Next
-            Catch ex As Exception
-                l("fehler2: " & ex.ToString)
-                TextBox2.Text = ic.ToString & Environment.NewLine & " " &
-                          Environment.NewLine &
-                       vid & "/" & vid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
-                       TextBox2.Text
-                Application.DoEvents()
-            End Try
-            GC.Collect()
-            GC.WaitForFullGCComplete()
-            idok += 1
-            If idok > maxobj Then Exit For
-        Next
-        'csvzeileSpeichern(zeileAntragsteller.ToString, puAusgabeStream)
-        zeileAntragsteller.Clear()
-
-        swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
-
-        '####
-        'swfehlt.Close()
-        l("fertig  " & puFehler)
-        ' Process.Start(puFehler)
     End Sub
+
+    Private Function hatAntragsteller(perscoll As List(Of person)) As Boolean
+        Try
+            For Each perso As person In perscoll
+                If perso.Rolle.ToLower.Contains("ntragsteller") Or perso.Rolle.ToLower.Contains("eschwerde") Then
+                    Return True
+                End If
+            Next
+            Return False
+        Catch ex As Exception
+            l("fertig  " & ex.ToString)
+            Return False
+        End Try
+    End Function
+
+    Private Shared Function bildeZeilePerson(eingang As Date, t As String, perso As person) As Text.StringBuilder
+        Dim zeileAntragsteller As New Text.StringBuilder
+
+        zeileAntragsteller.Clear()
+        zeileAntragsteller.Append(vid & t) 'Az
+        zeileAntragsteller.Append(eingang.ToString("yyyy") & t) 'jahr 
+        zeileAntragsteller.Append(perso.Rolle & t) ' 
+        zeileAntragsteller.Append(perso.Anrede & t) ' 
+        zeileAntragsteller.Append(perso.Kontakt.Org.Name & ", " & perso.Kontakt.Org.Zusatz & ", " & perso.Kontakt.Org.Bemerkung & ", " & perso.Kontakt.GesellFunktion & t) ' 
+        zeileAntragsteller.Append(perso.Namenszusatz & t) ' 
+        zeileAntragsteller.Append(perso.Vorname & t) ' 
+        zeileAntragsteller.Append(perso.Name & t) ' 
+        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Strasse & t) ' 
+        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr
+        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr bis
+        zeileAntragsteller.Append("Deutschland" & t) ' 
+        zeileAntragsteller.Append(perso.Kontakt.Anschrift.PLZ & t) ' 
+        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Gemeindename & t) ' 
+        zeileAntragsteller.Append(perso.Bemerkung & t) ' zusatz1
+        zeileAntragsteller.Append("" & perso.Kontakt.Anschrift.Postfach & t) ' zusatz2
+        zeileAntragsteller.Append(perso.Kontakt.elektr.Telefon1 & ", " & perso.Kontakt.elektr.Telefon2 & t) ' 
+        zeileAntragsteller.Append(perso.Kontakt.elektr.Fax1 & ", " & perso.Kontakt.elektr.Fax2 & t) ' 
+        zeileAntragsteller.Append(perso.Kontakt.elektr.MobilFon & t) ' 
+        zeileAntragsteller.Append(perso.Kontakt.elektr.Email & t) ' 
+        zeileAntragsteller.Append("" & t) ' de-mail
+        zeileAntragsteller.Append(perso.Kontakt.elektr.Homepage & t) ' 
+        zeileAntragsteller.Append(perso.Kassenkonto & t) ' ZEICHEN IHAH
+        zeileAntragsteller.Append(perso.PersonenID & t) ' 
+        zeileAntragsteller.Append("" & t) ' spalte1
+        zeileAntragsteller.Append(perso.Kassenkonto & t) '  
+        Return zeileAntragsteller
+    End Function
 
     Private Function getAllBeteiligte4vorgang(perstemp As person, vid As String) As List(Of person)
         Dim sql As String = "select * from beteiligte_t6 where vorgangsid=" & vid
