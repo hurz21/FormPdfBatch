@@ -1,6 +1,7 @@
 ﻿Imports System.Drawing.Imaging
 Imports System.Runtime.InteropServices
 Imports Acrobat
+Imports Microsoft.Office.Interop
 
 Public Class Form1
     Public wordVorlagen As New Microsoft.Office.Interop.Word.Application 'habe hier new ergänzt ????
@@ -2426,8 +2427,8 @@ Public Class Form1
                 zeile.Append(cleanString(dateinameext).Trim & t) 'ordner im mediencenter
 
                 'If iblock < blockMAX Then
-                '    block.AppendLine(zeile.ToString)
-                '    zeile.Clear()
+                '    block.AppendLine(zeileAntragsteller.ToString)
+                '    zeileAntragsteller.Clear()
                 '    iblock += 1
                 'Else
                 If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
@@ -2439,7 +2440,7 @@ Public Class Form1
                 End If
 
 
-                'zeile.Clear()
+                'zeileAntragsteller.Clear()
                 idok += 1
                 If idok > maxobj Then Exit For
             Catch ex As Exception
@@ -2565,7 +2566,7 @@ Public Class Form1
         zeile.Append("Hauptaktenzeichen" & t) ' (Hauptaktenzeichen) 
         zeile.Append("Hauptaktenjahr" & t) '
         zeile.Append("Notiz" & t) '             (az2 +  altaz + internenr + beschreibung)
-        'zeile.Append("geschlossen" & t) '  
+        'zeileAntragsteller.Append("geschlossen" & t) '  
 
 
         csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
@@ -2622,10 +2623,10 @@ Public Class Form1
                 zeile.Append((cleanString(Hauptaktenzeichen)) & t) '   
                 zeile.Append(hauptaktenjahr.ToString("yyyyMMdd") & t) 'datum 
                 zeile.Append(cleanString(Notiz) & t) ' 
-                'zeile.Append(geschlossen)
+                'zeileAntragsteller.Append(geschlossen)
                 'If iblock < blockMAX Then
-                '    block.AppendLine(zeile.ToString)
-                '    zeile.Clear()
+                '    block.AppendLine(zeileAntragsteller.ToString)
+                '    zeileAntragsteller.Clear()
                 '    iblock += 1
                 'Else
                 If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
@@ -2637,7 +2638,7 @@ Public Class Form1
                 End If
 
 
-                'zeile.Clear()
+                'zeileAntragsteller.Clear()
                 idok += 1
                 If idok > maxobj Then Exit For
             Catch ex As Exception
@@ -2651,7 +2652,7 @@ Public Class Form1
             GC.Collect()
             GC.WaitForFullGCComplete()
         Next
-        'csvzeileSpeichern(zeile.ToString, puAusgabeStream)
+        'csvzeileSpeichern(zeileAntragsteller.ToString, puAusgabeStream)
         zeile.Clear()
 
         swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
@@ -2795,11 +2796,17 @@ Public Class Form1
                "     ON c.SEKID = a.ID  " &
                "     order by VORGANGSID desc "
         Sql = "select * from  [Paradigma].[dbo].[PA_mitRH]      order by VORGANGSID desc "
+        Sql = "select * from Pa_mitRH as a, raumbezug as r " &
+                "where a.id=r.sekid  and typ=1	"
+
+
+
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         writeAdresseausgabePU(puFehler, puAusgabeStream, Sql, maxobj)
         puAusgabeStream.Close()
         puAusgabeStream.Dispose()
+        swfehlt.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
     End Sub
 
@@ -2812,7 +2819,7 @@ Public Class Form1
 
         Dim ic As Integer = 0
         Dim igesamt As Integer = 0
-        Dim ortsteil, strasse, gemeindenr, ort, nummer, freitext, funktion, strcode As String
+        Dim ortsteil, strasse, gemeindenr, ort, nummer, freitext, funktion, strcode, ost, nord, abstrakt, fs As String
         Dim newsavemode As Boolean
         Dim istRevisionssicher As Boolean
         Dim dbdatum, hauptaktenjahr As Date
@@ -2842,10 +2849,10 @@ Public Class Form1
         zeile.Append("strassencode" & t) ' 
         zeile.Append("rechtswert" & t)
         zeile.Append("hochwert" & t) '
-        zeile.Append("freitext" & t) '
         zeile.Append("funktion" & t) '
-        'zeile.Append("Funktion" & t) ' 
-        'zeile.Append("Freitext" & t) ' 
+        zeile.Append("freitext" & t) '
+        zeile.Append("abstract" & t) 'abstrakt
+        zeile.Append("FS" & t) 'fs
         csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
         For Each drr As DataRow In DT.Rows
             Try
@@ -2860,8 +2867,13 @@ Public Class Form1
                 spalte1 = ""
                 gemeindenr = CStr(clsDBtools.fieldvalue(drr.Item("gemeindenr")))
                 strcode = CStr(clsDBtools.fieldvalue(drr.Item("strcode")))
-                'freitext = CDate(clsDBtools.fieldvalueDate(drr.Item("freitext")))
-                'funktion = CDate(clsDBtools.fieldvalueDate(drr.Item("funktion"))) 
+                ost = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("rechts"))))
+                nord = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("hoch"))))
+                funktion = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("titel"))))
+                freitext = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("freitext"))))
+                abstrakt = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("abstract"))))
+                fs = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fs"))))
+
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
                 Application.DoEvents()
                 'zeilebilden
@@ -2875,6 +2887,12 @@ Public Class Form1
                 zeile.Append(spalte1 & t) '    
                 zeile.Append(gemeindenr & t) '    
                 zeile.Append(strcode & t) '    
+                zeile.Append(ost & t) ' 
+                zeile.Append(nord & t) '  
+                zeile.Append(funktion & t) ' 
+                zeile.Append(freitext & t) ' 
+                zeile.Append(abstrakt & t) '     
+                zeile.Append(fs & t) ' 
 
                 If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
 
@@ -2895,7 +2913,7 @@ Public Class Form1
             GC.Collect()
             GC.WaitForFullGCComplete()
         Next
-        'csvzeileSpeichern(zeile.ToString, puAusgabeStream)
+        'csvzeileSpeichern(zeileAntragsteller.ToString, puAusgabeStream)
         zeile.Clear()
 
         swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
@@ -2970,8 +2988,8 @@ Public Class Form1
         zeile.Append("gemarkungscode" & t) 'gemcode
         zeile.Append("FS" & t) 'fs
         zeile.Append("flaeche" & t) 'flaecheqm
-        'zeile.Append("Funktion" & t) ' 
-        'zeile.Append("Freitext" & t) ' 
+        'zeileAntragsteller.Append("Funktion" & t) ' 
+        'zeileAntragsteller.Append("Freitext" & t) ' 
         csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
         For Each drr As DataRow In DT.Rows
             Try
@@ -3033,7 +3051,7 @@ Public Class Form1
             GC.Collect()
             GC.WaitForFullGCComplete()
         Next
-        'csvzeileSpeichern(zeile.ToString, puAusgabeStream)
+        'csvzeileSpeichern(zeileAntragsteller.ToString, puAusgabeStream)
         zeile.Clear()
 
         swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
@@ -3049,6 +3067,201 @@ Public Class Form1
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
     End Sub
+
+    Private Sub Button30_Click(sender As Object, e As EventArgs) Handles Button30.Click
+        'antragsteller
+        Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_antragsteller" & Environment.UserName & ".txt"
+        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "PU_antragsteller" & ".csv"
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        swfehlt = New IO.StreamWriter(puFehler)
+        swfehlt.AutoFlush = True
+        Dim Sql As String
+        Dim maxobj As Integer = 0
+        maxobj = setMaxObj(maxobj)
+
+        Sql = "select vorgangsid from stammdaten_tutti     order by vorgangsid desc   "
+        TextBox1.Text = puAusgabe
+        TextBox2.Text = Sql
+        writeAntragstellerausgabePU(puFehler, puAusgabeStream, Sql, maxobj)
+        puAusgabeStream.Close()
+        puAusgabeStream.Dispose()
+        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
+    End Sub
+
+    Private Sub writeAntragstellerausgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
+        Dim DT As DataTable
+        Dim idok As Integer = 0
+        puAusgabeStream.AutoFlush = True
+        swfehlt.WriteLine("writeKatasterausgabePU---")
+        DT = alleDokumentDatenHolen(sql)
+
+        Dim ic As Integer = 0
+        Dim igesamt As Integer = 0
+        Dim gemarkung, flur, flurstueck, ost, nord, freitext, funktion, gemcode, abstrakt, FS, flaecheqm As String
+        Dim newsavemode As Boolean
+        Dim istRevisionssicher As Boolean
+        Dim dbdatum, hauptaktenjahr As Date
+        Dim spalte1 As String
+        Dim veraltet As String
+        Dim eingang, antrag, vollstaendig, bescheid, abgeschlossen As Date
+        Dim aktenstandort As String
+        Dim myoracle As SqlClient.SqlConnection
+        myoracle = getMSSQLCon()
+        myoracle.Open()
+        Dim zeileAntragsteller As New Text.StringBuilder
+        Dim zeileBeteiligte As New Text.StringBuilder
+        Dim fullfilename As String
+        Dim t As String = ";"
+        Dim geschlossen As String = "0"
+        l("writeKatasterausgabePU")
+        Dim perstemp As New person
+        Dim perscoll As New List(Of person)
+        'kopfzeile
+        zeileAntragsteller.Append("az" & t) '     vid   
+        zeileAntragsteller.Append("jahr" & t) '     eingang
+        zeileAntragsteller.Append("Obergruppe" & t) '  rolle    
+        zeileAntragsteller.Append("Anrede" & t) '   
+        zeileAntragsteller.Append("Firma" & t) '  znkombi
+        zeileAntragsteller.Append("Titel" & t) '   rechts    
+        zeileAntragsteller.Append("Vorname" & t) ' hoch
+        zeileAntragsteller.Append("nachname" & t) '
+        zeileAntragsteller.Append("strasse" & t)
+        zeileAntragsteller.Append("hausnr" & t) ' 
+        zeileAntragsteller.Append("hausnr bis" & t) 'titel
+        zeileAntragsteller.Append("land" & t) 'freitext
+        zeileAntragsteller.Append("plz" & t) 'abstrakt
+        zeileAntragsteller.Append("ort" & t) 'gemcode
+        zeileAntragsteller.Append("adreszusatzzeile1" & t) 'fs
+        zeileAntragsteller.Append("adreszusatzzeile2" & t) 'fs
+        zeileAntragsteller.Append("telefon" & t) 'fs
+        zeileAntragsteller.Append("fax" & t) 'fs
+        zeileAntragsteller.Append("mobil" & t) 'fs
+        zeileAntragsteller.Append("email" & t) 'fs
+        zeileAntragsteller.Append("de-mail" & t) 'fs
+        zeileAntragsteller.Append("web" & t) 'fs
+        zeileAntragsteller.Append("zeichen" & t) 'fs
+        zeileAntragsteller.Append("personennummer" & t) 'fs
+        zeileAntragsteller.Append("spalte1" & t)
+        zeileAntragsteller.Append("KASSENKONTO" & t)
+        csvzeileSpeichern(zeileAntragsteller.ToString, puAusgabeStream) : zeileAntragsteller.Clear()
+        For Each drr As DataRow In DT.Rows
+            Try
+                igesamt += 1
+                vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+                perscoll = getAllBeteiligte4vorgang(perstemp, vid)
+                For Each perso As person In perscoll
+                    TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
+                    zeileAntragsteller.Append(vid & t) 'Az
+                    zeileAntragsteller.Append(eingang.ToString("yyyy") & t) 'jahr 
+                    zeileAntragsteller.Append(perso.Rolle & t) ' 
+                    zeileAntragsteller.Append(perso.Anrede & t) ' 
+                    zeileAntragsteller.Append(perso.Kontakt.Org.Name & "," & perso.Kontakt.Org.Zusatz & t) ' 
+                    zeileAntragsteller.Append(perso.Namenszusatz & t) ' 
+                    zeileAntragsteller.Append(perso.Vorname & t) ' 
+                    zeileAntragsteller.Append(perso.Name & t) ' 
+                    zeileAntragsteller.Append(perso.Kontakt.Anschrift.Strasse & t) ' 
+                    zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' 
+                    zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' 
+                    zeileAntragsteller.Append("Deutschland" & t) ' 
+                    zeileAntragsteller.Append(perso.Kontakt.Anschrift.PLZ & t) ' 
+                    zeileAntragsteller.Append(perso.Kontakt.Anschrift.Gemeindename & t) ' 
+                    zeileAntragsteller.Append(perso.Bemerkung & t) ' zusatz1
+                    zeileAntragsteller.Append("Postfach: " & perso.Kontakt.Anschrift.Postfach & t) ' zusatz2
+                    zeileAntragsteller.Append(perso.Kontakt.elektr.Telefon1 & "," & perso.Kontakt.elektr.Telefon2 & t) ' 
+                    zeileAntragsteller.Append(perso.Kontakt.elektr.Fax1 & ", " & perso.Kontakt.elektr.Fax2 & t) ' 
+                    zeileAntragsteller.Append(perso.Kontakt.elektr.MobilFon & t) ' 
+                    zeileAntragsteller.Append(perso.Kontakt.elektr.Email & t) ' 
+                    zeileAntragsteller.Append("" & t) ' de-mail
+                    zeileAntragsteller.Append(perso.Kontakt.elektr.Homepage & t) ' 
+                    zeileAntragsteller.Append(perso.Kassenkonto & t) ' ZEICHEN IHAH
+                    zeileAntragsteller.Append(perso.PersonenID & t) ' 
+                    zeileAntragsteller.Append("" & t) ' spalte1
+                    zeileAntragsteller.Append(perso.Kassenkonto & t) '  
+
+
+                    If csvzeileSpeichern(zeileAntragsteller.ToString, puAusgabeStream) Then
+
+                        zeileAntragsteller.Clear()
+                    Else
+                        Debug.Print("oooo")
+                    End If
+                    idok += 1
+                    If idok > maxobj Then Exit For
+                Next
+            Catch ex As Exception
+                l("fehler2: " & ex.ToString)
+                TextBox2.Text = ic.ToString & Environment.NewLine & " " &
+                          Environment.NewLine &
+                       vid & "/" & vid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       TextBox2.Text
+                Application.DoEvents()
+            End Try
+            GC.Collect()
+            GC.WaitForFullGCComplete()
+        Next
+        'csvzeileSpeichern(zeileAntragsteller.ToString, puAusgabeStream)
+        zeileAntragsteller.Clear()
+
+        swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
+
+        '####
+        'swfehlt.Close()
+        l("fertig  " & puFehler)
+        ' Process.Start(puFehler)
+    End Sub
+
+    Private Function getAllBeteiligte4vorgang(perstemp As person, vid As String) As List(Of person)
+        Dim sql As String = "select * from beteiligte_t6 where vorgangsid=" & vid
+        Dim per As New person
+        Dim perlist As New List(Of person)
+        Try
+            'myoracle = getMSSQLCon()
+            'myoracle.Open()
+            dt = alleDokumentDatenHolen(sql)
+            For Each drr As DataRow In dt.Rows
+                per = New person
+                per.Rolle = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("rolle"))))
+                per.Name = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("nachname"))))
+                per.Vorname = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("vorname"))))
+                per.Bemerkung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("bemerkung"))))
+                per.Namenszusatz = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Namenszusatz"))))
+                per.Anrede = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Anrede"))))
+                per.Kontakt.Anschrift.Gemeindename = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Gemeindename"))))
+                per.Kontakt.Anschrift.Strasse = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Strasse"))))
+                per.Kontakt.Anschrift.Hausnr = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Hausnr"))))
+                per.Kontakt.Anschrift.Postfach = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Postfach"))))
+                per.Kontakt.Anschrift.PLZ = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Postfach"))))
+                per.Kontakt.Org.Name = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("plz"))))
+                per.Kontakt.Org.Zusatz = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgzusatz"))))
+                per.Kontakt.Org.Typ1 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgtyp1"))))
+                per.Kontakt.Org.Typ2 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgtyp2"))))
+                per.Kontakt.Org.Eigentuemer = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgEigentuemer"))))
+                per.Quelle = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("quelle"))))
+                per.Kontakt.Org.Bemerkung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgBemerkung"))))
+                per.Kontakt.GesellFunktion = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("GesellFunktion"))))
+                per.Kontakt.elektr.Telefon1 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fftelefon1"))))
+                per.Kontakt.elektr.Telefon2 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fftelefon2"))))
+                per.Kontakt.elektr.Fax1 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFFax1"))))
+                per.Kontakt.elektr.Fax2 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFFax2"))))
+                per.Kontakt.elektr.MobilFon = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFMOBILFON"))))
+                per.Kontakt.elektr.Fax1 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFemail"))))
+                per.Kontakt.elektr.Homepage = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFhomepage"))))
+
+                per.Kassenkonto = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Kassenkonto"))))
+                per.VERTRETENDURCH = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("VERTRETENDURCH"))))
+
+                'für die sepa daten muss man über die personenid holen
+
+                per.Kontakt.BankkontoID = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("personenid"))))
+                perlist.Add(per)
+            Next
+            Return perlist
+        Catch ex As Exception
+            'swfehlt.Close()
+            l("fertig  " & ex.ToString)
+            Return Nothing
+        End Try
+    End Function
 
 
 
