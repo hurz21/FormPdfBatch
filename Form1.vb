@@ -3079,7 +3079,7 @@ Public Class Form1
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
 
-        Sql = "select vorgangsid from stammdaten_tutti     order by vorgangsid desc   "
+        Sql = "select vorgangsid,eingang from stammdaten_tutti     order by vorgangsid desc   "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         writeAntragstellerausgabePU(puFehler, puAusgabeStream, Sql, maxobj)
@@ -3147,27 +3147,27 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
+                TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
                 vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
                 perscoll = getAllBeteiligte4vorgang(perstemp, vid)
                 For Each perso As person In perscoll
-                    TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
                     zeileAntragsteller.Append(vid & t) 'Az
                     zeileAntragsteller.Append(eingang.ToString("yyyy") & t) 'jahr 
                     zeileAntragsteller.Append(perso.Rolle & t) ' 
                     zeileAntragsteller.Append(perso.Anrede & t) ' 
-                    zeileAntragsteller.Append(perso.Kontakt.Org.Name & "," & perso.Kontakt.Org.Zusatz & t) ' 
+                    zeileAntragsteller.Append(perso.Kontakt.Org.Name & ", " & perso.Kontakt.Org.Zusatz & ", " & perso.Kontakt.Org.Bemerkung & ", " & perso.Kontakt.GesellFunktion & t) ' 
                     zeileAntragsteller.Append(perso.Namenszusatz & t) ' 
                     zeileAntragsteller.Append(perso.Vorname & t) ' 
                     zeileAntragsteller.Append(perso.Name & t) ' 
                     zeileAntragsteller.Append(perso.Kontakt.Anschrift.Strasse & t) ' 
-                    zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' 
-                    zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' 
+                    zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr
+                    zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr bis
                     zeileAntragsteller.Append("Deutschland" & t) ' 
                     zeileAntragsteller.Append(perso.Kontakt.Anschrift.PLZ & t) ' 
                     zeileAntragsteller.Append(perso.Kontakt.Anschrift.Gemeindename & t) ' 
                     zeileAntragsteller.Append(perso.Bemerkung & t) ' zusatz1
-                    zeileAntragsteller.Append("Postfach: " & perso.Kontakt.Anschrift.Postfach & t) ' zusatz2
-                    zeileAntragsteller.Append(perso.Kontakt.elektr.Telefon1 & "," & perso.Kontakt.elektr.Telefon2 & t) ' 
+                    zeileAntragsteller.Append("" & perso.Kontakt.Anschrift.Postfach & t) ' zusatz2
+                    zeileAntragsteller.Append(perso.Kontakt.elektr.Telefon1 & ", " & perso.Kontakt.elektr.Telefon2 & t) ' 
                     zeileAntragsteller.Append(perso.Kontakt.elektr.Fax1 & ", " & perso.Kontakt.elektr.Fax2 & t) ' 
                     zeileAntragsteller.Append(perso.Kontakt.elektr.MobilFon & t) ' 
                     zeileAntragsteller.Append(perso.Kontakt.elektr.Email & t) ' 
@@ -3185,8 +3185,7 @@ Public Class Form1
                     Else
                         Debug.Print("oooo")
                     End If
-                    idok += 1
-                    If idok > maxobj Then Exit For
+
                 Next
             Catch ex As Exception
                 l("fehler2: " & ex.ToString)
@@ -3198,6 +3197,8 @@ Public Class Form1
             End Try
             GC.Collect()
             GC.WaitForFullGCComplete()
+            idok += 1
+            If idok > maxobj Then Exit For
         Next
         'csvzeileSpeichern(zeileAntragsteller.ToString, puAusgabeStream)
         zeileAntragsteller.Clear()
@@ -3230,8 +3231,8 @@ Public Class Form1
                 per.Kontakt.Anschrift.Strasse = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Strasse"))))
                 per.Kontakt.Anschrift.Hausnr = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Hausnr"))))
                 per.Kontakt.Anschrift.Postfach = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Postfach"))))
-                per.Kontakt.Anschrift.PLZ = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Postfach"))))
-                per.Kontakt.Org.Name = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("plz"))))
+                per.Kontakt.Anschrift.PLZ = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("plz"))))
+                per.Kontakt.Org.Name = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgname"))))
                 per.Kontakt.Org.Zusatz = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgzusatz"))))
                 per.Kontakt.Org.Typ1 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgtyp1"))))
                 per.Kontakt.Org.Typ2 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgtyp2"))))
@@ -3244,7 +3245,7 @@ Public Class Form1
                 per.Kontakt.elektr.Fax1 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFFax1"))))
                 per.Kontakt.elektr.Fax2 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFFax2"))))
                 per.Kontakt.elektr.MobilFon = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFMOBILFON"))))
-                per.Kontakt.elektr.Fax1 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFemail"))))
+                per.Kontakt.elektr.Email = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFemail"))))
                 per.Kontakt.elektr.Homepage = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFhomepage"))))
 
                 per.Kassenkonto = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Kassenkonto"))))
