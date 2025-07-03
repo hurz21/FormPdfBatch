@@ -29,7 +29,7 @@
                            ByVal drr As DataRow, ByRef datumDB As Date, ByRef istRevisionssicher As Boolean,
 ByRef initial As String, ByRef eid As Integer, ByRef beschreibung As String, ByRef eingang As Date, ByRef fullfilename As String)
         Try
-            vid = CStr(drr.Item("vid"))
+            vid = CStr(drr.Item("bearbeiterID"))
             dokumentid = CStr(drr.Item("dokumentid"))
             eid = CStr(drr.Item("eid"))
             relativpfad = CStr(drr.Item("relativpfad"))

@@ -385,7 +385,7 @@ Partial Class Form1
         Me.Button27.Name = "Button27"
         Me.Button27.Size = New System.Drawing.Size(179, 23)
         Me.Button27.TabIndex = 31
-        Me.Button27.Text = "9. Wiedervorlagen"
+        Me.Button27.Text = "9. Sachbearbeiter "
         Me.Button27.UseVisualStyleBackColor = True
         '
         'Button26
@@ -403,7 +403,7 @@ Partial Class Form1
         Me.Button25.Name = "Button25"
         Me.Button25.Size = New System.Drawing.Size(179, 23)
         Me.Button25.TabIndex = 29
-        Me.Button25.Text = "11. Sachbearbeiter"
+        Me.Button25.Text = "11. Wiedervorlagen"
         Me.Button25.UseVisualStyleBackColor = True
         '
         'Button24
