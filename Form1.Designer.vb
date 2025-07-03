@@ -48,6 +48,7 @@ Partial Class Form1
         Me.Button20 = New System.Windows.Forms.Button()
         Me.Button21 = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.Button31 = New System.Windows.Forms.Button()
         Me.Button30 = New System.Windows.Forms.Button()
         Me.Button29 = New System.Windows.Forms.Button()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -59,7 +60,6 @@ Partial Class Form1
         Me.Button24 = New System.Windows.Forms.Button()
         Me.Button23 = New System.Windows.Forms.Button()
         Me.Button22 = New System.Windows.Forms.Button()
-        Me.Button31 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -326,6 +326,15 @@ Partial Class Form1
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "ProbauG Umsetzung"
         '
+        'Button31
+        '
+        Me.Button31.Location = New System.Drawing.Point(251, 154)
+        Me.Button31.Name = "Button31"
+        Me.Button31.Size = New System.Drawing.Size(179, 23)
+        Me.Button31.TabIndex = 37
+        Me.Button31.Text = "13. geopolygone"
+        Me.Button31.UseVisualStyleBackColor = True
+        '
         'Button30
         '
         Me.Button30.Location = New System.Drawing.Point(7, 184)
@@ -403,7 +412,7 @@ Partial Class Form1
         Me.Button24.Name = "Button24"
         Me.Button24.Size = New System.Drawing.Size(179, 19)
         Me.Button24.TabIndex = 28
-        Me.Button24.Text = "10. Stakeholder"
+        Me.Button24.Text = "10. "
         Me.Button24.UseVisualStyleBackColor = True
         '
         'Button23
@@ -412,7 +421,7 @@ Partial Class Form1
         Me.Button23.Name = "Button23"
         Me.Button23.Size = New System.Drawing.Size(179, 22)
         Me.Button23.TabIndex = 27
-        Me.Button23.Text = "8.  "
+        Me.Button23.Text = "8.  Stakeholder"
         Me.Button23.UseVisualStyleBackColor = True
         '
         'Button22
@@ -423,15 +432,6 @@ Partial Class Form1
         Me.Button22.TabIndex = 26
         Me.Button22.Text = "5.Lage-Adresse"
         Me.Button22.UseVisualStyleBackColor = True
-        '
-        'Button31
-        '
-        Me.Button31.Location = New System.Drawing.Point(251, 154)
-        Me.Button31.Name = "Button31"
-        Me.Button31.Size = New System.Drawing.Size(179, 23)
-        Me.Button31.TabIndex = 37
-        Me.Button31.Text = "13. geopolygone"
-        Me.Button31.UseVisualStyleBackColor = True
         '
         'Form1
         '

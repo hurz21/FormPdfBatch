@@ -3063,16 +3063,153 @@ Public Class Form1
     End Sub
 
     Private Sub Button23_Click(sender As Object, e As EventArgs) Handles Button23.Click
-        'beteiligte
+        'beteiligte 2_stakeholder 
+        Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_beteiligte" & Environment.UserName & ".txt"
+        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "beteiligte_2_stakeholder" & ".csv"
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        swfehlt = New IO.StreamWriter(puFehler)
+        swfehlt.AutoFlush = True
+        Dim Sql As String
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
+        Sql = "select *      FROM [Paradigma].[dbo].[STAKEHOLDER]    order by rolle desc  "
+        TextBox1.Text = puAusgabe
+        TextBox2.Text = Sql
+        'writeKatasterausgabePU(puFehler, puAusgabeStream, Sql, maxobj)
+        'writeAntragstellerausgabePU()
+        writeStakeholderAusgabePU(puFehler, puAusgabeStream, Sql, maxobj)
+        puAusgabeStream.Close()
+        puAusgabeStream.Dispose()
+        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
+        swfehlt.Dispose()
+    End Sub
+
+    Private Sub writeStakeholderAusgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
+        Dim DT As DataTable
+        Dim idok As Integer = 0
+        swfehlt.WriteLine("writeStakeholderAusgabePU---")
+        DT = alleDokumentDatenHolen(sql)
+        Dim ic As Integer = 0
+        Dim igesamt As Integer = 0
+        Dim eingang As Date
+        Dim myoracle As SqlClient.SqlConnection
+        myoracle = getMSSQLCon()
+        myoracle.Open()
+        Dim zeileBeteiligte As New Text.StringBuilder
+        Dim t As String = ";"
+        Dim geschlossen As String = "0"
+        l("writeKatasterausgabePU")
+        Dim perstemp As New person
+        Dim perscoll As New List(Of person)
+        'kopfzeile
+        bildeKopfZeileStakeholder(zeileBeteiligte, t)
+        csvzeileSpeichern(zeileBeteiligte.ToString, puAusgabeStream) : zeileBeteiligte.Clear()
+        Dim beteiligter As New person
+        'For Each drr As DataRow In DT.Rows  'alle vorgänge
+        Try
+                beteiligter = New person
+                igesamt += 1
+                TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
+            vid = 0 'CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+            eingang = CDate("1911-01-01") ' ""CStr(clsDBtools.fieldvalueDate(drr.Item("eingang")))'""
+            perscoll = getAllStakeholders(perstemp, DT)
+
+            For Each perso As person In perscoll
+                zeileBeteiligte = bildeZeilePerson(eingang, t, perso)
+                If csvzeileSpeichern(zeileBeteiligte.ToString, puAusgabeStream) Then
+                    zeileBeteiligte.Clear()
+                End If
+            Next
+        Catch ex As Exception
+                l("ddd" & ex.ToString)
+            End Try
+        'Next
+    End Sub
+
+    Private Function getAllStakeholders(perstemp As person, dt As DataTable) As List(Of person)
+        Dim perlist As New List(Of person)
+        Dim per As New person
+        Try
+
+            For Each drr As DataRow In dt.Rows
+                per = New person
+                per.Rolle = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("rolle"))))
+                per.Name = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("nachname"))))
+                per.Vorname = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("vorname"))))
+                per.Bemerkung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("bemerkung"))))
+                per.Namenszusatz = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Namenszusatz"))))
+                per.Anrede = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Anrede"))))
+                per.Kontakt.Anschrift.Gemeindename = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Gemeindename"))))
+                per.Kontakt.Anschrift.Strasse = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Strasse"))))
+                per.Kontakt.Anschrift.Hausnr = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Hausnr"))))
+                per.Kontakt.Anschrift.Postfach = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Postfach"))))
+                per.Kontakt.Anschrift.PLZ = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("plz"))))
+                per.Kontakt.Org.Name = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgname"))))
+                per.Kontakt.Org.Zusatz = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgzusatz"))))
+                per.Kontakt.Org.Typ1 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgtyp1"))))
+                per.Kontakt.Org.Typ2 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgtyp2"))))
+                per.Kontakt.Org.Eigentuemer = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgEigentuemer"))))
+                per.Quelle = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("quelle"))))
+                per.Kontakt.Org.Bemerkung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgBemerkung"))))
+                per.Kontakt.GesellFunktion = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("GesellFunktion"))))
+                per.Kontakt.elektr.Telefon1 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fftelefon1"))))
+                per.Kontakt.elektr.Telefon2 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fftelefon2"))))
+                per.Kontakt.elektr.Fax1 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFFax1"))))
+                per.Kontakt.elektr.Fax2 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFFax2"))))
+                per.Kontakt.elektr.MobilFon = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFMOBILFON"))))
+                per.Kontakt.elektr.Email = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFemail"))))
+                per.Kontakt.elektr.Homepage = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFhomepage"))))
+
+                per.Kassenkonto = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Kassenkonto"))))
+                per.VERTRETENDURCH = "" 'cleanString(CStr(clsDBtools.fieldvalue(drr.Item("VERTRETENDURCH"))))
+
+                'für die sepa daten muss man über die personenid holen
+
+                per.Kontakt.BankkontoID = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("personenid"))))
+                perlist.Add(per)
+            Next
+            Return perlist
+        Catch ex As Exception
+            'swfehlt.Close()
+            l("fertig  " & ex.ToString)
+            Return Nothing
+        End Try
+    End Function
+
+    Private Sub bildeKopfZeileStakeholder(zeileBeteiligte As System.Text.StringBuilder, t As String)
+        zeileBeteiligte.Append("az" & t) '     vid   
+        zeileBeteiligte.Append("jahr" & t) '     eingang
+        zeileBeteiligte.Append("Obergruppe" & t) '  rolle    
+        zeileBeteiligte.Append("Anrede" & t) '   
+        zeileBeteiligte.Append("Firma" & t) '  znkombi
+        zeileBeteiligte.Append("Titel" & t) '   rechts    
+        zeileBeteiligte.Append("Vorname" & t) ' hoch
+        zeileBeteiligte.Append("nachname" & t) '
+        zeileBeteiligte.Append("strasse" & t)
+        zeileBeteiligte.Append("hausnr" & t) ' 
+        zeileBeteiligte.Append("hausnr bis" & t) 'titel
+        zeileBeteiligte.Append("land" & t) 'freitext
+        zeileBeteiligte.Append("plz" & t) 'abstrakt
+        zeileBeteiligte.Append("ort" & t) 'gemcode
+        zeileBeteiligte.Append("adreszusatzzeile1" & t) 'fs
+        zeileBeteiligte.Append("adreszusatzzeile2" & t) 'fs
+        zeileBeteiligte.Append("telefon" & t) 'fs
+        zeileBeteiligte.Append("fax" & t) 'fs
+        zeileBeteiligte.Append("mobil" & t) 'fs
+        zeileBeteiligte.Append("email" & t) 'fs
+        zeileBeteiligte.Append("de-mail" & t) 'fs
+        zeileBeteiligte.Append("web" & t) 'fs
+        zeileBeteiligte.Append("zeichen" & t) 'fs
+        zeileBeteiligte.Append("personennummer" & t) 'fs
+        zeileBeteiligte.Append("spalte1" & t)
+        zeileBeteiligte.Append("KASSENKONTO" & t)
     End Sub
 
     Private Sub Button30_Click(sender As Object, e As EventArgs) Handles Button30.Click
         'antragsteller
         Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_antragsteller" & Environment.UserName & ".txt"
         Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "PU_antragsteller" & ".csv"
-        Dim pubeteiligte As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "PU_beteiligte" & ".csv"
+        Dim pubeteiligte As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "PU_beteiligte_1" & ".csv"
         Dim ausgabeAntragsteller As New IO.StreamWriter(puAusgabe)
         Dim ausgabeBeteiligte As New IO.StreamWriter(pubeteiligte)
         swfehlt = New IO.StreamWriter(puFehler)
@@ -3102,14 +3239,8 @@ Public Class Form1
 
         Dim ic As Integer = 0
         Dim igesamt As Integer = 0
-        Dim gemarkung, flur, flurstueck, ost, nord, freitext, funktion, gemcode, abstrakt, FS, flaecheqm As String
-        Dim newsavemode As Boolean
-        Dim istRevisionssicher As Boolean
-        Dim dbdatum, hauptaktenjahr As Date
-        Dim spalte1 As String
-        Dim veraltet As String
-        Dim eingang, antrag, vollstaendig, bescheid, abgeschlossen As Date
-        Dim aktenstandort As String
+
+        Dim eingang As Date
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
         myoracle.Open()
@@ -3346,6 +3477,10 @@ Public Class Form1
             Return Nothing
         End Try
     End Function
+
+    Private Sub Button24_Click(sender As Object, e As EventArgs) Handles Button24.Click
+
+    End Sub
 
 
 
