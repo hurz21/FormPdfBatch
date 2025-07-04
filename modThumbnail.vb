@@ -5,7 +5,7 @@ Module modThumbnail
 
     Public Sub datenholden(ByRef vid As Integer, ByRef relativpfad As String, ByRef dateinameext As String, ByRef typ As String, ByRef newsavemode As Boolean, ByRef dokumentid As Integer, ByVal drr As DataRow,
                            ByRef datum As Date, ByRef init5ial As String)
-        vid = CInt(drr.Item("bearbeiterID"))
+        vid = CInt(drr.Item("Bearbeitungsart"))
         dokumentid = CInt(drr.Item("dokumentid"))
         relativpfad = CStr(drr.Item("relativpfad"))
         dateinameext = CStr(drr.Item("dateinameext"))

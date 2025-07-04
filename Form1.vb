@@ -13,7 +13,7 @@ Public Class Form1
     Property dt As New Data.DataTable
     Private count As Integer = 0
 
-    Public Shared inndir, outdir, bearbeiterID, checkoutRoot As String
+    Public Shared inndir, outdir, Bearbeitungsart, checkoutRoot As String
     Public Shared nichtUeberschreiben As Boolean = True
     Public Shared sw As IO.StreamWriter
     Public Shared swfehlt As IO.StreamWriter
@@ -153,7 +153,7 @@ Public Class Form1
     '            g.ReleaseHdc()
     '        End Using
     '        pic.Image = backbuffer
-    '        'filename = getJPGfilename(filename, outdir, bearbeiterID)
+    '        'filename = getJPGfilename(filename, outdir, Bearbeitungsart)
     '        _pdfdoc.ExportJpg(outfilename, 1, 1, 150, 5, -1)
     '        ' _pdfdoc.ExportText(filename, 1, 1, True, True)
     '        Return True
@@ -186,7 +186,7 @@ Public Class Form1
         sw = New IO.StreamWriter(logfile)
         sw.AutoFlush = True
         sw.WriteLine(Now)
-        If bearbeiterID = "fehler" Then End
+        If Bearbeitungsart = "fehler" Then End
         Dim Sql As String
         Sql = "SELECT * FROM dokumente where   ort<2000000 and ort>0  " &
                   "  order by ort desc "
@@ -208,10 +208,10 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                DbMetaDatenDokumentHolen(bearbeiterID, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
+                DbMetaDatenDokumentHolen(Bearbeitungsart, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
                                  beschreibung, eingang, fullfilename)
-                '   l(bearbeiterID & " " & CStr(ort) & " " & ic & " (" & DT.Rows.Count & ")")
-                '   sw.WriteLine(bearbeiterID & " " & CStr(ort) & " " & ic & " (" & DT.Rows.Count & ")")
+                '   l(Bearbeitungsart & " " & CStr(ort) & " " & ic & " (" & DT.Rows.Count & ")")
+                '   sw.WriteLine(Bearbeitungsart & " " & CStr(ort) & " " & ic & " (" & DT.Rows.Count & ")")
                 If newsavemode Then
                     inputfile = GetInputfilename(inndir, relativpfad, CInt(dokumentid))
                 Else
@@ -240,12 +240,12 @@ Public Class Form1
                     ic += 1
                     l("dokument fehlt: " & ic.ToString & Environment.NewLine & " " &
                                      inputfile & Environment.NewLine &
-                                     bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")")
+                                     Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")")
 
 
                     TextBox2.Text = ic.ToString & Environment.NewLine & " " &
                       inputfile & Environment.NewLine &
-                      bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                      Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                       TextBox2.Text
                     Application.DoEvents()
                 End If
@@ -267,7 +267,7 @@ Public Class Form1
 
 
 
-    'Private Sub PDFSverarbeiten(outdir As String, bearbeiterID As String, dt As DataTable)
+    'Private Sub PDFSverarbeiten(outdir As String, Bearbeitungsart As String, dt As DataTable)
     '    Dim ic As Integer = 0
     '    Dim sachgebiet As String = "", Verfahrensart As String = "", Vorhaben As String, batchfile As String
     '    Dim newsavemode As Boolean
@@ -277,23 +277,23 @@ Public Class Form1
     '    For Each drr As DataRow In dt.Rows
     '        Try
     '            ic += 1
-    '            DbMetaDatenDokumentHolen(bearbeiterID, sachgebiet, Verfahrensart, Vorhaben, newsavemode, ort, drr, dbdatum)
-    '            l(bearbeiterID & " " & ort.ToString & " " & ic & " (" & dt.Rows.Count & ")")
-    '            TextBox1.Text = TextBox1.Text & bearbeiterID & " " & ort.ToString & " " & ic & " (" & dt.Rows.Count & ")"
+    '            DbMetaDatenDokumentHolen(Bearbeitungsart, sachgebiet, Verfahrensart, Vorhaben, newsavemode, ort, drr, dbdatum)
+    '            l(Bearbeitungsart & " " & ort.ToString & " " & ic & " (" & dt.Rows.Count & ")")
+    '            TextBox1.Text = TextBox1.Text & Bearbeitungsart & " " & ort.ToString & " " & ic & " (" & dt.Rows.Count & ")"
     '            If newsavemode Then
     '                Vorhabensmerkmal = GetInputfile(inndir, sachgebiet, CInt(ort))
     '            Else
     '                Vorhabensmerkmal = GetInputfile1(inndir, sachgebiet, Verfahrensart)
     '            End If
-    '            bearbeiter = modPrep.GetOutfile(CInt(bearbeiterID), outdir, CInt(ort), ".jpg")
+    '            bearbeiter = modPrep.GetOutfile(CInt(Bearbeitungsart), outdir, CInt(ort), ".jpg")
     '            Dim fi As New IO.FileInfo(bearbeiter.Replace(Chr(34), ""))
 
     '            If fi.Exists Then
     '                l("exists")
     '                Continue For
     '            End If
-    '            If Not IO.Directory.Exists(outdir & bearbeiterID.ToString) Then
-    '                IO.Directory.CreateDirectory(outdir & bearbeiterID.ToString)
+    '            If Not IO.Directory.Exists(outdir & Bearbeitungsart.ToString) Then
+    '                IO.Directory.CreateDirectory(outdir & Bearbeitungsart.ToString)
     '            End If
 
     '        Catch ex As Exception
@@ -328,10 +328,10 @@ Public Class Form1
 
         checkoutRoot = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) & "\paradigma\muell\"
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
-        '  bearbeiterID = modPrep.getVid()
+        '  Bearbeitungsart = modPrep.getVid()
 
-        sw.WriteLine(bearbeiterID)
-        If bearbeiterID = "fehler" Then End
+        sw.WriteLine(Bearbeitungsart)
+        If Bearbeitungsart = "fehler" Then End
         DT = PDFdokumentDatenHolen()
         'teil1 = pdf -----------------------------------------------
 
@@ -354,9 +354,9 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                DbMetaDatenDokumentHolen(bearbeiterID, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid, beschreibung, eingang, fullfilename)
-                l(bearbeiterID & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
-                sw.WriteLine(bearbeiterID & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
+                DbMetaDatenDokumentHolen(Bearbeitungsart, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid, beschreibung, eingang, fullfilename)
+                l(Bearbeitungsart & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
+                sw.WriteLine(Bearbeitungsart & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
 
 
                 If newsavemode Then
@@ -364,7 +364,7 @@ Public Class Form1
                 Else
                     inputfile = GetInputfile1Name(inndir, relativpfad, dateinameext)
                 End If
-                outfile = modPrep.GetOutfileName(CInt(bearbeiterID), outdir, CInt(dokumentid), ".jpg")
+                outfile = modPrep.GetOutfileName(CInt(Bearbeitungsart), outdir, CInt(dokumentid), ".jpg")
                 Dim fo As New IO.FileInfo(outfile.Replace(Chr(34), ""))
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count
                 Application.DoEvents()
@@ -376,12 +376,12 @@ Public Class Form1
 
                 TextBox1.Text = ic.ToString & " / " & dateinameext & Environment.NewLine & " " &
                 inputfile & Environment.NewLine &
-                bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")"
+                Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")"
                 Application.DoEvents()
 
 
-                If Not IO.Directory.Exists(outdir & bearbeiterID.ToString) Then
-                    IO.Directory.CreateDirectory(outdir & bearbeiterID.ToString)
+                If Not IO.Directory.Exists(outdir & Bearbeitungsart.ToString) Then
+                    IO.Directory.CreateDirectory(outdir & Bearbeitungsart.ToString)
                 End If
             Catch ex As Exception
                 l("fehler1: " & ex.ToString)
@@ -398,7 +398,7 @@ Public Class Form1
                 'If ort = "80071" Then Continue For
                 Dim fi As New IO.FileInfo(inputfile.Replace(Chr(34), ""))
                 If Not fi.Exists Then
-                    swfehlt.WriteLine(bearbeiterID & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
+                    swfehlt.WriteLine(Bearbeitungsart & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
                     Continue For
                 Else
 
@@ -409,15 +409,15 @@ Public Class Form1
                     ic += 1
                     TextBox1.Text = ic.ToString & " / " & dateinameext & Environment.NewLine & " " &
                         inputfile & Environment.NewLine &
-                        bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")"
+                        Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")"
                     Application.DoEvents()
                 Else
                     l("erfolglos " & ic.ToString & Environment.NewLine & " " &
                         inputfile & Environment.NewLine &
-                        bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")")
+                        Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")")
                     TextBox2.Text = ic.ToString & " / " & dateinameext & Environment.NewLine & " " &
                         inputfile & Environment.NewLine &
-                        bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                        Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                         TextBox2.Text
                     Application.DoEvents()
                 End If
@@ -425,7 +425,7 @@ Public Class Form1
                 l("fehler2: " & ex.ToString)
                 TextBox2.Text = ic.ToString & Environment.NewLine & " " &
                        inputfile & Environment.NewLine &
-                       bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
                 Application.DoEvents()
             End Try
@@ -629,7 +629,7 @@ Public Class Form1
     End Sub
 
     Friend Sub DOCXumwandeln(vid As Integer, isDebugmode As Boolean)
-        '    If Not IsNumeric(bearbeiterID) Then Exit Sub
+        '    If Not IsNumeric(Bearbeitungsart) Then Exit Sub
         Dim inputfile, outfileJPG, parameter As String
         Dim innDir, outDir, checkoutfile, pdffile As String
         'Dim checkoutRoot As String = "C:\muell\" 
@@ -665,7 +665,7 @@ Public Class Form1
         Sql = "SELECT * FROM dokumente where   ort > " & unten & "  and ort < " & oben & "  " &
               "and ( Vorhaben='docx' or  Vorhaben='doc'  or  Vorhaben='rtf' )  " &
               "order by ort desc"
-        'Sql = "SELECT * FROM dokumente where   bearbeiterID=9609 " &
+        'Sql = "SELECT * FROM dokumente where   Bearbeitungsart=9609 " &
         '      "and ( Vorhaben='docx' or  Vorhaben='doc' or  Vorhaben='rtf')  " &
         '      "order by ort desc"
         l(Sql)
@@ -678,7 +678,7 @@ Public Class Form1
         Dim newsavemode As Boolean
 
         Dim dokumentid As Integer = 0
-        'l("nach 1: " & outDir & bearbeiterID.ToString)
+        'l("nach 1: " & outDir & Bearbeitungsart.ToString)
         IO.Directory.CreateDirectory(outDir & vid.ToString)
         'l("nach 2")
         logfile = outDir & "\tnmaker_" & Environment.UserName & "wordgen.txt"
@@ -718,7 +718,7 @@ Public Class Form1
 
                 Dim fi As New IO.FileInfo(inputfile.Replace(Chr(34), ""))
                 If Not fi.Exists Then
-                    'swfehlt.WriteLine(bearbeiterID & "," & ort & ", " & dbdatum & "," & initial & ", " & Vorhabensmerkmal & "")
+                    'swfehlt.WriteLine(Bearbeitungsart & "," & ort & ", " & dbdatum & "," & initial & ", " & Vorhabensmerkmal & "")
                     swfehlt.WriteLine(vid & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
                     Continue For
                 Else
@@ -855,7 +855,7 @@ Public Class Form1
         Xls2XlsxKonv(9609, True)
     End Sub
     Friend Sub Xls2XlsxKonv(vid As Integer, isDebugmode As Boolean)
-        '    If Not IsNumeric(bearbeiterID) Then Exit Sub
+        '    If Not IsNumeric(Bearbeitungsart) Then Exit Sub
         Dim inputfile, outfile, parameter As String
         Dim innDir, outDir, checkoutfile, pdffile As String
         'Dim checkoutRoot As String = "C:\muell\"
@@ -888,7 +888,7 @@ Public Class Form1
         Sql = "SELECT * FROM dokumente where   ort > " & unten & "  and ort < " & oben & "  " &
               "and (  lower(Verfahrensart) like '%.xls' )  " &
               "order by ort desc"
-        'Sql = "SELECT * FROM dokumente where   bearbeiterID=9609 " &
+        'Sql = "SELECT * FROM dokumente where   Bearbeitungsart=9609 " &
         '      "and ( Vorhaben='docx' or  Vorhaben='doc' or  Vorhaben='rtf')  " &
         '      "order by ort desc"
 
@@ -901,7 +901,7 @@ Public Class Form1
         Dim newsavemode As Boolean
 
         Dim dokumentid As Integer = 0
-        'l("nach 1: " & outDir & bearbeiterID.ToString)
+        'l("nach 1: " & outDir & Bearbeitungsart.ToString)
         IO.Directory.CreateDirectory(outDir & vid.ToString)
         'l("nach 2")
         logfile = outDir & "\tnmaker_" & "wordgen.txt"
@@ -928,7 +928,7 @@ Public Class Form1
 
                 End If
                 Console.Write(vid & "/" & dokumentid & "----")
-                'sw.WriteLine(bearbeiterID & "/" & ort & "----")
+                'sw.WriteLine(Bearbeitungsart & "/" & ort & "----")
                 If newsavemode Then
                     inputfile = GetInputfileWordFullPath(innDir, relativpfad, dokumentid)
                 Else
@@ -962,7 +962,7 @@ Public Class Form1
 
                 fi = New IO.FileInfo(inputfile.Replace(Chr(34), ""))
                 If Not fi.Exists Then
-                    'swfehlt.WriteLine(bearbeiterID & "," & ort & ", " & dbdatum & "," & initial & ", " & Vorhabensmerkmal & "")
+                    'swfehlt.WriteLine(Bearbeitungsart & "," & ort & ", " & dbdatum & "," & initial & ", " & Vorhabensmerkmal & "")
                     swfehlt.WriteLine(vid & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
                     Continue For
                 Else
@@ -1030,7 +1030,7 @@ Public Class Form1
         End Try
     End Function
     Private Function db_eintragExcelAendern(vid As Integer, relativpfad As String, dateinameext As String, typ As String, newsavemode As Boolean, dokumentid As Integer, drr As DataRow) As Boolean
-        'modOracle.setExcelAttribute2(bearbeiterID, sachgebiet, Verfahrensart, Vorhaben, newsavemode, ort, drr)
+        'modOracle.setExcelAttribute2(Bearbeitungsart, sachgebiet, Verfahrensart, Vorhaben, newsavemode, ort, drr)
     End Function
     Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
         'doc2docx
@@ -1067,10 +1067,10 @@ Public Class Form1
 
         checkoutRoot = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) & "\paradigma\muell\"
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
-        '  bearbeiterID = modPrep.getVid()
+        '  Bearbeitungsart = modPrep.getVid()
 
-        sw.WriteLine(bearbeiterID)
-        If bearbeiterID = "fehler" Then End
+        sw.WriteLine(Bearbeitungsart)
+        If Bearbeitungsart = "fehler" Then End
         DT = PDFdokumentDatenHolen()
         'teil1 = pdf -----------------------------------------------
 
@@ -1089,21 +1089,21 @@ Public Class Form1
         '  Using sw As New IO.StreamWriter(logfile)
         For Each drr As DataRow In DT.Rows
             Try
-                If bearbeiterID = 8930 Then
+                If Bearbeitungsart = 8930 Then
                     Debug.Print("")
                 End If
                 igesamt += 1
-                DbMetaDatenDokumentHolen(bearbeiterID, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
+                DbMetaDatenDokumentHolen(Bearbeitungsart, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
                                  beschreibung, eingang, fullfilename)
-                l(bearbeiterID & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
+                l(Bearbeitungsart & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
 
-                sw.WriteLine(bearbeiterID & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
+                sw.WriteLine(Bearbeitungsart & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
                 If newsavemode Then
                     inputfile = GetInputfilename(inndir, relativpfad, CInt(dokumentid))
                 Else
                     inputfile = GetInputfile1Name(inndir, relativpfad, dateinameext)
                 End If
-                outfile = modPrep.GetOutfileName(CInt(bearbeiterID), outdir, CInt(dokumentid), ".jpg")
+                outfile = modPrep.GetOutfileName(CInt(Bearbeitungsart), outdir, CInt(dokumentid), ".jpg")
                 Dim fo As New IO.FileInfo(outfile.Replace(Chr(34), ""))
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count
                 Application.DoEvents()
@@ -1111,8 +1111,8 @@ Public Class Form1
                     l("exists")
                     Continue For
                 End If
-                If Not IO.Directory.Exists(outdir & bearbeiterID.ToString) Then
-                    IO.Directory.CreateDirectory(outdir & bearbeiterID.ToString)
+                If Not IO.Directory.Exists(outdir & Bearbeitungsart.ToString) Then
+                    IO.Directory.CreateDirectory(outdir & Bearbeitungsart.ToString)
                 End If
             Catch ex As Exception
                 l("fehler1: " & ex.ToString)
@@ -1132,15 +1132,15 @@ Public Class Form1
                     ic += 1
                     TextBox1.Text = ic.ToString & Environment.NewLine & " " &
                         inputfile & Environment.NewLine &
-                        bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")"
+                        Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")"
                     Application.DoEvents()
                 Else
                     l("erfolglos " & ic.ToString & Environment.NewLine & " " &
                         inputfile & Environment.NewLine &
-                        bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")")
+                        Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")")
                     TextBox2.Text = ic.ToString & Environment.NewLine & " " &
                         inputfile & Environment.NewLine &
-                        bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                        Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                         TextBox2.Text
                     Application.DoEvents()
                 End If
@@ -1148,7 +1148,7 @@ Public Class Form1
                 l("fehler2: " & ex.ToString)
                 TextBox2.Text = ic.ToString & Environment.NewLine & " " &
                        inputfile & Environment.NewLine &
-                       bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
                 Application.DoEvents()
             End Try
@@ -1371,7 +1371,7 @@ Public Class Form1
     End Sub
 
     Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click
-        '    If Not IsNumeric(bearbeiterID) Then Exit Sub
+        '    If Not IsNumeric(Bearbeitungsart) Then Exit Sub
         Dim inputfile, outfile, parameter As String
         Dim innDir, outDir, checkoutfile, pdffile As String
         parameter = " /1 1"
@@ -1393,7 +1393,7 @@ Public Class Form1
 
         l("nach getDT")
 
-        'l("nach 1: " & outDir & bearbeiterID.ToString)
+        'l("nach 1: " & outDir & Bearbeitungsart.ToString)
         IO.Directory.CreateDirectory(outDir)
         'l("nach 2")
         logfile = outDir & "\" & "dok.txt"
@@ -1416,13 +1416,13 @@ Public Class Form1
                 ic += 1
                 TextBox2.Text = " " & ierfolg & "   konvertierungen von word nach jpg erfolgreich von " & soll & Environment.NewLine
                 Application.DoEvents()
-                datenholden(bearbeiterID, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, initial)
+                datenholden(Bearbeitungsart, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, initial)
                 If dokumentid = 174865 Then
                     Debug.Print("")
 
                 End If
-                Console.Write(bearbeiterID & "/" & dokumentid & "----")
-                'sw.WriteLine(bearbeiterID & "/" & ort & "----")
+                Console.Write(Bearbeitungsart & "/" & dokumentid & "----")
+                'sw.WriteLine(Bearbeitungsart & "/" & ort & "----")
                 If newsavemode Then
                     inputfile = GetInputfileWordFullPath(innDir, relativpfad, dokumentid)
                 Else
@@ -1484,7 +1484,7 @@ Public Class Form1
 
         l("nach getDT")
 
-        'l("nach 1: " & outDir & bearbeiterID.ToString)
+        'l("nach 1: " & outDir & Bearbeitungsart.ToString)
         IO.Directory.CreateDirectory(outDir)
         'l("nach 2")
         logfile = outDir & "\" & "bearbeiterid.txt"
@@ -1517,8 +1517,8 @@ Public Class Form1
                     " where lower(bearbeiter)='" & kuerzel.ToLower & "' and bearbeiterid<>" & bearbeiterid & ";" & Environment.NewLine
                 summe2 += Sql
 
-                Console.Write(Form1.bearbeiterID & "/" & initial_ & "----")
-                'sw.WriteLine(bearbeiterID & "/" & ort & "----")
+                Console.Write(Form1.Bearbeitungsart & "/" & initial_ & "----")
+                'sw.WriteLine(Bearbeitungsart & "/" & ort & "----")
 
                 'sizeSumme += fi.Length
                 'TextBox1.Text = TextBox1.Text & ic & " " & Vorhabensmerkmal & " " & fi.Length & Environment.NewLine
@@ -1576,7 +1576,7 @@ Public Class Form1
 
         l("nach getDT")
 
-        'l("nach 1: " & outDir & bearbeiterID.ToString)
+        'l("nach 1: " & outDir & Bearbeitungsart.ToString)
         IO.Directory.CreateDirectory(outDir)
         'l("nach 2")
         logfile = outDir & "\" & "bearbeiterid.sql"
@@ -1601,14 +1601,14 @@ Public Class Form1
                 'TextBox2.Text = " " & ierfolg & "   konvertierungen von word nach jpg erfolgreich von " & soll & Environment.NewLine
                 Application.DoEvents()
                 weitere = (drr.Item("weitereBearb")).tolower
-                Form1.bearbeiterID = (drr.Item("vorgangsid"))
+                Form1.Bearbeitungsart = (drr.Item("vorgangsid"))
                 b = weitere.Split(New Char() {";"c},
                         StringSplitOptions.RemoveEmptyEntries)
                 ReDim bids(b.Length - 1)
                 For i = 0 To b.Length - 1
                     bids(i) = getBearbeiterID(b(i), bearbeiterDT)
-                    sw.WriteLine(getinsertSql(bids(i), Form1.bearbeiterID))
-                    Console.Write(Form1.bearbeiterID & "/" & initial_ & "----")
+                    sw.WriteLine(getinsertSql(bids(i), Form1.Bearbeitungsart))
+                    Console.Write(Form1.Bearbeitungsart & "/" & initial_ & "----")
                 Next
 
 
@@ -1616,7 +1616,7 @@ Public Class Form1
 
 
 
-                'sw.WriteLine(bearbeiterID & "/" & ort & "----")
+                'sw.WriteLine(Bearbeitungsart & "/" & ort & "----")
 
                 'sizeSumme += fi.Length
                 'TextBox1.Text = TextBox1.Text & ic & " " & Vorhabensmerkmal & " " & fi.Length & Environment.NewLine
@@ -1670,10 +1670,10 @@ Public Class Form1
         swfehlt.WriteLine(Now)
 
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
-        '  bearbeiterID = modPrep.getVid()
+        '  Bearbeitungsart = modPrep.getVid()
 
 
-        If bearbeiterID = "fehler" Then End
+        If Bearbeitungsart = "fehler" Then End
         Dim Sql As String
         Sql = "SELECT * FROM dokumente where   ort<2000000 and ort>0  " &
                   "  order by ort desc "
@@ -1700,9 +1700,9 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                DbMetaDatenDokumentHolen(bearbeiterID, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
+                DbMetaDatenDokumentHolen(Bearbeitungsart, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
                                  beschreibung, eingang, fullfilename)
-                l(bearbeiterID & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
+                l(Bearbeitungsart & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
 
                 If newsavemode Then
                     inputfile = GetInputfilename(inndir, relativpfad, CInt(dokumentid))
@@ -1714,7 +1714,7 @@ Public Class Form1
                 Application.DoEvents()
                 Dim fi As New IO.FileInfo(inputfile.Replace(Chr(34), ""))
                 If Not fi.Exists Then
-                    swfehlt.WriteLine(bearbeiterID & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
+                    swfehlt.WriteLine(Bearbeitungsart & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
                     Continue For
                 Else
 
@@ -1723,7 +1723,7 @@ Public Class Form1
                 l("fehler2: " & ex.ToString)
                 TextBox2.Text = ic.ToString & Environment.NewLine & " " &
                        inputfile & Environment.NewLine &
-                       bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
                 Application.DoEvents()
             End Try
@@ -1799,10 +1799,10 @@ Public Class Form1
 
         checkoutRoot = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) & "\paradigma\muell\"
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
-        '  bearbeiterID = modPrep.getVid()
+        '  Bearbeitungsart = modPrep.getVid()
 
-        sw.WriteLine(bearbeiterID)
-        If bearbeiterID = "fehler" Then End
+        sw.WriteLine(Bearbeitungsart)
+        If Bearbeitungsart = "fehler" Then End
         Dim Sql As String
         Sql = "SELECT * FROM dokumente where   ort<2000000 and ort>0  " &
                   " and (revisionssicher=1) order by ort desc "
@@ -1825,10 +1825,10 @@ Public Class Form1
                 If igesamt > 500 Then
                     Debug.Print("top")
                 End If
-                DbMetaDatenDokumentHolen(bearbeiterID, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
+                DbMetaDatenDokumentHolen(Bearbeitungsart, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
                                  beschreibung, eingang, fullfilename)
-                l(bearbeiterID & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
-                sw.WriteLine(bearbeiterID & " did: " & CStr(dokumentid) & " " & ic & " (count: " & DT.Rows.Count & ")")
+                l(Bearbeitungsart & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
+                sw.WriteLine(Bearbeitungsart & " did: " & CStr(dokumentid) & " " & ic & " (count: " & DT.Rows.Count & ")")
                 If istFoto(dateinameext) Then
                     Continue For
                 End If
@@ -1838,7 +1838,7 @@ Public Class Form1
                     inputfile = GetInputfile1Name(inndir, relativpfad, dateinameext)
                 End If
                 Dim blobid As Long
-                blobid = clsBlob.db_speichern(inputfile, dokumentid, myoracle, eid, bearbeiterID)
+                blobid = clsBlob.db_speichern(inputfile, dokumentid, myoracle, eid, Bearbeitungsart)
 
             Catch ex As Exception
                 l("fehler1: " & ex.ToString)
@@ -1873,7 +1873,7 @@ Public Class Form1
         sw = New IO.StreamWriter(logfile)
         sw.AutoFlush = True
         'sw.WriteLine(Now)
-        If bearbeiterID = "fehler" Then End
+        If Bearbeitungsart = "fehler" Then End
         DT = alleDokumentDatenHolenohnemb()
         'DT = alleDokumentDatenHolen()
         l("vor prüfung")
@@ -1896,7 +1896,7 @@ Public Class Form1
         Dim altvid As Integer = 0
         Dim days As Long
         'For i = 50000 To 1 Step -1
-        '    If CStr(drr.Item("bearbeiterID")) Then
+        '    If CStr(drr.Item("Bearbeitungsart")) Then
         'Next
         For Each drr As DataRow In DT.Rows
             If CDate(drr.Item("aufnahme")) > altdatum Then
@@ -1940,7 +1940,7 @@ Public Class Form1
         sw = New IO.StreamWriter(logfile)
         sw.AutoFlush = True
         'sw.WriteLine(Now)
-        If bearbeiterID = "fehler" Then End
+        If Bearbeitungsart = "fehler" Then End
         DT = alleDokumentDatenHolenohnemb()
         'DT = alleDokumentDatenHolen()
         l("vor prüfung")
@@ -1961,10 +1961,10 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                DbMetaDatenDokumentHolen(bearbeiterID, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
+                DbMetaDatenDokumentHolen(Bearbeitungsart, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
                                  beschreibung, eingang, fullfilename)
-                '   l(bearbeiterID & " " & CStr(ort) & " " & ic & " (" & DT.Rows.Count & ")")
-                '   sw.WriteLine(bearbeiterID & " " & CStr(ort) & " " & ic & " (" & DT.Rows.Count & ")")
+                '   l(Bearbeitungsart & " " & CStr(ort) & " " & ic & " (" & DT.Rows.Count & ")")
+                '   sw.WriteLine(Bearbeitungsart & " " & CStr(ort) & " " & ic & " (" & DT.Rows.Count & ")")
                 If newsavemode Then
                     inputfile = GetInputfilename(inndir, relativpfad, CInt(dokumentid))
                 Else
@@ -1996,10 +1996,10 @@ Public Class Form1
                     ic += 1
                     l("dokument fehlt: " & ic.ToString & Environment.NewLine & " " &
                                      inputfile & Environment.NewLine &
-                                     bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")")
+                                     Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")")
                     TextBox2.Text = ic.ToString & Environment.NewLine & " " &
                       inputfile & Environment.NewLine &
-                      bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                      Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                       TextBox2.Text
                     Application.DoEvents()
                 End If
@@ -2066,10 +2066,10 @@ Public Class Form1
 
 
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
-        '  bearbeiterID = modPrep.getVid()
+        '  Bearbeitungsart = modPrep.getVid()
 
         swfehlt.WriteLine("Teil1 referenz  Dokumente ausschreiben ---------------------")
-        If bearbeiterID = "fehler" Then End
+        If Bearbeitungsart = "fehler" Then End
 
         Dim Sql As String
 
@@ -2145,7 +2145,7 @@ Public Class Form1
                         Sql = " Select distinct  b.*  " &
                                 "   FROM [Paradigma].[dbo].[VORGANG_T43] a, DOKUMENTE b" &
                                 "   where a.SACHGEBIETNR='1020'" &
-                                "   and b.bearbeiterID=" & fremdvorgangsid & " "
+                                "   and b.Bearbeitungsart=" & fremdvorgangsid & " "
                         tempREfDokumente = alleDokumentDatenHolen(Sql)
                         For Each fremddokus As DataRow In tempREfDokumente.Rows
                             Try
@@ -2153,10 +2153,10 @@ Public Class Form1
                                 Debug.Print(CStr(fremddokumentid))
 
 
-                                DbMetaDatenDokumentHolen(bearbeiterID, relativpfad, dateinameext, typ, newsavemode, dokumentid, fremddokus, dbdatum, istRevisionssicher, initial, eid, beschreibung,
+                                DbMetaDatenDokumentHolen(Bearbeitungsart, relativpfad, dateinameext, typ, newsavemode, dokumentid, fremddokus, dbdatum, istRevisionssicher, initial, eid, beschreibung,
                                                 eingang, fullfilename)
-                                bearbeiterID = aktVID
-                                'l(bearbeiterID & " " & CStr(ort) & " " & ic & " (" & DT.Rows.Count & ")")
+                                Bearbeitungsart = aktVID
+                                'l(Bearbeitungsart & " " & CStr(ort) & " " & ic & " (" & DT.Rows.Count & ")")
 
                                 If newsavemode Then
                                     inputfile = GetInputfilename(inndir, relativpfad, CInt(dokumentid))
@@ -2167,10 +2167,10 @@ Public Class Form1
                                 Application.DoEvents()
                                 Dim fi As New IO.FileInfo(inputfile.Replace(Chr(34), ""))
                                 If Not fi.Exists Then
-                                    swfehlt.WriteLine(bearbeiterID & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
+                                    swfehlt.WriteLine(Bearbeitungsart & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
                                     Continue For
                                 Else
-                                    If clsBlob.dokufull_speichern(dokumentid, myoracle, inputfile, bearbeiterID, zieltabelle) <> 0 Then
+                                    If clsBlob.dokufull_speichern(dokumentid, myoracle, inputfile, Bearbeitungsart, zieltabelle) <> 0 Then
                                         MsgBox("Fehler")
                                     Else
 
@@ -2212,7 +2212,7 @@ Public Class Form1
         swfehlt.WriteLine("Teil2 normale Dokumente ausschreiben ---------------------")
 
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
-        If bearbeiterID = "fehler" Then End
+        If Bearbeitungsart = "fehler" Then End
         Dim Sql As String
         Sql = "SELECT * FROM dokumentefull where   ort<20000000 and ort>0  and fullname is null " &
                   "  order by ort desc "
@@ -2244,9 +2244,9 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                DbMetaDatenDokumentHolen(bearbeiterID, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
+                DbMetaDatenDokumentHolen(Bearbeitungsart, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
                                  beschreibung, eingang, fullfilename)
-                l(bearbeiterID & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
+                l(Bearbeitungsart & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
 
                 If newsavemode Then
                     inputfile = GetInputfilename(inndir, relativpfad, CInt(dokumentid))
@@ -2258,15 +2258,15 @@ Public Class Form1
                 Application.DoEvents()
                 Dim fi As New IO.FileInfo(inputfile.Replace(Chr(34), ""))
                 If Not fi.Exists Then
-                    swfehlt.WriteLine("FEhlt: " & bearbeiterID & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext) '& ", " & Vorhabensmerkmal & "")
+                    swfehlt.WriteLine("FEhlt: " & Bearbeitungsart & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext) '& ", " & Vorhabensmerkmal & "")
                     Continue For
                 Else
-                    'If clsBlob.dokufull_speichern(ort, myoracle, Vorhabensmerkmal, bearbeiterID, zieltabelle) <> 0 Then
+                    'If clsBlob.dokufull_speichern(ort, myoracle, Vorhabensmerkmal, Bearbeitungsart, zieltabelle) <> 0 Then
                     '    MsgBox("Fehler")
                     'Else
 
                     'End If
-                    If clsBlob.saveDokumenteTooltip(dokumentid, myoracle, inputfile, bearbeiterID) <> 0 Then
+                    If clsBlob.saveDokumenteTooltip(dokumentid, myoracle, inputfile, Bearbeitungsart) <> 0 Then
                         'MsgBox("Fehler")
                     Else
                         'MsgBox("Fehler")
@@ -2279,7 +2279,7 @@ Public Class Form1
                 l("fehler2: " & ex.ToString)
                 TextBox2.Text = ic.ToString & Environment.NewLine & " " &
                        inputfile & Environment.NewLine &
-                       bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
                 Application.DoEvents()
             End Try
@@ -2365,7 +2365,7 @@ Public Class Form1
         swfehlt.WriteLine("Teil2 normale Dokumente ausschreiben ---------------------")
 
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
-        If bearbeiterID = "fehler" Then End
+        If Bearbeitungsart = "fehler" Then End
 
         DT = alleDokumentDatenHolen(sql)
         l("vor csvverarbeiten")
@@ -2406,9 +2406,9 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                DbMetaDatenDokumentHolen(bearbeiterID, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
+                DbMetaDatenDokumentHolen(Bearbeitungsart, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher, initial, eid,
                                  beschreibung, eingang, fullfilename)
-                l(bearbeiterID & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
+                l(Bearbeitungsart & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
 
                 'If newsavemode Then
                 '    Vorhabensmerkmal = GetInputfilename(inndir, sachgebiet, CInt(ort))
@@ -2419,7 +2419,7 @@ Public Class Form1
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
                 Application.DoEvents()
                 'zeilebilden
-                zeile.Append(bearbeiterID & t) 'Az
+                zeile.Append(Bearbeitungsart & t) 'Az
                 zeile.Append(eingang.ToString("yyyy") & t) 'jahr
                 zeile.Append(dbdatum.ToString("yyyyMMdd") & t) 'datum
                 zeile.Append(typ & t) 'oberbegriff Protokolle
@@ -2448,7 +2448,7 @@ Public Class Form1
                 l("fehler2: " & ex.ToString)
                 TextBox2.Text = ic.ToString & Environment.NewLine & " " &
                        inputfile & Environment.NewLine &
-                       bearbeiterID & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       Bearbeitungsart & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
                 Application.DoEvents()
             End Try
@@ -2549,10 +2549,10 @@ Public Class Form1
 
         'kopfzeile
         zeile.Append("az" & t) '                           (VID)
-        zeile.Append("jahr" & t) '                       (eingang)
+        zeile.Append("jahr" & t) '                       (datum)
         zeile.Append("Fachschale" & t) '                  PROUMWELT
         zeile.Append("ort" & t) '                 (sgtext + / + paragraf + / + vorgangsgegenstand + ) Überwachung einer Kleinkläranlage
-        zeile.Append("Eingangsdatum" & t) '              (eingang)
+        zeile.Append("Eingangsdatum" & t) '              (datum)
         zeile.Append("Antragsdatum" & t) '               (aufnahme)
         zeile.Append("Datum Vollständigkeit geprüft" & t) '(letztebearbeitung)
         zeile.Append("Bescheid Datum" & t) '
@@ -2576,11 +2576,11 @@ Public Class Form1
             Try
                 igesamt += 1
 
-                bearbeiterID = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+                Bearbeitungsart = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("datum")))
                 Bezeichnung = cleanString(makeStammBezeichnung(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), CStr(clsDBtools.fieldvalue(drr.Item("PARAGRAF"))),
                                                                CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSGEGENSTAND")))))
-                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("datum")))
                 antrag = CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
                 vollstaendig = CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG")))
                 bescheid = CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
@@ -2593,7 +2593,7 @@ Public Class Form1
                 Vorhabensmerkmal = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 4))
                 sachbearbeiter = CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter")))
                 Hauptaktenzeichen = CStr(clsDBtools.fieldvalue(drr.Item("probaugaz")))
-                hauptaktenjahr = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+                hauptaktenjahr = CDate(clsDBtools.fieldvalueDate(drr.Item("datum")))
                 geschlossen = CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))
 
                 Notiz = cleanString(makeStammNotiz(CStr(clsDBtools.fieldvalue(drr.Item("az2"))),
@@ -2605,7 +2605,7 @@ Public Class Form1
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
                 Application.DoEvents()
                 'zeilebilden
-                zeile.Append(bearbeiterID & t) 'Az
+                zeile.Append(Bearbeitungsart & t) 'Az
                 zeile.Append(eingang.ToString("yyyy") & t) 'jahr
                 zeile.Append("PROUMWELT" & t) '
                 zeile.Append(Bezeichnung & t) ' 
@@ -2646,7 +2646,7 @@ Public Class Form1
                 l("fehler2: " & ex.ToString)
                 TextBox2.Text = ic.ToString & Environment.NewLine & " " &
                        Vorhabensmerkmal & Environment.NewLine &
-                       bearbeiterID & "/" & Bezeichnung & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       Bearbeitungsart & "/" & Bezeichnung & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
                 Application.DoEvents()
             End Try
@@ -2858,8 +2858,8 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                bearbeiterID = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+                Bearbeitungsart = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("datum")))
                 ort = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemeindetext"))))
                 ortsteil = ""
                 strasse = (clsDBtools.fieldvalue(drr.Item("strassenname")))
@@ -2878,7 +2878,7 @@ Public Class Form1
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
                 Application.DoEvents()
                 'zeilebilden
-                zeile.Append(bearbeiterID & t) 'Az
+                zeile.Append(Bearbeitungsart & t) 'Az
                 zeile.Append(eingang.ToString("yyyy") & t) 'jahr 
                 zeile.Append(ort & t) ' 
                 zeile.Append(ortsteil & t) ' 
@@ -2907,7 +2907,7 @@ Public Class Form1
                 l("fehler2: " & ex.ToString)
                 TextBox2.Text = ic.ToString & Environment.NewLine & " " &
                           Environment.NewLine &
-                       bearbeiterID & "/" & ort & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       Bearbeitungsart & "/" & ort & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
                 Application.DoEvents()
             End Try
@@ -2936,7 +2936,7 @@ Public Class Form1
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
 
-        Sql = "select * from PF_mitRH as a, raumbezug as r  where a.id=r.sekid and typ=2      order by bearbeiterID desc  "
+        Sql = "select * from PF_mitRH as a, raumbezug as r  where a.id=r.sekid and typ=2      order by Bearbeitungsart desc  "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         'writeAdresseausgabePU(puFehler, ausgabeAntragsteller, Sql, maxobj)
@@ -2974,8 +2974,8 @@ Public Class Form1
         l("writeKatasterausgabePU")
 
         'kopfzeile
-        zeile.Append("az" & t) '     bearbeiterID   
-        zeile.Append("jahr" & t) '     eingang
+        zeile.Append("az" & t) '     Bearbeitungsart   
+        zeile.Append("jahr" & t) '     datum
         zeile.Append("Gemarkung" & t) '  gemarkungstext    
         zeile.Append("nachname" & t) '  nachname
         zeile.Append("vorname" & t) '  znkombi
@@ -2996,8 +2996,8 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                bearbeiterID = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+                Bearbeitungsart = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("datum")))
                 gemarkung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemarkungstext"))))
                 flur = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("nachname"))))
                 flurstueck = cleanString((clsDBtools.fieldvalue(drr.Item("znkombi"))))
@@ -3017,7 +3017,7 @@ Public Class Form1
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
                 Application.DoEvents()
                 'zeilebilden
-                zeile.Append(bearbeiterID & t) 'Az
+                zeile.Append(Bearbeitungsart & t) 'Az
                 zeile.Append(eingang.ToString("yyyy") & t) 'jahr 
                 zeile.Append(gemarkung & t) ' 
                 zeile.Append(flur & t) ' 
@@ -3046,7 +3046,7 @@ Public Class Form1
                 l("fehler2: " & ex.ToString)
                 TextBox2.Text = ic.ToString & Environment.NewLine & " " &
                           Environment.NewLine &
-                       bearbeiterID & "/" & bearbeiterID & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       Bearbeitungsart & "/" & Bearbeitungsart & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
                 Application.DoEvents()
             End Try
@@ -3062,6 +3062,7 @@ Public Class Form1
         'swfehlt.Close()
         l("fertig  " & puFehler)
         ' Process.Start(puFehler)
+
     End Sub
 
     Private Sub Button23_Click(sender As Object, e As EventArgs) Handles Button23.Click
@@ -3074,7 +3075,7 @@ Public Class Form1
         Dim Sql As String
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
-        Sql = "select *      FROM [Paradigma].[dbo].[STAKEHOLDER]    order by rolle desc  "
+        Sql = "select * FROM [Paradigma].[dbo].[STAKEHOLDER]    order by rolle desc  "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         'writeKatasterausgabePU(puFehler, puAusgabeStream, Sql, maxobj)
@@ -3084,6 +3085,132 @@ Public Class Form1
         puAusgabeStream.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
         swfehlt.Dispose()
+    End Sub
+    Private Sub Button25_Click(sender As Object, e As EventArgs) Handles Button25.Click
+        'wiedervorlagen
+        Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_wiedervorlagen" & Environment.UserName & ".txt"
+        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "PU_wiedervorlagen" & ".csv"
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        swfehlt = New IO.StreamWriter(puFehler)
+        swfehlt.AutoFlush = True
+        Dim Sql As String
+        Dim maxobj As Integer = 0
+        maxobj = setMaxObj(maxobj)
+        Sql = "select DATUM,TODO,w.BEMERKUNG,w.TS,w.VORGANGSID,w.ERLEDIGTAM,w.ERLEDIGT,w.BEARBEITER,w.WARTENAUF,w.BEARBEITERID," &
+                    "t.EINGANG as teingang " &
+              "From [Paradigma].[dbo].[WIEDERVORLAGE_T45] as w, stammdaten_tutti As t " &
+              "where w.VORGANGSID=t.VORGANGSID   order by w.VORGANGSID desc"
+        TextBox1.Text = puAusgabe
+        TextBox2.Text = Sql
+        'writeStakeholderAusgabePU(puFehler, puAusgabeStream, Sql, maxobj)
+        writeWiedervorlageAusgabePU(puFehler, puAusgabeStream, Sql, maxobj)
+        puAusgabeStream.Close()
+        puAusgabeStream.Dispose()
+        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
+        swfehlt.Dispose()
+    End Sub
+    Private Sub writeWiedervorlageAusgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
+        Dim DT As DataTable
+        Dim idok As Integer = 0
+        puAusgabeStream.AutoFlush = True
+        swfehlt.WriteLine("Wiedervorlage---")
+        DT = alleDokumentDatenHolen(sql)
+
+        Dim ic As Integer = 0
+        Dim igesamt As Integer = 0
+        Dim gemarkung, flur, flurstueck, ost, info, funktion, gemcode, bearbeiterid, FS, Betreff As String
+        Dim newsavemode As Boolean
+        Dim istRevisionssicher As Boolean
+        Dim dbdatum, hauptaktenjahr As Date
+        Dim spalte1 As String
+        Dim vid As String
+        Dim datum, antrag, vollstaendig, eingang As Date
+        Dim sachbearbeiter As String
+        Dim myoracle As SqlClient.SqlConnection
+        myoracle = getMSSQLCon()
+        myoracle.Open()
+        Dim zeile As New Text.StringBuilder
+        Dim erledigtam As Date
+        Dim erledigt As Boolean
+        Dim t As String = ";"
+        Dim geschlossen As String = "0"
+        l("Wiedervorlage")
+
+        'kopfzeile
+        zeile.Append("az" & t) '     Bearbeitungsart   
+        zeile.Append("jahr" & t) '     datum
+        zeile.Append("Bearbeitungsart" & t) '  gemarkungstext    
+        zeile.Append("datum" & t) '  nachname
+        zeile.Append("sachbearbeiter" & t) '  znkombi
+        zeile.Append("Betreff" & t) '   rechts    
+        zeile.Append("info" & t) ' hoch
+
+        zeile.Append("bearbeiterid" & t) '  
+        zeile.Append("erledigtam" & t) '  
+        zeile.Append("erledigt" & t) '  
+        'zeile.Append("angelegtam" & t) '  
+        csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
+        For Each drr As DataRow In DT.Rows
+            Try
+                igesamt += 1
+                vid = CStr(clsDBtools.fieldvalue(drr.Item("vorgangsid")))
+                eingang = cleanString(CStr(clsDBtools.fieldvalueDate(drr.Item("teingang"))))
+                Bearbeitungsart = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("TODO"))))
+                datum = CDate(clsDBtools.fieldvalueDate(drr.Item("datum")))  '==FÄLLIG
+                sachbearbeiter = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter"))))
+                Betreff = "Wartenauf: " & cleanString(CStr(clsDBtools.fieldvalue(drr.Item("wartenauf"))))
+                info = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Bemerkung"))))
+
+                bearbeiterid = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("bearbeiterid"))))
+                erledigtam = cleanString(CStr(clsDBtools.fieldvalueDate(drr.Item("erledigtam"))))
+                erledigt = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("erledigt"))))
+                'angelegtam = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("weingang"))))
+
+                TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
+                Application.DoEvents()
+                'zeilebilden
+                zeile.Append(vid & t) 'Az
+                zeile.Append(eingang.ToString("yyyy") & t) 'jahr 
+                zeile.Append(Bearbeitungsart & t) 'Az 
+                zeile.Append(datum & t) ' 
+                zeile.Append(sachbearbeiter & t) ' 
+                zeile.Append(Betreff & t) ' 
+                zeile.Append(info & t) ' 
+
+
+                zeile.Append(bearbeiterid & t) ' 
+                zeile.Append(erledigtam.ToString("yyyy") & t) 'jahr 
+                zeile.Append(erledigt & t) ' 
+                'zeile.Append(angelegtam & t) ' veraltet
+
+
+                If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
+                    zeile.Clear()
+                Else
+                    Debug.Print("oooo")
+                End If
+                idok += 1
+                If idok > maxobj Then Exit For
+            Catch ex As Exception
+                l("fehler2: " & ex.ToString)
+                TextBox2.Text = ic.ToString & Environment.NewLine & " " &
+                          Environment.NewLine &
+                       Bearbeitungsart & "/" & Bearbeitungsart & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       TextBox2.Text
+                Application.DoEvents()
+            End Try
+            GC.Collect()
+            GC.WaitForFullGCComplete()
+        Next
+        'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
+        zeile.Clear()
+
+        swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
+
+        '####
+        'swfehlt.Close()
+        l("fertig  " & puFehler)
+        ' Process.Start(puFehler)
     End Sub
 
     Private Sub writeStakeholderAusgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
@@ -3111,8 +3238,8 @@ Public Class Form1
             beteiligter = New person
             igesamt += 1
             TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
-            bearbeiterID = 0 'CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-            eingang = CDate("1911-01-01") ' ""CStr(clsDBtools.fieldvalueDate(drr.Item("eingang")))'""
+            Bearbeitungsart = 0 'CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+            eingang = CDate("1911-01-01") ' ""CStr(clsDBtools.fieldvalueDate(drr.Item("datum")))'""
             perscoll = getAllStakeholders(perstemp, DT)
 
             For Each perso As person In perscoll
@@ -3178,10 +3305,37 @@ Public Class Form1
             Return Nothing
         End Try
     End Function
-
+    Private Sub bildeKopfZeileWiedervorlage(zeileBeteiligte As System.Text.StringBuilder, t As String)
+        zeileBeteiligte.Append("az" & t) '     Bearbeitungsart   
+        zeileBeteiligte.Append("jahr" & t) '     datum
+        zeileBeteiligte.Append("Obergruppe" & t) '  rolle    
+        zeileBeteiligte.Append("Anrede" & t) '   
+        zeileBeteiligte.Append("Firma" & t) '  znkombi
+        zeileBeteiligte.Append("Titel" & t) '   rechts    
+        zeileBeteiligte.Append("Vorname" & t) ' hoch
+        zeileBeteiligte.Append("nachname" & t) '
+        zeileBeteiligte.Append("strasse" & t)
+        zeileBeteiligte.Append("hausnr" & t) ' 
+        zeileBeteiligte.Append("hausnr bis" & t) 'titel
+        zeileBeteiligte.Append("land" & t) 'abteilung
+        zeileBeteiligte.Append("plz" & t) 'telefon
+        zeileBeteiligte.Append("ort" & t) 'fax
+        zeileBeteiligte.Append("adreszusatzzeile1" & t) 'fs
+        zeileBeteiligte.Append("adreszusatzzeile2" & t) 'fs
+        zeileBeteiligte.Append("telefon" & t) 'fs
+        zeileBeteiligte.Append("fax" & t) 'fs
+        zeileBeteiligte.Append("mobil" & t) 'fs
+        zeileBeteiligte.Append("email" & t) 'fs
+        zeileBeteiligte.Append("de-mail" & t) 'fs
+        zeileBeteiligte.Append("web" & t) 'fs
+        zeileBeteiligte.Append("zeichen" & t) 'fs
+        zeileBeteiligte.Append("personennummer" & t) 'fs
+        zeileBeteiligte.Append("spalte1" & t)
+        zeileBeteiligte.Append("KASSENKONTO" & t)
+    End Sub
     Private Sub bildeKopfZeileStakeholder(zeileBeteiligte As System.Text.StringBuilder, t As String)
-        zeileBeteiligte.Append("az" & t) '     bearbeiterID   
-        zeileBeteiligte.Append("jahr" & t) '     eingang
+        zeileBeteiligte.Append("az" & t) '     Bearbeitungsart   
+        zeileBeteiligte.Append("jahr" & t) '     datum
         zeileBeteiligte.Append("Obergruppe" & t) '  rolle    
         zeileBeteiligte.Append("Anrede" & t) '   
         zeileBeteiligte.Append("Firma" & t) '  znkombi
@@ -3221,7 +3375,7 @@ Public Class Form1
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
 
-        Sql = "select vorgangsid,eingang from stammdaten_tutti     order by vorgangsid desc   "
+        Sql = "select vorgangsid,datum from stammdaten_tutti     order by vorgangsid desc   "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         writeAntragstellerausgabePU(puFehler, ausgabeAntragsteller, ausgabeBeteiligte, Sql, maxobj)
@@ -3266,9 +3420,9 @@ Public Class Form1
                 antragsteller = New person
                 igesamt += 1
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
-                bearbeiterID = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                eingang = CStr(clsDBtools.fieldvalueDate(drr.Item("eingang")))
-                perscoll = getAllBeteiligte4vorgang(perstemp, bearbeiterID)
+                Bearbeitungsart = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+                eingang = CStr(clsDBtools.fieldvalueDate(drr.Item("datum")))
+                perscoll = getAllBeteiligte4vorgang(perstemp, Bearbeitungsart)
                 If hatAntragsteller(perscoll) Then
                     antragsteller = getAntragsteller(perscoll)
                     If antragsteller Is Nothing Then Exit For
@@ -3300,7 +3454,7 @@ Public Class Form1
                 l("fehler2: " & ex.ToString)
                 TextBox2.Text = ic.ToString & Environment.NewLine & " " &
                           Environment.NewLine &
-                       bearbeiterID & "/" & bearbeiterID & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       Bearbeitungsart & "/" & Bearbeitungsart & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
                 Application.DoEvents()
             End Try
@@ -3349,8 +3503,8 @@ Public Class Form1
     End Function
 
     Private Shared Sub bildeKopfZeile(zeileAntragsteller As System.Text.StringBuilder, t As String)
-        zeileAntragsteller.Append("az" & t) '     bearbeiterID   
-        zeileAntragsteller.Append("jahr" & t) '     eingang
+        zeileAntragsteller.Append("az" & t) '     Bearbeitungsart   
+        zeileAntragsteller.Append("jahr" & t) '     datum
         zeileAntragsteller.Append("Obergruppe" & t) '  rolle    
         zeileAntragsteller.Append("Anrede" & t) '   
         zeileAntragsteller.Append("Firma" & t) '  znkombi
@@ -3395,7 +3549,7 @@ Public Class Form1
         Dim zeileAntragsteller As New Text.StringBuilder
 
         zeileAntragsteller.Clear()
-        zeileAntragsteller.Append(bearbeiterID & t) 'Az
+        zeileAntragsteller.Append(Bearbeitungsart & t) 'Az
         zeileAntragsteller.Append(eingang.ToString("yyyy") & t) 'jahr 
         zeileAntragsteller.Append(perso.Rolle & t) ' 
         zeileAntragsteller.Append(perso.Anrede & t) ' 
@@ -3532,8 +3686,8 @@ Public Class Form1
         Dim geschlossen As String = "0"
         l("writeKatasterausgabePU")
         'kopfzeile
-        zeile.Append("bearbeiterID" & t) '     bearbeiterID   
-        zeile.Append("Username" & t) '     eingang
+        zeile.Append("Bearbeitungsart" & t) '     Bearbeitungsart   
+        zeile.Append("Username" & t) '     datum
         zeile.Append("nachname" & t) '  gemarkungstext    
         zeile.Append("vorname" & t) '  nachname
         zeile.Append("rang" & t) '  znkombi
@@ -3552,7 +3706,7 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                bearbeiterID = CStr(clsDBtools.fieldvalue(drr.Item("bearbeiterID")))
+                Bearbeitungsart = CStr(clsDBtools.fieldvalue(drr.Item("Bearbeitungsart")))
                 Username = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Username"))))
                 nachname = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("nachname"))))
                 vorname = cleanString((clsDBtools.fieldvalue(drr.Item("vorname"))))
@@ -3572,7 +3726,7 @@ Public Class Form1
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
                 Application.DoEvents()
                 'zeilebilden
-                zeile.Append(bearbeiterID & t) 'Az 
+                zeile.Append(Bearbeitungsart & t) 'Az 
                 zeile.Append(Username & t) ' 
                 zeile.Append(nachname & t) ' 
                 zeile.Append(vorname & t) ' 
@@ -3600,7 +3754,7 @@ Public Class Form1
                 l("fehler2: " & ex.ToString)
                 TextBox2.Text = ic.ToString & Environment.NewLine & " " &
                           Environment.NewLine &
-                       bearbeiterID & "/" & bearbeiterID & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       Bearbeitungsart & "/" & Bearbeitungsart & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
                 Application.DoEvents()
             End Try
@@ -3616,6 +3770,12 @@ Public Class Form1
         'swfehlt.Close()
         l("fertig  " & puFehler)
         ' Process.Start(puFehler)
+    End Sub
+
+
+
+    Private Sub GroupBox1_Enter(sender As Object, e As EventArgs) Handles GroupBox1.Enter
+
     End Sub
 
 
@@ -3646,10 +3806,10 @@ Public Class Form1
 
         checkoutRoot = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) & "\paradigma\muell\"
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
-        '  bearbeiterID = modPrep.getVid()
+        '  Bearbeitungsart = modPrep.getVid()
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
-        If bearbeiterID = "fehler" Then End
+        If Bearbeitungsart = "fehler" Then End
         Dim Sql As String
         Sql = "SELECT * FROM dokumente where   ort<2000000 and ort>0  " &
                   " and (revisionssicher=1) order by ort desc "
