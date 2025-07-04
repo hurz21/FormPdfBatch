@@ -60,6 +60,10 @@ Partial Class Form1
         Me.Button24 = New System.Windows.Forms.Button()
         Me.Button23 = New System.Windows.Forms.Button()
         Me.Button22 = New System.Windows.Forms.Button()
+        Me.Button32 = New System.Windows.Forms.Button()
+        Me.Button33 = New System.Windows.Forms.Button()
+        Me.Button34 = New System.Windows.Forms.Button()
+        Me.Button35 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -303,6 +307,10 @@ Partial Class Form1
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.Button35)
+        Me.GroupBox1.Controls.Add(Me.Button34)
+        Me.GroupBox1.Controls.Add(Me.Button33)
+        Me.GroupBox1.Controls.Add(Me.Button32)
         Me.GroupBox1.Controls.Add(Me.Button31)
         Me.GroupBox1.Controls.Add(Me.Button30)
         Me.GroupBox1.Controls.Add(Me.Button29)
@@ -412,7 +420,7 @@ Partial Class Form1
         Me.Button24.Name = "Button24"
         Me.Button24.Size = New System.Drawing.Size(179, 19)
         Me.Button24.TabIndex = 28
-        Me.Button24.Text = "10. "
+        Me.Button24.Text = "10. Zahlungen / Verwandte"
         Me.Button24.UseVisualStyleBackColor = True
         '
         'Button23
@@ -432,6 +440,42 @@ Partial Class Form1
         Me.Button22.TabIndex = 26
         Me.Button22.Text = "5.Lage-Adresse"
         Me.Button22.UseVisualStyleBackColor = True
+        '
+        'Button32
+        '
+        Me.Button32.Location = New System.Drawing.Point(520, 21)
+        Me.Button32.Name = "Button32"
+        Me.Button32.Size = New System.Drawing.Size(75, 23)
+        Me.Button32.TabIndex = 38
+        Me.Button32.Text = "verwandte"
+        Me.Button32.UseVisualStyleBackColor = True
+        '
+        'Button33
+        '
+        Me.Button33.Location = New System.Drawing.Point(533, 99)
+        Me.Button33.Name = "Button33"
+        Me.Button33.Size = New System.Drawing.Size(75, 23)
+        Me.Button33.TabIndex = 39
+        Me.Button33.Text = "kosten"
+        Me.Button33.UseVisualStyleBackColor = True
+        '
+        'Button34
+        '
+        Me.Button34.Location = New System.Drawing.Point(520, 46)
+        Me.Button34.Name = "Button34"
+        Me.Button34.Size = New System.Drawing.Size(75, 23)
+        Me.Button34.TabIndex = 40
+        Me.Button34.Text = "natureg"
+        Me.Button34.UseVisualStyleBackColor = True
+        '
+        'Button35
+        '
+        Me.Button35.Location = New System.Drawing.Point(533, 184)
+        Me.Button35.Name = "Button35"
+        Me.Button35.Size = New System.Drawing.Size(75, 23)
+        Me.Button35.TabIndex = 41
+        Me.Button35.Text = "illegalehütten"
+        Me.Button35.UseVisualStyleBackColor = True
         '
         'Form1
         '
@@ -507,4 +551,8 @@ End Sub
     Friend WithEvents TextBox4 As TextBox
     Friend WithEvents Button30 As Button
     Friend WithEvents Button31 As Button
+    Friend WithEvents Button34 As Button
+    Friend WithEvents Button33 As Button
+    Friend WithEvents Button32 As Button
+    Friend WithEvents Button35 As Button
 End Class
