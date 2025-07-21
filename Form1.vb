@@ -3803,6 +3803,11 @@ Public Class Form1
                 " where Not (art Like '%email%' or art like '%wiederv%') " &
                 " And e.VORGANGSID = s.VORGANGSID " &
                 " order by e.id desc "
+        Sql = "    Select   * FROM [Paradigma].[dbo].[EREIGNIS_T16]    e, " &
+                "  [Paradigma].[dbo].[stammdaten_tutti] s " &
+                " where  " &
+                "   e.VORGANGSID = s.VORGANGSID " &
+                " order by    e.VORGANGSID desc,  e.DATUM desc"
 
 
         Dim relativpfad As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\ereignisse\"
@@ -3843,7 +3848,7 @@ Public Class Form1
         l("vor csvverarbeiten")
         Dim ic As Integer = 0
         Dim igesamt As Integer = 0
-        Dim dateinameext, art, richtung, inputfile, outfile, typnr, outstring As String
+        Dim dateinameext, art, richtung, inputfile, outfile, typnr, outstring, summary As String
         Dim newsavemode As Boolean
         Dim istRevisionssicher As Boolean
         Dim dbdatum As Date
