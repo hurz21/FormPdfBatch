@@ -67,7 +67,7 @@ Public Class clsBlob
 
 
     Shared Function saveDokumenteTooltip(dokumentid As Integer, myoracle As SqlConnection,
-                                 fullpath As String, vid As Integer) As Long
+                                 fullpath As String) As Long
 
         'myoracle = New SqlClient.SqlConnection(v)
         'MsgBox(myoracle.ToString)

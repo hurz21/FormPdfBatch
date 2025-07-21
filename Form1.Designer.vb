@@ -48,6 +48,10 @@ Partial Class Form1
         Me.Button20 = New System.Windows.Forms.Button()
         Me.Button21 = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.Button35 = New System.Windows.Forms.Button()
+        Me.Button34 = New System.Windows.Forms.Button()
+        Me.Button33 = New System.Windows.Forms.Button()
+        Me.Button32 = New System.Windows.Forms.Button()
         Me.Button31 = New System.Windows.Forms.Button()
         Me.Button30 = New System.Windows.Forms.Button()
         Me.Button29 = New System.Windows.Forms.Button()
@@ -60,10 +64,6 @@ Partial Class Form1
         Me.Button24 = New System.Windows.Forms.Button()
         Me.Button23 = New System.Windows.Forms.Button()
         Me.Button22 = New System.Windows.Forms.Button()
-        Me.Button32 = New System.Windows.Forms.Button()
-        Me.Button33 = New System.Windows.Forms.Button()
-        Me.Button34 = New System.Windows.Forms.Button()
-        Me.Button35 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -289,7 +289,7 @@ Partial Class Form1
         '
         'Button20
         '
-        Me.Button20.Location = New System.Drawing.Point(5, 72)
+        Me.Button20.Location = New System.Drawing.Point(7, 72)
         Me.Button20.Name = "Button20"
         Me.Button20.Size = New System.Drawing.Size(213, 23)
         Me.Button20.TabIndex = 24
@@ -307,6 +307,7 @@ Partial Class Form1
         '
         'GroupBox1
         '
+        Me.GroupBox1.BackColor = System.Drawing.SystemColors.ActiveCaption
         Me.GroupBox1.Controls.Add(Me.Button35)
         Me.GroupBox1.Controls.Add(Me.Button34)
         Me.GroupBox1.Controls.Add(Me.Button33)
@@ -333,6 +334,42 @@ Partial Class Form1
         Me.GroupBox1.TabIndex = 26
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "ProbauG Umsetzung"
+        '
+        'Button35
+        '
+        Me.Button35.Location = New System.Drawing.Point(520, 111)
+        Me.Button35.Name = "Button35"
+        Me.Button35.Size = New System.Drawing.Size(75, 23)
+        Me.Button35.TabIndex = 41
+        Me.Button35.Text = "illegalehütten"
+        Me.Button35.UseVisualStyleBackColor = True
+        '
+        'Button34
+        '
+        Me.Button34.Location = New System.Drawing.Point(520, 46)
+        Me.Button34.Name = "Button34"
+        Me.Button34.Size = New System.Drawing.Size(75, 23)
+        Me.Button34.TabIndex = 40
+        Me.Button34.Text = "natureg"
+        Me.Button34.UseVisualStyleBackColor = True
+        '
+        'Button33
+        '
+        Me.Button33.Location = New System.Drawing.Point(520, 75)
+        Me.Button33.Name = "Button33"
+        Me.Button33.Size = New System.Drawing.Size(75, 23)
+        Me.Button33.TabIndex = 39
+        Me.Button33.Text = "kosten"
+        Me.Button33.UseVisualStyleBackColor = True
+        '
+        'Button32
+        '
+        Me.Button32.Location = New System.Drawing.Point(520, 21)
+        Me.Button32.Name = "Button32"
+        Me.Button32.Size = New System.Drawing.Size(75, 23)
+        Me.Button32.TabIndex = 38
+        Me.Button32.Text = "verwandte"
+        Me.Button32.UseVisualStyleBackColor = True
         '
         'Button31
         '
@@ -384,7 +421,7 @@ Partial Class Form1
         Me.Button28.Name = "Button28"
         Me.Button28.Size = New System.Drawing.Size(179, 23)
         Me.Button28.TabIndex = 32
-        Me.Button28.Text = "12. Synthetische Dokus"
+        Me.Button28.Text = "12. Ereignisse Dokus"
         Me.Button28.UseVisualStyleBackColor = True
         '
         'Button27
@@ -440,42 +477,6 @@ Partial Class Form1
         Me.Button22.TabIndex = 26
         Me.Button22.Text = "5.Lage-Adresse"
         Me.Button22.UseVisualStyleBackColor = True
-        '
-        'Button32
-        '
-        Me.Button32.Location = New System.Drawing.Point(520, 21)
-        Me.Button32.Name = "Button32"
-        Me.Button32.Size = New System.Drawing.Size(75, 23)
-        Me.Button32.TabIndex = 38
-        Me.Button32.Text = "verwandte"
-        Me.Button32.UseVisualStyleBackColor = True
-        '
-        'Button33
-        '
-        Me.Button33.Location = New System.Drawing.Point(533, 99)
-        Me.Button33.Name = "Button33"
-        Me.Button33.Size = New System.Drawing.Size(75, 23)
-        Me.Button33.TabIndex = 39
-        Me.Button33.Text = "kosten"
-        Me.Button33.UseVisualStyleBackColor = True
-        '
-        'Button34
-        '
-        Me.Button34.Location = New System.Drawing.Point(520, 46)
-        Me.Button34.Name = "Button34"
-        Me.Button34.Size = New System.Drawing.Size(75, 23)
-        Me.Button34.TabIndex = 40
-        Me.Button34.Text = "natureg"
-        Me.Button34.UseVisualStyleBackColor = True
-        '
-        'Button35
-        '
-        Me.Button35.Location = New System.Drawing.Point(533, 184)
-        Me.Button35.Name = "Button35"
-        Me.Button35.Size = New System.Drawing.Size(75, 23)
-        Me.Button35.TabIndex = 41
-        Me.Button35.Text = "illegalehütten"
-        Me.Button35.UseVisualStyleBackColor = True
         '
         'Form1
         '
