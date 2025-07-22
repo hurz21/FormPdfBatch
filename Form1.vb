@@ -3807,7 +3807,16 @@ Public Class Form1
                 "  [Paradigma].[dbo].[stammdaten_tutti] s " &
                 " where  " &
                 "   e.VORGANGSID = s.VORGANGSID " &
+                "  and    not( art like '%email%' or art like '%wiederv%' or  (NOTIZ) is  null  ) " &
                 " order by    e.VORGANGSID desc,  e.DATUM desc"
+
+        'Sql = "  SELECT e.id,e.BESCHREIBUNG,datum,art,richtung,notiz,typnr,e.VORGANGSID,s.EINGANG,dateinameext " &
+        '        " FROM [Paradigma].[dbo].EREIGNIS_und_DOK e,   " &
+        '        "   [Paradigma].[dbo].[stammdaten_tutti] s  " &
+        '        "   Where   " &
+        '        "     e.VORGANGSID = s.VORGANGSID  " &
+        '        "  and    not( art like '%email%' or art like '%wiederv%' or  (NOTIZ) is  null  ) " &
+        '        "  order by VORGANGSID desc,datum desc "
 
 
         Dim relativpfad As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\ereignisse\"
@@ -3887,6 +3896,9 @@ Public Class Form1
                 igesamt += 1
                 DbMetaDatenEreignisHolen(art, richtung, notiz, typnr, dbdatum, eingang, vid,
                                            eid, beschreibung, drr)
+                If Trim(notiz) = String.Empty Then
+                    Continue For
+                End If
                 l(eid & " " & CStr(art) & " " & ic)
                 outfile = dbdatum.ToString("yyyyMMdd_hhmmss") & "_" & cleanString(art) & "_" & cleanString(richtung) & ".txt"
                 outfile = relativpfad & vid & "\" & eid & "\" & outfile
