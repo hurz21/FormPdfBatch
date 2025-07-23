@@ -3785,7 +3785,7 @@ Public Class Form1
 
     Private Sub Button28_Click(sender As Object, e As EventArgs) Handles Button28.Click
         Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_ausgabeEreignisse" & Environment.UserName & ".txt"
-        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "ereignisse" & ".csv"
+        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "dokumente_ereignisse" & ".csv"
         Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
         '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".txt"
         swfehlt = New IO.StreamWriter(puFehler)
