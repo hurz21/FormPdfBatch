@@ -48,6 +48,7 @@ Partial Class Form1
         Me.Button20 = New System.Windows.Forms.Button()
         Me.Button21 = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.Button36 = New System.Windows.Forms.Button()
         Me.Button35 = New System.Windows.Forms.Button()
         Me.Button34 = New System.Windows.Forms.Button()
         Me.Button33 = New System.Windows.Forms.Button()
@@ -64,7 +65,6 @@ Partial Class Form1
         Me.Button24 = New System.Windows.Forms.Button()
         Me.Button23 = New System.Windows.Forms.Button()
         Me.Button22 = New System.Windows.Forms.Button()
-        Me.Button36 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -337,6 +337,15 @@ Partial Class Form1
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "ProbauG Umsetzung"
         '
+        'Button36
+        '
+        Me.Button36.Location = New System.Drawing.Point(251, 153)
+        Me.Button36.Name = "Button36"
+        Me.Button36.Size = New System.Drawing.Size(188, 23)
+        Me.Button36.TabIndex = 42
+        Me.Button36.Text = "14. VerlaufSummary"
+        Me.Button36.UseVisualStyleBackColor = True
+        '
         'Button35
         '
         Me.Button35.Location = New System.Drawing.Point(520, 111)
@@ -479,15 +488,6 @@ Partial Class Form1
         Me.Button22.TabIndex = 26
         Me.Button22.Text = "5.Lage-Adresse"
         Me.Button22.UseVisualStyleBackColor = True
-        '
-        'Button36
-        '
-        Me.Button36.Location = New System.Drawing.Point(251, 153)
-        Me.Button36.Name = "Button36"
-        Me.Button36.Size = New System.Drawing.Size(188, 23)
-        Me.Button36.TabIndex = 42
-        Me.Button36.Text = "14. VerlaufSummary"
-        Me.Button36.UseVisualStyleBackColor = True
         '
         'Form1
         '

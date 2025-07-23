@@ -22,6 +22,24 @@
         End Try
     End Function
 
+    'Public Sub DbMetaDatenEreignisHolen(ByRef art As String, ByRef richtung As String, ByRef notiz As String, ByRef typnr As String,
+    '                                   ByRef datum As Date, ByRef eingang As Date, ByRef vid As String,
+    '                                       ByRef eid As String, ByRef beschreibung As String, drr As DataRow)
+    '    Try
+    '        vid = CStr(clsDBtools.fieldvalue(drr.Item("vorgangsid"))) 'Bearbeitungsart 
+    '        eid = CStr(clsDBtools.fieldvalue(drr.Item("id")))
+    '        richtung = (CStr(clsDBtools.fieldvalue(drr.Item("richtung"))))
+    '        typnr = (CStr(clsDBtools.fieldvalue(drr.Item("typnr"))))
+    '        notiz = (CStr(clsDBtools.fieldvalue(drr.Item("notiz"))))
+    '        datum = CDate(clsDBtools.fieldvalueDate(drr.Item("datum")))
+    '        eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+    '        beschreibung = (CStr(clsDBtools.fieldvalue(drr.Item("Beschreibung"))))
+
+    '        art = CStr(clsDBtools.fieldvalue(drr.Item("art")))
+    '    Catch ex As Exception
+    '        l("fehler in DbMetaDatenDokumentHolen:" & vid & ex.ToString)
+    '    End Try
+    'End Sub
     Public Sub DbMetaDatenEreignisHolen(ByRef art As String, ByRef richtung As String, ByRef notiz As String, ByRef typnr As String,
                                        ByRef datum As Date, ByRef eingang As Date, ByRef vid As String,
                                            ByRef eid As String, ByRef beschreibung As String, drr As DataRow)
@@ -41,6 +59,28 @@
         End Try
     End Sub
 
+    '    Public Sub DbMetaDatenVerlaufDokumentHolen(ByRef vid As String, ByRef relativpfad As String, ByRef dateinameext As String,
+    '                           ByRef typ As String, ByRef newsavemode As Boolean, ByRef dokumentid As String,
+    '                           ByVal drr As DataRow, ByRef datumDB As Date, ByRef istRevisionssicher As Boolean,
+    'ByRef initial As String, ByRef eid As Integer, ByRef beschreibung As String, ByRef eingang As Date, ByRef fullfilename As String)
+    '        Try
+    '            vid = CStr(drr.Item("vid")) 'Bearbeitungsart
+    '            dokumentid = CStr(drr.Item("dokumentid"))
+    '            eid = CStr(drr.Item("eid"))
+    '            relativpfad = CStr(drr.Item("relativpfad"))
+    '            dateinameext = CStr(drr.Item("dateinameext"))
+    '            newsavemode = CBool(drr.Item("newsavemode"))
+    '            datumDB = CDate(drr.Item("checkindatum"))
+    '            eingang = CDate(drr.Item("checkindatum"))
+    '            initial = CStr(drr.Item("initial_"))
+    '            istRevisionssicher = CBool(drr.Item("revisionssicher"))
+    '            beschreibung = CStr(drr.Item("Beschreibung"))
+    '            fullfilename = CStr(drr.Item("tooltip"))
+    '            typ = CStr(drr.Item("typ"))
+    '        Catch ex As Exception
+    '            l("fehler in DbMetaDatenDokumentHolen:" & vid & ex.ToString)
+    '        End Try
+    '    End Sub
     Public Sub DbMetaDatenDokumentHolen(ByRef vid As String, ByRef relativpfad As String, ByRef dateinameext As String,
                            ByRef typ As String, ByRef newsavemode As Boolean, ByRef dokumentid As String,
                            ByVal drr As DataRow, ByRef datumDB As Date, ByRef istRevisionssicher As Boolean,

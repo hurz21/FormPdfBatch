@@ -1,5 +1,7 @@
 ﻿Imports System.Drawing.Imaging
-Imports System.Runtime.InteropServices
+'Imports System.Runtime.InteropServices
+'Imports Microsoft.Office.Interop.Excel
+Imports System.Data
 'Imports Acrobat
 'Imports Microsoft.Office.Interop
 'Imports Microsoft.Office.Interop.Word
@@ -53,7 +55,7 @@ Public Class Form1
     End Sub
     Private Shared Function RevSicherdokumentDatenHolen(sql As String) As DataTable
 
-        Dim dt As New DataTable
+        Dim dt As New System.Data.DataTable
         Try
 
             'MsgBox(Sql)
@@ -603,9 +605,9 @@ Public Class Form1
 
 
             pdfDoc.Close()
-            If pdfPage IsNot Nothing Then Marshal.ReleaseComObject(pdfPage)
-            If pdfRect IsNot Nothing Then Marshal.ReleaseComObject(pdfRect)
-            If pdfDoc IsNot Nothing Then Marshal.ReleaseComObject(pdfDoc)
+            'If pdfPage IsNot Nothing Then Marshal.ReleaseComObject(pdfPage)
+            'If pdfRect IsNot Nothing Then Marshal.ReleaseComObject(pdfRect)
+            'If pdfDoc IsNot Nothing Then Marshal.ReleaseComObject(pdfDoc)
         End Try
     End Function
     Function GetEncoderInfo(ByVal format As ImageFormat) As ImageCodecInfo
@@ -3828,28 +3830,14 @@ Public Class Form1
         writeEreignissePU(puFehler, puAusgabeStream, Sql, maxobj, relativpfad)
         puAusgabeStream.Close()
         puAusgabeStream.Dispose()
-        'Process.Start(puAusgabe)
-        '######
-        'puAusgabe = "D:\probaug_Ausgabe\" & "ereignisse" & ".csv"
-        'puAusgabeStream = New IO.StreamWriter(puAusgabe)
-        ''     Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_referenz]  order by ort desc "
-        'TextBox1.Text = TextBox1.Text & Environment.NewLine & puAusgabe
-        'TextBox2.Text = TextBox2.Text & Environment.NewLine & Sql
-        'writeDokumentePU(puFehler, puAusgabeStream, Sql, 500)
         swfehlt.Close()
         l("fertig  " & puFehler)
-        ' SELECT *  FROM [Paradigma].[dbo].[EREIGNIS_T16]  where not( art like '%email%' or art like '%wiederv%')
     End Sub
 
     Private Sub writeEreignissePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer, relativpfad As String)
-        '####
         Dim DT As DataTable
         Dim idok As Integer = 0
         puAusgabeStream.AutoFlush = True
-        'ausgabeAntragsteller.WriteLine(Now)
-        l("PDFumwandeln ")
-
-
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
         If Bearbeitungsart = "fehler" Then End
 
@@ -3988,6 +3976,243 @@ Public Class Form1
             Return "fehler"
         End Try
     End Function
+
+    Private Sub Button36_Click(sender As Object, e As EventArgs) Handles Button36.Click
+        Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_verlauf" & Environment.UserName & ".txt"
+        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "dokumente_verlaufSummary" & ".csv"
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".txt"
+        swfehlt = New IO.StreamWriter(puFehler)
+        swfehlt.AutoFlush = True
+        '  swfehlt.WriteLine(Now)
+        ' S1020dokumenteMitFullpathTabelleErstellen("DOKUFULLNAME", swfehlt) 'referenzfälleNeuZuweisen
+        ' swfehlt.WriteLine("wechsel")
+        ' dokumenteMitFullpathTabelleErstellen(swfehlt)
+        Dim Sql As String
+        Dim maxobj As Integer = 0
+        maxobj = setMaxObj(maxobj)
+        'Sql = "SELECT *  FROM [Paradigma].[dbo].[EREIGNIS_T16]  where not( art like '%email%' or art like '%wiederv%')  order by id desc "
+        Sql = "    Select   * FROM [Paradigma].[dbo].[EREIGNIS_T16]    e, " &
+                "  [Paradigma].[dbo].[stammdaten_tutti] s " &
+                " where Not (art Like '%email%' or art like '%wiederv%') " &
+                " And e.VORGANGSID = s.VORGANGSID " &
+                " order by e.id desc "
+
+
+        Sql = "  Select   top 100 " &
+            "  e.VORGANGSID,EINGANG,e.beschreibung,datum,art,richtung, notiz,quelle, " &
+            "  DATEINAMEEXT,d_beschreibung, " &
+            "  FILEDATUM, typ, CHECKINDATUM, REVISIONSSICHER " &
+            "  FROM [Paradigma].[dbo].[EREIGNIS_und_dok]    e,   " &
+            "   [Paradigma].[dbo].[stammdaten_tutti] s  " &
+            "   where         e.VORGANGSID = s.VORGANGSID    " &
+            "   order by    e.VORGANGSID desc,  e.DATUM desc"
+
+
+
+        Dim relativpfad As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\ereignisse\"
+
+
+        TextBox1.Text = puAusgabe
+        TextBox2.Text = Sql
+        'MsgBox("max. objekte für test: " & maxobj)
+        writeVerlaufPU(puFehler, puAusgabeStream, Sql, maxobj, relativpfad)
+        puAusgabeStream.Close()
+        puAusgabeStream.Dispose()
+
+        swfehlt.Close()
+        l("fertig  " & puFehler)
+    End Sub
+
+    Private Sub writeVerlaufPU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer, relativpfad As String)
+        Dim DT As DataTable
+        Dim idok As Integer = 0
+        puAusgabeStream.AutoFlush = True
+        inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
+        If Bearbeitungsart = "fehler" Then End
+
+        DT = alleDokumentDatenHolen(sql)
+        l("vor csvverarbeiten")
+        Dim ic As Integer = 0
+        Dim igesamt As Integer = 0
+        Dim dateinameext, art, richtung, inputfile, outfile, typnr, outstring, summary As String
+        Dim newsavemode As Boolean
+        Dim istRevisionssicher As Boolean
+        Dim dbdatum, FILEDATUM, CHECKINDATUM As Date
+        Dim notiz As String
+        Dim beschreibung As String
+        Dim eingang As Date
+        Dim eid, vid As String
+        Dim myoracle As SqlClient.SqlConnection
+        myoracle = getMSSQLCon()
+        myoracle.Open()
+        Dim zeile As New Text.StringBuilder
+        Dim excelkopf As New Text.StringBuilder
+        Dim fullfilename, quelle, d_beschreibung, typ, REVISIONSSICHER As String
+        Dim t As String = ";"
+        excelkopf.Append("Ereignis" & t) 'Az
+        excelkopf.Append("datum" & t) 'jahr
+        excelkopf.Append("richtung" & t) 'datum
+        excelkopf.Append("quelle" & t) 'oberbegriff Protokolle
+        excelkopf.Append((cleanString("beschreibung")) & t) 'bezeichnung beschreibung
+        excelkopf.Append(("dateiname") & t) 'pfad
+        excelkopf.Append("dateibeschreibung" & t) 'ordner im mediencenter
+        excelkopf.Append("dateityp" & t) ' 
+        excelkopf.Append("revisionssicher" & t) ' 
+        excelkopf.Append("filedatum" & t) ' 
+        excelkopf.Append("checkindatum" & Environment.NewLine) '  
+        'kopfzeile
+        zeile.Append("az" & t) 'Az
+        zeile.Append("jahr" & t) 'jahr
+        zeile.Append("datum" & t) 'datum
+        zeile.Append("oberbegriff" & t) 'oberbegriff Protokolle
+        zeile.Append((cleanString("bezeichnung")) & t) 'bezeichnung beschreibung
+        zeile.Append(("pfad") & t) 'pfad
+        zeile.Append("ordner" & t) 'ordner im mediencenter
+        zeile.Append("revisionssicher" & t) ' 
+        zeile.Append("bearbeiterid" & t) ' 
+        csvzeileSpeichern(zeile.ToString, puAusgabeStream)
+        zeile.Clear()
+        Dim aktvorgangsid As String = "0"
+        Dim alter_eingang As Date
+        Dim summe As New Text.StringBuilder
+        outfile = makeAktOutfile(dbdatum, aktvorgangsid, relativpfad)
+        For Each drr As DataRow In DT.Rows
+            Try
+                igesamt += 1
+                DbMetaDatenVerlaufDokumentHolen(art, richtung, notiz, typnr, dbdatum, eingang, vid,
+                                           eid, beschreibung, quelle, dateinameext, d_beschreibung,
+                                           FILEDATUM, typ, CHECKINDATUM, REVISIONSSICHER, drr)
+                If vid = aktvorgangsid Then
+                    'alte summary weiterschreiben
+                    outstring = erzeugeverlaufZeile(beschreibung, richtung, art, dbdatum, dateinameext, quelle, d_beschreibung, typ, REVISIONSSICHER, FILEDATUM, CHECKINDATUM)
+                    summe.Append(outstring)
+                Else
+                    'alte summary schliessen
+                    schreibeEreignisdatei(outfile, summe.ToString)
+                    summe.Clear()
+                    'eintrag ins logbuch
+                    'zeilebilden
+                    zeile.Append(aktvorgangsid & t) 'Az
+                    zeile.Append(eingang.ToString("yyyy") & t) 'jahr
+                    zeile.Append(t) 'datum
+                    zeile.Append(t) 'oberbegriff Protokolle
+                    zeile.Append(t) 'bezeichnung beschreibung
+                    zeile.Append((outfile) & t) 'pfad
+                    zeile.Append("" & t) 'ordner im mediencenter
+                    zeile.Append("" & t) 'ordner im mediencenter
+                    zeile.Append("" & t) 'ordner im mediencenter
+
+                    If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
+                        zeile.Clear()
+                    Else
+                        Debug.Print("oooo")
+                    End If
+                    'neue aufmachen
+                    outfile = makeAktOutfile(dbdatum, vid, relativpfad)
+                    alter_eingang = eingang
+                    summe = New Text.StringBuilder
+                    summe.Append(excelkopf.ToString)
+                    aktvorgangsid = vid
+                    outstring = erzeugeverlaufZeile(beschreibung, richtung, art, dbdatum, dateinameext, quelle, d_beschreibung, typ, REVISIONSSICHER, FILEDATUM, CHECKINDATUM)
+                    summe.Append(outstring)
+                End If
+                l(eid & " " & CStr(art) & " " & ic)
+                TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
+                Application.DoEvents()
+
+                idok += 1
+                If idok > maxobj Then Exit For
+            Catch ex As Exception
+                l("fehler2: " & ex.ToString)
+                TextBox2.Text = ic.ToString & Environment.NewLine & " " &
+                       inputfile & Environment.NewLine &
+                       vid & "/" & eid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                       TextBox2.Text
+                'Application.DoEvents()
+            End Try
+            GC.Collect()
+            GC.WaitForFullGCComplete()
+        Next
+        csvzeileSpeichern(zeile.ToString, puAusgabeStream)
+        zeile.Clear()
+
+        swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
+
+        '####
+        'swfehlt.Close()
+        l("fertig  " & puFehler)
+    End Sub
+
+    Private Function erzeugeverlaufZeile(beschreibung As String, richtung As String, art As String,
+                                           dbdatum As Date,
+                                           dateinameext As String, quelle As String, d_beschreibung As String, typ As String, REVISIONSSICHER As String,
+                                         FILEDATUM As Date, CHECKINDATUM As Date) As String
+        Dim pu As New Text.StringBuilder
+        Dim t = ";"
+        'dbdatum, dateinameext, quelle, d_beschreibung, typ, REVISIONSSICHER, FILEDATUM, CHECKINDATUM
+        Try
+            pu.Append(art & t)
+            pu.Append(dbdatum.ToString("yyyyMMdd_hhmmss") & t)
+            pu.Append(cleanString(richtung) & t)
+            pu.Append(cleanString(quelle) & t)
+            pu.Append(cleanString(beschreibung) & t)
+            pu.Append(cleanString(dateinameext) & t)
+            pu.Append(cleanString(d_beschreibung) & t)
+            pu.Append(cleanString(typ) & t)
+            pu.Append(cleanString(REVISIONSSICHER) & t)
+            pu.Append(cleanString(FILEDATUM.ToString("yyyyMMdd_hhmmss")) & t)
+            pu.Append(cleanString(CHECKINDATUM.ToString("yyyyMMdd_hhmmss")) & Environment.NewLine)
+            Return pu.ToString
+        Catch ex As Exception
+            l("fehler  " & ex.ToString)
+            Return "fehler"
+        End Try
+    End Function
+
+    Private Function makeAktOutfile(ByRef dbdatum As Date, vid As String, relativpfad As String) As String
+        Dim out As String
+
+        Try
+            out = ("Summary") & "_" & cleanString(vid) & ".csv"
+            out = relativpfad & vid & "\" & out
+            If Not IO.Directory.Exists(relativpfad & vid) Then
+                IO.Directory.CreateDirectory(relativpfad & vid)
+            End If
+            Return out
+        Catch ex As Exception
+            l("fertig  " & ex.ToString)
+        End Try
+    End Function
+
+    Private Sub DbMetaDatenVerlaufDokumentHolen(ByRef art As String, ByRef richtung As String, ByRef notiz As String, ByRef typnr As String, ByRef dbdatum As Date, ByRef eingang As Date,
+                                               ByRef vid As String, ByRef eid As String, ByRef beschreibung As String, ByRef quelle As String, ByRef dateinameext As String,
+                                                ByRef d_beschreibung As String, ByRef fILEDATUM As Date, ByRef typ As String, ByRef cHECKINDATUM As Date,
+                                                ByRef rEVISIONSSICHER As String, drr As DataRow)
+        Try
+            vid = CStr(clsDBtools.fieldvalue(drr.Item("vorgangsid"))) 'Bearbeitungsart 
+            'eid = CStr(clsDBtools.fieldvalue(drr.Item("eid")))
+            richtung = (CStr(clsDBtools.fieldvalue(drr.Item("richtung"))))
+            'typnr = (CStr(clsDBtools.fieldvalue(drr.Item("typnr"))))
+            notiz = (CStr(clsDBtools.fieldvalue(drr.Item("notiz"))))
+            dbdatum = CDate(clsDBtools.fieldvalueDate(drr.Item("datum")))
+            eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+            beschreibung = (CStr(clsDBtools.fieldvalue(drr.Item("Beschreibung"))))
+
+            d_beschreibung = (CStr(clsDBtools.fieldvalue(drr.Item("d_beschreibung"))))
+            typ = (CStr(clsDBtools.fieldvalue(drr.Item("typ"))))
+            dateinameext = (CStr(clsDBtools.fieldvalue(drr.Item("dateinameext"))))
+            quelle = (CStr(clsDBtools.fieldvalue(drr.Item("quelle"))))
+
+            fILEDATUM = CDate(clsDBtools.fieldvalueDate(drr.Item("fILEDATUM")))
+            cHECKINDATUM = CDate(clsDBtools.fieldvalueDate(drr.Item("cHECKINDATUM")))
+            rEVISIONSSICHER = (CStr(clsDBtools.fieldvalue(drr.Item("rEVISIONSSICHER"))))
+
+            art = CStr(clsDBtools.fieldvalue(drr.Item("art")))
+        Catch ex As Exception
+            l("fehler in DbMetaDatenDokumentHolen:" & vid & ex.ToString)
+        End Try
+    End Sub
 
 
 
