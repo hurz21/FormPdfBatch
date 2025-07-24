@@ -2346,7 +2346,7 @@ Public Class Form1
     End Sub
 
     Private Function setMaxObj(maxobj As Integer) As Integer
-        If (TextBox4.Text) = 0 Or TextBox4.Text = "" Then
+        If (TextBox4.Text) = "0" Or TextBox4.Text = "" Then
             maxobj = 10000000
         Else
             If IsNumeric(TextBox4.Text) Then
@@ -3997,9 +3997,9 @@ Public Class Form1
                 " where Not (art Like '%email%' or art like '%wiederv%') " &
                 " And e.VORGANGSID = s.VORGANGSID " &
                 " order by e.id desc "
+        ' top 100
 
-
-        Sql = "  Select   top 100 " &
+        Sql = "  Select   " &
             "  e.VORGANGSID,EINGANG,e.beschreibung,datum,art,richtung, notiz,quelle, " &
             "  DATEINAMEEXT,d_beschreibung, " &
             "  FILEDATUM, typ, CHECKINDATUM, REVISIONSSICHER " &
@@ -4094,7 +4094,7 @@ Public Class Form1
                     'eintrag ins logbuch
                     'zeilebilden
                     zeile.Append(aktvorgangsid & t) 'Az
-                    zeile.Append(eingang.ToString("yyyy") & t) 'jahr
+                    zeile.Append(alter_eingang.ToString("yyyy") & t) 'jahr
                     zeile.Append(t) 'datum
                     zeile.Append(t) 'oberbegriff Protokolle
                     zeile.Append(t) 'bezeichnung beschreibung
@@ -4119,10 +4119,15 @@ Public Class Form1
                 End If
                 l(eid & " " & CStr(art) & " " & ic)
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
-                Application.DoEvents()
+                If igesamt Mod 100 = 0 Then
+                    Application.DoEvents()
+                End If
+
 
                 idok += 1
-                If idok > maxobj Then Exit For
+                'If idok > maxobj Then
+                '    Exit For
+                'End If
             Catch ex As Exception
                 l("fehler2: " & ex.ToString)
                 TextBox2.Text = ic.ToString & Environment.NewLine & " " &
