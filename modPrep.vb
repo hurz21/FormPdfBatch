@@ -26,7 +26,7 @@
     '                                   ByRef datum As Date, ByRef eingang As Date, ByRef vid As String,
     '                                       ByRef eid As String, ByRef beschreibung As String, drr As DataRow)
     '    Try
-    '        vid = CStr(clsDBtools.fieldvalue(drr.Item("vorgangsid"))) 'Bearbeitungsart 
+    '        vid = CStr(clsDBtools.fieldvalue(drr.Item("vorgangsid"))) 'vid 
     '        eid = CStr(clsDBtools.fieldvalue(drr.Item("id")))
     '        richtung = (CStr(clsDBtools.fieldvalue(drr.Item("richtung"))))
     '        typnr = (CStr(clsDBtools.fieldvalue(drr.Item("typnr"))))
@@ -44,7 +44,7 @@
                                        ByRef datum As Date, ByRef eingang As Date, ByRef vid As String,
                                            ByRef eid As String, ByRef beschreibung As String, drr As DataRow)
         Try
-            vid = CStr(clsDBtools.fieldvalue(drr.Item("vorgangsid"))) 'Bearbeitungsart 
+            vid = CStr(clsDBtools.fieldvalue(drr.Item("vorgangsid"))) 'vid 
             eid = CStr(clsDBtools.fieldvalue(drr.Item("id")))
             richtung = (CStr(clsDBtools.fieldvalue(drr.Item("richtung"))))
             typnr = (CStr(clsDBtools.fieldvalue(drr.Item("typnr"))))
@@ -64,7 +64,7 @@
     '                           ByVal drr As DataRow, ByRef datumDB As Date, ByRef istRevisionssicher As Boolean,
     'ByRef initial As String, ByRef eid As Integer, ByRef beschreibung As String, ByRef eingang As Date, ByRef fullfilename As String)
     '        Try
-    '            vid = CStr(drr.Item("vid")) 'Bearbeitungsart
+    '            vid = CStr(drr.Item("vid")) 'vid
     '            dokumentid = CStr(drr.Item("dokumentid"))
     '            eid = CStr(drr.Item("eid"))
     '            relativpfad = CStr(drr.Item("relativpfad"))
@@ -86,7 +86,7 @@
                            ByVal drr As DataRow, ByRef datumDB As Date, ByRef istRevisionssicher As Boolean,
 ByRef initial As String, ByRef eid As Integer, ByRef beschreibung As String, ByRef eingang As Date, ByRef fullfilename As String)
         Try
-            vid = CStr(drr.Item("vid")) 'Bearbeitungsart
+            vid = CStr(drr.Item("vid")) 'vid
             dokumentid = CStr(drr.Item("dokumentid"))
             eid = CStr(drr.Item("eid"))
             relativpfad = CStr(drr.Item("relativpfad"))
