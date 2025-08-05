@@ -37,7 +37,7 @@ Public Class Form1
             .CustomLocation = "D:\probaug_Ausgabe\logs\" & ""
 #End If
 
-            .BaseFileName = "form2pdf" & "_" & Environment.UserName
+            .BaseFileName = "form2pdf" & "_" & Environment.UserName & "-" & Now.ToString("yyyy-MM-dd_HH_mm_ss")
             .AutoFlush = True
             .Append = False
         End With
@@ -2314,8 +2314,8 @@ Public Class Form1
     End Sub
 
     Private Sub Button20_Click(sender As Object, e As EventArgs) Handles Button20.Click
-        Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_ausgabeDoku" & Environment.UserName & ".txt"
-        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "dokumente" & ".csv"
+        Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_ausgabeDoku" & Environment.UserName & "-" & Now.ToString("yyyy-MM-dd_HH_mm_ss") & ".txt"
+        Dim puAusgabe As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "dokumente" & ".csv"
         '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".txt"
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -2402,7 +2402,7 @@ Public Class Form1
         Dim initial As String
         Dim beschreibung As String
         Dim eingang As Date
-        Dim eid As Integer = 0
+        Dim eid As String = 0
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
         myoracle.Open()
@@ -2432,6 +2432,7 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
+                vid = ""
                 DbMetaDatenDokumentHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher,
                                          initial, eid,
                                  beschreibung, eingang, fullfilename)
@@ -2442,6 +2443,10 @@ Public Class Form1
                 'Else
                 '    Vorhabensmerkmal = GetInputfile1Name(inndir, sachgebiet, Verfahrensart)
                 'End If
+                'End If
+                If vid = String.Empty Then
+                    Continue For
+                End If
                 If fullfilename = String.Empty Then Continue For
                 TextBox3.Text = vid & ", " & igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
                 Application.DoEvents()
@@ -4244,6 +4249,10 @@ Public Class Form1
         Catch ex As Exception
             l("fehler in DbMetaDatenDokumentHolen:" & vid & ex.ToString)
         End Try
+    End Sub
+
+    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
+
     End Sub
 
 

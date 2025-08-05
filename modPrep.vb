@@ -84,23 +84,42 @@
     Public Sub DbMetaDatenDokumentHolen(ByRef vid As String, ByRef relativpfad As String, ByRef dateinameext As String,
                            ByRef typ As String, ByRef newsavemode As Boolean, ByRef dokumentid As String,
                            ByVal drr As DataRow, ByRef datumDB As Date, ByRef istRevisionssicher As Boolean,
-ByRef initial As String, ByRef eid As Integer, ByRef beschreibung As String, ByRef eingang As Date, ByRef fullfilename As String)
+ByRef initial As String, ByRef eid As String, ByRef beschreibung As String, ByRef eingang As Date, ByRef fullfilename As String)
+        Dim test = ""
         Try
+            vid = "" : dokumentid = "" : eid = "" : relativpfad = "" : dateinameext = "" : newsavemode = False : initial = "" : beschreibung = "" : typ = "" : fullfilename = "" : vid = "" : vid = "" : vid = ""
+            datumDB = Nothing : eingang = Nothing : istRevisionssicher = False
             vid = CStr(drr.Item("vid")) 'vid
+            'If vid = 19803 Then
+            '    Debug.Print("")
+            'End If
             dokumentid = CStr(drr.Item("dokumentid"))
             eid = CStr(drr.Item("eid"))
             relativpfad = CStr(drr.Item("relativpfad"))
             dateinameext = CStr(drr.Item("dateinameext"))
-            newsavemode = CBool(drr.Item("newsavemode"))
+            test = CStr((drr.Item("newsavemode")))
+            If test <> String.Empty Or test Is Nothing Then
+                newsavemode = CBool(drr.Item("newsavemode"))
+            Else
+                newsavemode = "0"
+            End If
+
             datumDB = CDate(drr.Item("checkindatum"))
             eingang = CDate(drr.Item("checkindatum"))
             initial = CStr(drr.Item("initial_"))
-            istRevisionssicher = CBool(drr.Item("revisionssicher"))
-            beschreibung = CStr(drr.Item("Beschreibung"))
-            fullfilename = CStr(drr.Item("tooltip"))
+            test = CStr((drr.Item("revisionssicher")))
+            If test <> String.Empty Or test Is Nothing Then
+                istRevisionssicher = CBool(drr.Item("revisionssicher"))
+            Else
+                istRevisionssicher = "0"
+            End If
+
+            beschreibung = clsDBtools.fieldvalue((drr.Item("Beschreibung")))
+            fullfilename = clsDBtools.fieldvalue((drr.Item("tooltip")))
             typ = CStr(drr.Item("typ"))
         Catch ex As Exception
             l("fehler in DbMetaDatenDokumentHolen:" & vid & ex.ToString)
+            vid = ""
         End Try
     End Sub
     Public Function GetInputfilename(ByVal innDir As String, ByVal relativpfad As String, ByVal dokumentid As Integer) As String
