@@ -7,9 +7,9 @@ Imports System.Data
 'Imports Microsoft.Office.Interop.Word
 
 Public Class Form1
+
     Public wordVorlagen As New Microsoft.Office.Interop.Word.Application 'habe hier new ergänzt ????
     Public docVorlagen As New Microsoft.Office.Interop.Word.Document
-
     Private immerUeberschreiben As Boolean
     Private nichtUeberschreibenAusserWennNeuer As Boolean
     Property dt As New Data.DataTable
@@ -2314,11 +2314,10 @@ Public Class Form1
     End Sub
 
     Private Sub Button20_Click(sender As Object, e As EventArgs) Handles Button20.Click
-        Dim puFehler As String = "\\file-paradigma\paradigma\test\thumbnails\PU_ausgabeDoku" & Environment.UserName & "-" & Now.ToString("yyyy-MM-dd_HH_mm_ss") & ".txt"
+        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\PU_ausgabeDoku" & Environment.UserName & "-" & Now.ToString("yyyy-MM-dd_HH_mm_ss") & ".txt"
         Dim puAusgabe As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "dokumente" & ".csv"
         '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".txt"
-        swfehlt = New IO.StreamWriter(puFehler)
-        swfehlt.AutoFlush = True
+
         '  swfehlt.WriteLine(Now)
         ' S1020dokumenteMitFullpathTabelleErstellen("DOKUFULLNAME", swfehlt) 'referenzfälleNeuZuweisen
         ' swfehlt.WriteLine("wechsel")
@@ -2326,7 +2325,15 @@ Public Class Form1
         Dim Sql As String
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
-
+        Dim untergrenze = 0
+        If maxobj - 10000 < 0 Then
+            untergrenze = 0
+        Else
+            untergrenze = maxobj - 10000
+        End If
+        puFehler = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\PU_ausgabeDoku" & Environment.UserName & "-" & maxobj & ".txt"
+        swfehlt = New IO.StreamWriter(puFehler)
+        swfehlt.AutoFlush = True
         puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "dokumente_ab_" & maxobj & ".csv"
         Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
 
@@ -2340,7 +2347,7 @@ Public Class Form1
               "union all  " &
               "SELECT  vid,dokumentid,eid,relativpfad,dateinameext,newsavemode," &
               "checkindatum,initial_,revisionssicher,Beschreibung,tooltip,typ from [Paradigma].[dbo].dokumente) as a " &
-              "where vid <" & maxobj & " order by vid desc;"
+              "where vid <" & maxobj & " and vid>" & untergrenze & " order by vid desc;"
 
 
 
@@ -2556,16 +2563,26 @@ Public Class Form1
     End Sub
 
     Private Sub writeStammdatenPU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
-        Dim DT As DataTable
+        Dim DT, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR As DataTable
         Dim idok As Integer = 0
         puAusgabeStream.AutoFlush = True
         swfehlt.WriteLine("writeStammdatenPU---")
         DT = alleDokumentDatenHolen(sql)
+        sql = "SELECT s.[VORGANGSID] ,[FREMDVORGANGSID] " &
+                     "From [Paradigma].[dbo].[stammdaten_tutti]  s, [Paradigma].[dbo].[verwandte_t44] v " &
+                     " where s.VORGANGSID = v.VORGANGSID  " &
+                     " order by s.vorgangsid desc  "
+        alleVIDmitVerwandten = alleDokumentDatenHolen(sql)
+        sql = "SELECT distinct  s.[VORGANGSID] ,v.FREMDVORGANGSID     ,  s.[SACHGEBIETNR]" &
+                  " FROM [Paradigma].[dbo].[VORGANG_T43] as s,  [Paradigma].[dbo].[verwandte_t44] v " &
+                 "   where v.FREMDVORGANGSID=s.VORGANGSID  order by  s.VORGANGSID desc"
+        alleFremdvorgaengeMitSGNR = alleDokumentDatenHolen(sql)
 
         Dim ic As Integer = 0
         Dim igesamt As Integer = 0
         Dim sachgebiet, Verfahrensart, Vorhaben, Bezeichnung, Vorhabensmerkmal, Notiz, sachbearbeiter As String
         Dim newsavemode As Boolean
+        Dim verwandteString As String
         Dim istRevisionssicher As Boolean
         Dim dbdatum, hauptaktenjahr As Date
         Dim Hauptaktenzeichen As String
@@ -2611,10 +2628,10 @@ Public Class Form1
                 igesamt += 1
 
                 vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("datum")))
+                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                 Bezeichnung = cleanString(makeStammBezeichnung(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), CStr(clsDBtools.fieldvalue(drr.Item("PARAGRAF"))),
                                                                CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSGEGENSTAND")))))
-                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("datum")))
+                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                 antrag = CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
                 vollstaendig = CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG")))
                 bescheid = CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
@@ -2627,9 +2644,10 @@ Public Class Form1
                 Vorhabensmerkmal = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 4))
                 sachbearbeiter = CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter")))
                 Hauptaktenzeichen = CStr(clsDBtools.fieldvalue(drr.Item("probaugaz")))
-                hauptaktenjahr = CDate(clsDBtools.fieldvalueDate(drr.Item("datum")))
+                hauptaktenjahr = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                 geschlossen = CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))
 
+                verwandteString = makeVerwandteString(vid, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR)
                 Notiz = cleanString(makeStammNotiz(CStr(clsDBtools.fieldvalue(drr.Item("az2"))),
                                                    CStr(clsDBtools.fieldvalue(drr.Item("altaz"))),
                                                    CStr(clsDBtools.fieldvalue(drr.Item("internenr"))),
@@ -2697,6 +2715,26 @@ Public Class Form1
         l("fertig  " & puFehler)
         ' Process.Start(puFehler)
     End Sub
+
+    Private Function makeVerwandteString(vid As String, alleVIDmitVerwandten As DataTable, alleFremdvorgaengeMitSGNR As DataTable) As String
+        Dim verw As String
+        Dim summe As New Text.StringBuilder
+        summe.Append("Verwandte: ")
+        Try
+            For i = 0 To alleVIDmitVerwandten.Rows.Count - 1
+                If vid = CStr(clsDBtools.fieldvalue(alleVIDmitVerwandten(i).Item("VORGANGSID"))) Then
+                    Debug.Print("treffer")
+                    verw = CStr(clsDBtools.fieldvalue(alleVIDmitVerwandten(i).Item("VORGANGSID")))
+                    verw = CStr(clsDBtools.fieldvalue(alleVIDmitVerwandten(i).Item("FREMDVORGANGSID")))
+                    summe.Append(verw & ",")
+                End If
+            Next
+            Return "hurz"
+        Catch ex As Exception
+            l("error  " & ex.ToString)
+            Return "error makeVerwandteString"
+        End Try
+    End Function
 
     Private Function makeAbgeschlossen([date] As Date, erledigt As String) As Date
         Try

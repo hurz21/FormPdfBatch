@@ -24,7 +24,7 @@ Module modOracle
 
         Dim com As New SqlClient.SqlCommand(sql, myoracle)
         Dim da As New SqlClient.SqlDataAdapter(com)
-        da.MissingSchemaAction = MissingSchemaAction.AddWithKey
+        'da.MissingSchemaAction = MissingSchemaAction.AddWithKey
 
         Dim mycount As Integer
         'MsgBox("vorfill")
