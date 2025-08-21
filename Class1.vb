@@ -104,7 +104,8 @@ Public Class clsDBtools
     Public Shared Function fieldvalueDate(ByVal obj As Object) As Date
         If obj Is DBNull.Value Then
 
-            Return Nothing
+            Return CDate("1900-01-01")
+
         Else
             Return DirectCast(obj, Date)
         End If

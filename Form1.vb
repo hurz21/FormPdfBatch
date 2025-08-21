@@ -2,6 +2,7 @@
 'Imports System.Runtime.InteropServices
 'Imports Microsoft.Office.Interop.Excel
 Imports System.Data
+Imports System.Diagnostics.Eventing.Reader
 'Imports Acrobat
 'Imports Microsoft.Office.Interop
 'Imports Microsoft.Office.Interop.Word
@@ -2347,7 +2348,7 @@ Public Class Form1
               "union all  " &
               "SELECT  vid,dokumentid,eid,relativpfad,dateinameext,newsavemode," &
               "checkindatum,initial_,revisionssicher,Beschreibung,tooltip,typ from [Paradigma].[dbo].dokumente) as a " &
-              "where vid <" & maxobj & " and vid>" & untergrenze & " order by vid desc;"
+              "where vid <" & maxobj & " and vid>" & untergrenze & " order by vid,checkindatum desc;"
 
 
 
@@ -2459,12 +2460,13 @@ Public Class Form1
                 Application.DoEvents()
                 'zeilebilden
                 zeile.Append(vid & t) 'Az
-                zeile.Append(eingang.ToString("yyyy") & t) 'jahr
+                zeile.Append("" & t) 'jahr leer weil nicht vorhanden
+                ' zeile.Append(eingang.ToString("yyyy") & t) 'jahr
                 zeile.Append(dbdatum.ToString("yyyyMMdd") & t) 'datum
                 zeile.Append(typ & t) 'oberbegriff Protokolle
                 zeile.Append((cleanString(beschreibung)) & t) 'bezeichnung beschreibung
                 zeile.Append((fullfilename) & t) 'pfad
-                zeile.Append(cleanString(dateinameext).Trim & t) 'ordner im mediencenter
+                zeile.Append(dbdatum.ToString("yyyyMMdd") & "_" & cleanString(dateinameext).Trim & t) 'ordner im mediencenter
                 zeile.Append(CInt(istRevisionssicher) & t) 'ordner im mediencenter
                 zeile.Append(CInt(bearbeiterid) & t) 'ordner im mediencenter
 
@@ -2620,7 +2622,7 @@ Public Class Form1
         zeile.Append("Notiz" & t) '             (az2 +  altaz + internenr + beschreibung)
         'zeileAntragsteller.Append("geschlossen" & t) '  
 
-
+        Dim jump = 0
         csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
 
         For Each drr As DataRow In DT.Rows
@@ -2630,7 +2632,8 @@ Public Class Form1
                 vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
                 eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                 Bezeichnung = cleanString(makeStammBezeichnung(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), CStr(clsDBtools.fieldvalue(drr.Item("PARAGRAF"))),
-                                                               CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSGEGENSTAND")))))
+                                                               CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSGEGENSTAND"))),
+                                                                CStr(clsDBtools.fieldvalue(drr.Item("az2")))))
                 eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                 antrag = CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
                 vollstaendig = CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG")))
@@ -2642,16 +2645,17 @@ Public Class Form1
                 Verfahrensart = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 2))
                 Vorhaben = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 3))
                 Vorhabensmerkmal = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 4))
-                sachbearbeiter = CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter")))
+                sachbearbeiter = CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter"))) & "," & CStr(clsDBtools.fieldvalue(drr.Item("weiterebearb")))
                 Hauptaktenzeichen = CStr(clsDBtools.fieldvalue(drr.Item("probaugaz")))
                 hauptaktenjahr = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                 geschlossen = CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))
 
-                verwandteString = makeVerwandteString(vid, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR)
+                verwandteString = makeVerwandteString(vid, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR, jump)
                 Notiz = cleanString(makeStammNotiz(CStr(clsDBtools.fieldvalue(drr.Item("az2"))),
                                                    CStr(clsDBtools.fieldvalue(drr.Item("altaz"))),
                                                    CStr(clsDBtools.fieldvalue(drr.Item("internenr"))),
-                                                   CStr(clsDBtools.fieldvalue(drr.Item("beschreibung")))))
+                                                   CStr(clsDBtools.fieldvalue(drr.Item("beschreibung"))),
+                                                    verwandteString))
 
 
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
@@ -2716,23 +2720,58 @@ Public Class Form1
         ' Process.Start(puFehler)
     End Sub
 
-    Private Function makeVerwandteString(vid As String, alleVIDmitVerwandten As DataTable, alleFremdvorgaengeMitSGNR As DataTable) As String
+    Private Function makeVerwandteString(vid As String, alleVIDmitVerwandten As DataTable, alleFremdvorgaengeMitSGNR As DataTable, ByRef jump As Integer) As String
         Dim verw As String
         Dim summe As New Text.StringBuilder
-        summe.Append("Verwandte: ")
+        Dim sachg As String
+        summe.Append(",Verwandte-Sachgebiet: ")
         Try
-            For i = 0 To alleVIDmitVerwandten.Rows.Count - 1
-                If vid = CStr(clsDBtools.fieldvalue(alleVIDmitVerwandten(i).Item("VORGANGSID"))) Then
-                    Debug.Print("treffer")
-                    verw = CStr(clsDBtools.fieldvalue(alleVIDmitVerwandten(i).Item("VORGANGSID")))
-                    verw = CStr(clsDBtools.fieldvalue(alleVIDmitVerwandten(i).Item("FREMDVORGANGSID")))
-                    summe.Append(verw & ",")
+            For i = jump To alleVIDmitVerwandten.Rows.Count - 1
+                If CStr(clsDBtools.fieldvalue(alleVIDmitVerwandten(i).Item("VORGANGSID"))) < vid Then
+                    jump = i - 10
+                    If jump < 1 Then jump = 0
+                    If summe.ToString = ",Verwandte-Sachgebiet: " Then
+                        Return " "
+                    Else
+                        Return summe.ToString
+                    End If
                 End If
+                If vid <> CStr(clsDBtools.fieldvalue(alleVIDmitVerwandten(i).Item("VORGANGSID"))) Then
+                    Continue For
+                End If
+
+                Debug.Print("treffer")
+                'verw = CStr(clsDBtools.fieldvalue(alleVIDmitVerwandten(i).Item("VORGANGSID")))
+                verw = CStr(clsDBtools.fieldvalue(alleVIDmitVerwandten(i).Item("FREMDVORGANGSID")))
+                sachg = getsachgebiet4Fremdvorgangsid(verw, alleFremdvorgaengeMitSGNR)
+                summe.Append(verw & "-" & sachg & " ")
             Next
-            Return "hurz"
+            If summe.ToString = ",Verwandte-Sachgebiet: " Then
+                Return " "
+            Else
+                Return summe.ToString
+            End If
         Catch ex As Exception
             l("error  " & ex.ToString)
             Return "error makeVerwandteString"
+        End Try
+    End Function
+
+    Private Function getsachgebiet4Fremdvorgangsid(verw As String, alleFremdvorgaengeMitSGNR As DataTable) As String
+        Dim sachg As String
+        Try
+            For i = 0 To alleFremdvorgaengeMitSGNR.Rows.Count - 1
+                If verw = CStr(clsDBtools.fieldvalue(alleFremdvorgaengeMitSGNR(i).Item("VORGANGSID"))) Then
+                    Debug.Print("treffer")
+                    sachg = CStr(clsDBtools.fieldvalue(alleFremdvorgaengeMitSGNR(i).Item("SACHGEBIETNR")))
+                    Return sachg
+                End If
+            Next
+
+            Return sachg
+        Catch ex As Exception
+            l("error  " & ex.ToString)
+            Return "error getsachgebiet4Fremdvorgangsid"
         End Try
     End Function
 
@@ -2741,7 +2780,7 @@ Public Class Form1
             If erledigt = 1 Then
                 Return [date]
             Else
-                Return Nothing
+                Return CDate("1970/01/01")
             End If
         Catch ex As Exception
             l("fehler  " & ex.ToString)
@@ -2809,7 +2848,7 @@ Public Class Form1
         End Try
     End Function
 
-    Private Function makeStammNotiz(az As String, altaz As String, interne As String, beschreibung As String) As String
+    Private Function makeStammNotiz(az As String, altaz As String, interne As String, beschreibung As String, verw As String) As String
         Dim t As Char = ","
         Dim ret As String = ""
         Try
@@ -2827,7 +2866,7 @@ Public Class Form1
             Else
                 interne = ", IntNr: " & interne
             End If
-            Return az & altaz & interne & t & " " & beschreibung
+            Return az & altaz & interne & t & " " & beschreibung & " " & verw
 
         Catch ex As Exception
             l("fehler  " & ex.ToString)
@@ -2835,7 +2874,7 @@ Public Class Form1
         End Try
     End Function
 
-    Private Function makeStammBezeichnung(sgtext As String, paragraf As String, vgGegenstand As String) As String
+    Private Function makeStammBezeichnung(sgtext As String, paragraf As String, vgGegenstand As String, az As String) As String
         Dim t As Char = ","
         Dim ret As String = ""
         Try
@@ -2847,7 +2886,7 @@ Public Class Form1
             Else
                 paragraf = t & " $: " & paragraf
             End If
-            ret = sgtext & paragraf & t & " " & vgGegenstand
+            ret = sgtext & paragraf & t & " " & vgGegenstand & " (" & az & ")"
             Return ret
         Catch ex As Exception
             l("fehler  " & ex.ToString)
@@ -3150,7 +3189,7 @@ Public Class Form1
         Sql = "select * FROM [Paradigma].[dbo].[STAKEHOLDER]    order by rolle desc  "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        'writeKatasterausgabePU(puFehler, puAusgabeStream, Sql, maxobj)
+        'writeKatasterausgabePU(puFehler, sammelStream, Sql, maxobj)
         'writeAntragstellerausgabePU()
         writeStakeholderAusgabePU(puFehler, puAusgabeStream, Sql, maxobj)
         puAusgabeStream.Close()
@@ -3174,7 +3213,7 @@ Public Class Form1
               "where w.VORGANGSID=t.VORGANGSID   order by w.VORGANGSID desc"
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        'writeStakeholderAusgabePU(puFehler, puAusgabeStream, Sql, maxobj)
+        'writeStakeholderAusgabePU(puFehler, sammelStream, Sql, maxobj)
         writeWiedervorlageAusgabePU(puFehler, puAusgabeStream, Sql, maxobj)
         puAusgabeStream.Close()
         puAusgabeStream.Dispose()
@@ -4058,6 +4097,7 @@ Public Class Form1
         Dim startvid = setMaxObj(maxobj)
 
         puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "dokumente_verlaufSummary_" & startvid & ".csv"
+        puAusgabeStream = New IO.StreamWriter(puAusgabe)
 
         'Sql = "SELECT *  FROM [Paradigma].[dbo].[EREIGNIS_T16]  where not( art like '%email%' or art like '%wiederv%')  order by id desc "
         Sql = "    Select   * FROM [Paradigma].[dbo].[EREIGNIS_T16]    e, " &
@@ -4093,10 +4133,10 @@ Public Class Form1
         l("fertig  " & puFehler)
     End Sub
 
-    Private Sub writeVerlaufPU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer, relativpfad As String, startVID As String)
+    Private Sub writeVerlaufPU(puFehler As String, sammelStream As IO.StreamWriter, sql As String, maxobj As Integer, relativpfad As String, startVID As String)
         Dim DT As DataTable
         Dim idok As Integer = 0
-        puAusgabeStream.AutoFlush = True
+        sammelStream.AutoFlush = True
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
         If Form1.vid = "fehler" Then End
 
@@ -4104,7 +4144,7 @@ Public Class Form1
         l("vor csvverarbeiten")
         Dim ic As Integer = 0
         Dim igesamt As Integer = 0
-        Dim dateinameext, art, richtung, inputfile, outfile, typnr, outstring, summary As String
+        Dim dateinameext, art, richtung, inputfile, summaryOutfile, typnr, outstring, summary As String
         Dim newsavemode As Boolean
         Dim istRevisionssicher As Boolean
         Dim dbdatum, FILEDATUM, CHECKINDATUM As Date
@@ -4130,7 +4170,7 @@ Public Class Form1
         excelkopf.Append("revisionssicher" & t) ' 
         excelkopf.Append("filedatum" & t) ' 
         excelkopf.Append("checkindatum" & Environment.NewLine) '  
-        excelkopf.Clear()
+        'excelkopf.Clear()
         'kopfzeile
         zeile.Append("az" & t) 'Az
         zeile.Append("jahr" & t) 'jahr
@@ -4141,12 +4181,12 @@ Public Class Form1
         zeile.Append("ordner" & t) 'ordner im mediencenter
         zeile.Append("revisionssicher" & t) ' 
         zeile.Append("bearbeiterid" & t) ' 
-        csvzeileSpeichern(zeile.ToString, puAusgabeStream)
+        csvzeileSpeichern(zeile.ToString, sammelStream)
         zeile.Clear()
         Dim aktvorgangsid As String = "0"
         Dim alter_eingang As Date
         Dim summe As New Text.StringBuilder
-        outfile = makeAktOutfile(dbdatum, aktvorgangsid, relativpfad)
+        summaryOutfile = makeAktOutfile(dbdatum, aktvorgangsid, relativpfad)
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
@@ -4155,11 +4195,13 @@ Public Class Form1
                                            FILEDATUM, typ, CHECKINDATUM, REVISIONSSICHER, drr)
                 If vid = aktvorgangsid Then
                     'alte summary weiterschreiben
+
                     outstring = erzeugeverlaufZeile(beschreibung, richtung, art, dbdatum, dateinameext, quelle, d_beschreibung, typ, REVISIONSSICHER, FILEDATUM, CHECKINDATUM)
+                    'summe.Append(excelkopf.ToString)
                     summe.Append(outstring)
                 Else
                     'alte summary schliessen
-                    schreibeEreignisdatei(outfile, summe.ToString)
+                    schreibeEreignisdatei(summaryOutfile, summe.ToString)
                     summe.Clear()
                     'eintrag ins logbuch
                     'zeilebilden
@@ -4168,18 +4210,18 @@ Public Class Form1
                     zeile.Append(t) 'datum
                     zeile.Append(t) 'oberbegriff Protokolle
                     zeile.Append(t) 'bezeichnung beschreibung
-                    zeile.Append((outfile) & t) 'pfad
+                    zeile.Append((summaryOutfile) & t) 'pfad
                     zeile.Append("" & t) 'ordner im mediencenter
                     zeile.Append("" & t) 'ordner im mediencenter
                     zeile.Append("" & t) 'ordner im mediencenter
 
-                    If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
+                    If csvzeileSpeichern(zeile.ToString, sammelStream) Then
                         zeile.Clear()
                     Else
                         Debug.Print("oooo")
                     End If
                     'neue aufmachen
-                    outfile = makeAktOutfile(dbdatum, vid, relativpfad)
+                    summaryOutfile = makeAktOutfile(dbdatum, vid, relativpfad)
                     alter_eingang = eingang
                     summe = New Text.StringBuilder
                     summe.Append(excelkopf.ToString)
@@ -4209,7 +4251,7 @@ Public Class Form1
             GC.Collect()
             GC.WaitForFullGCComplete()
         Next
-        csvzeileSpeichern(zeile.ToString, puAusgabeStream)
+        csvzeileSpeichern(zeile.ToString, sammelStream)
         zeile.Clear()
 
         swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
@@ -4236,8 +4278,17 @@ Public Class Form1
             pu.Append(cleanString(d_beschreibung) & t)
             pu.Append(cleanString(typ) & t)
             pu.Append(cleanString(REVISIONSSICHER) & t)
-            pu.Append(cleanString(FILEDATUM.ToString("yyyyMMdd_hhmmss")) & t)
-            pu.Append(cleanString(CHECKINDATUM.ToString("yyyyMMdd_hhmmss")) & Environment.NewLine)
+            If clsDBtools.fieldvalueDate(FILEDATUM) < "1/1/1990" Then
+                pu.Append("" & t)
+            Else
+                pu.Append(cleanString(clsDBtools.fieldvalueDate(FILEDATUM).ToString("yyyyMMdd_hhmmss")) & t)
+            End If
+            If clsDBtools.fieldvalueDate(CHECKINDATUM) < "1/1/1990" Then
+                pu.Append("" & t & Environment.NewLine)
+            Else
+                pu.Append(cleanString(clsDBtools.fieldvalueDate(CHECKINDATUM).ToString("yyyyMMdd_hhmmss")) & Environment.NewLine)
+            End If
+
             Return pu.ToString
         Catch ex As Exception
             l("fehler  " & ex.ToString)
