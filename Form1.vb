@@ -2546,7 +2546,7 @@ Public Class Form1
 
     Private Sub Button21_Click(sender As Object, e As EventArgs) Handles Button21.Click
         'probaugstammdaten
-        Dim puFehler As String = "\O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_Stammdaten" & Environment.UserName & ".txt"
+        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_Stammdaten" & Environment.UserName & ".txt"
         Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "Stammdaten" & ".csv"
         Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
         swfehlt = New IO.StreamWriter(puFehler)
@@ -4082,7 +4082,7 @@ Public Class Form1
     End Function
 
     Private Sub Button36_Click(sender As Object, e As EventArgs) Handles Button36.Click
-        Dim puFehler As String = "\O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_verlauf" & Environment.UserName & ".txt"
+        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_verlauf" & Environment.UserName & ".txt"
         Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_verlaufSummary" & ".csv"
         Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
         '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".txt"
@@ -4096,7 +4096,7 @@ Public Class Form1
         Dim maxobj As Integer = 10000000
         Dim startvid = setMaxObj(maxobj)
 
-        puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "dokumente_verlaufSummary_" & startvid & ".csv"
+        puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_verlaufSummary_" & startvid & ".csv"
         puAusgabeStream = New IO.StreamWriter(puAusgabe)
 
         'Sql = "SELECT *  FROM [Paradigma].[dbo].[EREIGNIS_T16]  where not( art like '%email%' or art like '%wiederv%')  order by id desc "
@@ -4119,7 +4119,7 @@ Public Class Form1
 
         TextBox3.Text = puAusgabe
 
-        Dim relativpfad As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\ereignisse\"
+        Dim relativpfad As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\ereignisse\"
 
 
         TextBox1.Text = puAusgabe
