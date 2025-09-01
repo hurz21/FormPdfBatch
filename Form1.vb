@@ -2909,7 +2909,7 @@ Public Class Form1
                "     order by VORGANGSID desc "
         Sql = "select * from  [Paradigma].[dbo].[PA_mitRH]      order by VORGANGSID desc "
         Sql = "select * from Pa_mitRH as a, raumbezug as r " &
-                "where a.id=r.sekid  and typ=1	"
+                "where a.id=r.sekid  and typ=1	order by az"  ' bitte ordnung einbauen
 
 
 
@@ -3301,7 +3301,7 @@ Public Class Form1
                     Debug.Print("oooo")
                 End If
                 idok += 1
-                If idok > maxobj Then Exit For
+                'If idok > maxobj Then Exit For
             Catch ex As Exception
                 l("fehler2: " & ex.ToString)
                 TextBox2.Text = ic.ToString & Environment.NewLine & " " &
@@ -3486,7 +3486,8 @@ Public Class Form1
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
 
-        Sql = "select vorgangsid,datum from stammdaten_tutti     order by vorgangsid desc   "
+        'Sql = "select vorgangsid,datum from stammdaten_tutti     order by vorgangsid desc   "
+        Sql = "select vorgangsid,eingang from stammdaten_tutti     order by vorgangsid desc   "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         writeAntragstellerausgabePU(puFehler, ausgabeAntragsteller, ausgabeBeteiligte, Sql, maxobj)
@@ -3520,7 +3521,8 @@ Public Class Form1
         Dim perstemp As New person
         Dim perscoll As New List(Of person)
         'kopfzeile
-        bildeKopfZeile(zeileAntragsteller, t)
+        'bildeKopfZeile(zeileAntragsteller, t)
+        bildeKopfZeileAntragsteller(zeileAntragsteller, t)
         bildeKopfZeile(zeileBeteiligte, t)
         csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller) : zeileAntragsteller.Clear()
         csvzeileSpeichern(zeileBeteiligte.ToString, ausgabeBeteiligte) : zeileBeteiligte.Clear()
@@ -3532,12 +3534,12 @@ Public Class Form1
                 igesamt += 1
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
                 vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                eingang = CStr(clsDBtools.fieldvalueDate(drr.Item("datum")))
+                eingang = CStr(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                 perscoll = getAllBeteiligte4vorgang(perstemp, vid)
                 If hatAntragsteller(perscoll) Then
                     antragsteller = getAntragsteller(perscoll)
                     If antragsteller Is Nothing Then Exit For
-                    zeileAntragsteller = bildeZeilePerson(eingang, t, antragsteller)
+                    zeileAntragsteller = bildeZeileantragsteller(eingang, t, antragsteller)
                     'zeile Nach antragsteller ausschreiben
                     csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
                     zeileAntragsteller.Clear()
@@ -3550,7 +3552,7 @@ Public Class Form1
                         antragsteller.Vorname = "dummy"
                         antragsteller.Rolle = "dummy"
                     End If
-                    zeileAntragsteller = bildeZeilePerson(eingang, t, antragsteller)
+                    zeileAntragsteller = bildeZeileantragsteller(eingang, t, antragsteller)
                     'zeile Nach antragsteller ausschreiben
                     csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
                     zeileAntragsteller.Clear()
@@ -3583,6 +3585,35 @@ Public Class Form1
         'swfehlt.Close()
         l("fertig  " & puFehler)
         ' Process.Start(puFehler)
+    End Sub
+
+    Private Sub bildeKopfZeileAntragsteller(zeileAntragsteller As System.Text.StringBuilder, t As String)
+        zeileAntragsteller.Append("az" & t) '     vid   
+        zeileAntragsteller.Append("jahr" & t) '     datum
+        'zeileAntragsteller.Append("Obergruppe" & t) '  rolle    
+        zeileAntragsteller.Append("Anrede" & t) '   
+        zeileAntragsteller.Append("Firma" & t) '  znkombi
+        zeileAntragsteller.Append("Titel" & t) '   rechts    
+        zeileAntragsteller.Append("Vorname" & t) ' hoch
+        zeileAntragsteller.Append("nachname" & t) '
+        zeileAntragsteller.Append("strasse" & t)
+        zeileAntragsteller.Append("hausnr" & t) ' 
+        zeileAntragsteller.Append("hausnr bis" & t) 'titel
+        zeileAntragsteller.Append("land" & t) 'abteilung
+        zeileAntragsteller.Append("plz" & t) 'telefon
+        zeileAntragsteller.Append("ort" & t) 'fax
+        zeileAntragsteller.Append("adreszusatzzeile1" & t) 'fs
+        zeileAntragsteller.Append("adreszusatzzeile2" & t) 'fs
+        zeileAntragsteller.Append("telefon" & t) 'fs
+        zeileAntragsteller.Append("fax" & t) 'fs
+        zeileAntragsteller.Append("mobil" & t) 'fs
+        zeileAntragsteller.Append("email" & t) 'fs
+        zeileAntragsteller.Append("de-mail" & t) 'fs
+        zeileAntragsteller.Append("web" & t) 'fs
+        zeileAntragsteller.Append("zeichen" & t) 'fs
+        zeileAntragsteller.Append("personennummer" & t) 'fs
+        zeileAntragsteller.Append("spalte1" & t)
+        zeileAntragsteller.Append("KASSENKONTO" & t)
     End Sub
 
     Private Function getErstenEintrag(perscoll As List(Of person)) As person
@@ -3662,7 +3693,41 @@ Public Class Form1
         zeileAntragsteller.Clear()
         zeileAntragsteller.Append(vid & t) 'Az
         zeileAntragsteller.Append(eingang.ToString("yyyy") & t) 'jahr 
+
         zeileAntragsteller.Append(perso.Rolle & t) ' 
+        zeileAntragsteller.Append(perso.Anrede & t) ' 
+        zeileAntragsteller.Append(bildeFirma(perso) & t) ' 
+        zeileAntragsteller.Append(perso.Namenszusatz & t) ' 
+        zeileAntragsteller.Append(perso.Vorname & t) ' 
+        zeileAntragsteller.Append(perso.Name & t) ' 
+        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Strasse & t) ' 
+        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr
+        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr bis
+        zeileAntragsteller.Append("Deutschland" & t) ' 
+        zeileAntragsteller.Append(perso.Kontakt.Anschrift.PLZ & t) ' 
+        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Gemeindename & t) ' 
+        zeileAntragsteller.Append(perso.Bemerkung & t) ' zusatz1
+        zeileAntragsteller.Append("" & perso.Kontakt.Anschrift.Postfach & t) ' zusatz2
+        zeileAntragsteller.Append((perso.Kontakt.elektr.Telefon1 & ", " & perso.Kontakt.elektr.Telefon2).Replace(", ", "") & t) ' 
+        zeileAntragsteller.Append((perso.Kontakt.elektr.Fax1 & ", " & perso.Kontakt.elektr.Fax2).Replace(", ", "") & t) ' 
+        zeileAntragsteller.Append(perso.Kontakt.elektr.MobilFon & t) ' 
+        zeileAntragsteller.Append(perso.Kontakt.elektr.Email & t) ' 
+        zeileAntragsteller.Append("" & t) ' de-mail
+        zeileAntragsteller.Append(perso.Kontakt.elektr.Homepage & t) ' 
+        zeileAntragsteller.Append(perso.Kassenkonto & t) ' ZEICHEN IHAH
+        zeileAntragsteller.Append(perso.PersonenID & t) ' 
+        zeileAntragsteller.Append("" & t) ' spalte1
+        zeileAntragsteller.Append(perso.Kassenkonto & t) '  
+        Return zeileAntragsteller
+    End Function
+    Private Shared Function bildeZeileantragsteller(eingang As Date, t As String, perso As person) As Text.StringBuilder
+        Dim zeileAntragsteller As New Text.StringBuilder
+
+        zeileAntragsteller.Clear()
+        zeileAntragsteller.Append(vid & t) 'Az
+        zeileAntragsteller.Append(eingang.ToString("yyyy") & t) 'jahr 
+
+        'zeileAntragsteller.Append(perso.Rolle & t) ' 
         zeileAntragsteller.Append(perso.Anrede & t) ' 
         zeileAntragsteller.Append(bildeFirma(perso) & t) ' 
         zeileAntragsteller.Append(perso.Namenszusatz & t) ' 
@@ -4082,12 +4147,11 @@ Public Class Form1
     End Function
 
     Private Sub Button36_Click(sender As Object, e As EventArgs) Handles Button36.Click
-        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_verlauf" & Environment.UserName & ".log"
+        Dim puFehler As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_verlauf" & Environment.UserName & ".log"
         Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_verlaufSummary" & ".csv"
         Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
         '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".log"
-        swfehlt = New IO.StreamWriter(puFehler)
-        swfehlt.AutoFlush = True
+
         '  swfehlt.WriteLine(Now)
         ' S1020dokumenteMitFullpathTabelleErstellen("DOKUFULLNAME", swfehlt) 'referenzfälleNeuZuweisen
         ' swfehlt.WriteLine("wechsel")
@@ -4096,6 +4160,9 @@ Public Class Form1
         Dim maxobj As Integer = 10000000
         Dim endvid As Integer
         Dim startvid = setMaxObj(maxobj)
+        puFehler = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_verlauf_" & startvid & ".log"
+        swfehlt = New IO.StreamWriter(puFehler)
+        swfehlt.AutoFlush = True
         If startvid - 10000 < 1 Then
             endvid = 0
         Else
