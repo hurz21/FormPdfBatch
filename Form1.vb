@@ -2332,6 +2332,7 @@ Public Class Form1
         Else
             untergrenze = maxobj - 10000
         End If
+        Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         puFehler = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_ausgabeDoku" & Environment.UserName & "-" & maxobj & ".txt"
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -2462,7 +2463,7 @@ Public Class Form1
                 zeile.Append(vid & t) 'Az
                 zeile.Append("" & t) 'jahr leer weil nicht vorhanden
                 ' zeile.Append(eingang.ToString("yyyy") & t) 'jahr
-                zeile.Append(dbdatum.ToString("yyyyMMdd") & t) 'datum
+                zeile.Append(dbdatum.ToString("dd.MM.yyyy") & t) 'datum
                 zeile.Append(typ & t) 'oberbegriff Protokolle
                 zeile.Append((cleanString(beschreibung)) & t) 'bezeichnung beschreibung
                 zeile.Append((fullfilename) & t) 'pfad
@@ -2554,17 +2555,19 @@ Public Class Form1
         Dim Sql As String
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
+        Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         Sql = "SELECT * FROM [Paradigma].[dbo].[stammdaten_tutti]  order by vorgangsid desc "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         'writeDokumentePU(puFehler, ausgabeAntragsteller, Sql, maxobj)
-        writeStammdatenPU(puFehler, puAusgabeStream, Sql, maxobj)
+        writeStammdatenPU(puFehler, puAusgabeStream, Sql, maxobj, umlautwandeln)
         puAusgabeStream.Close()
         puAusgabeStream.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\")
     End Sub
 
-    Private Sub writeStammdatenPU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
+    Private Sub writeStammdatenPU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String,
+                                  maxobj As Integer, umlautwandeln As Boolean)
         Dim DT, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR As DataTable
         Dim idok As Integer = 0
         puAusgabeStream.AutoFlush = True
@@ -2607,10 +2610,10 @@ Public Class Form1
         zeile.Append("ort" & t) '                 (sgtext + / + paragraf + / + vorgangsgegenstand + ) Überwachung einer Kleinkläranlage
         zeile.Append("Eingangsdatum" & t) '              (datum)
         zeile.Append("Antragsdatum" & t) '               (aufnahme)
-        zeile.Append("Datum Vollständigkeit geprüft" & t) '(letztebearbeitung)
+        zeile.Append("Datum Vollstandigkeit gepruft" & t) '(letztebearbeitung)
         zeile.Append("Bescheid Datum" & t) '
         zeile.Append("Datum Abgeschlossen am " & t) '   (letztebearbeitung falls erledigt=1)
-        zeile.Append("Kürzel des Aktenstandorts" & t) ' (storaumnr)	3.b.11 oder  mu
+        zeile.Append("Kurzel Stando" & t) ' (storaumnr)	3.b.11 oder  mu  des Aktenstandorts
         zeile.Append("Sachgebiet" & t) '                (sachgebietnr)
         zeile.Append("Verfahrensart" & t) '
         zeile.Append("Vorhaben" & t) '
@@ -2634,6 +2637,7 @@ Public Class Form1
                 Bezeichnung = cleanString(makeStammBezeichnung(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), CStr(clsDBtools.fieldvalue(drr.Item("PARAGRAF"))),
                                                                CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSGEGENSTAND"))),
                                                                 CStr(clsDBtools.fieldvalue(drr.Item("az2")))))
+
                 eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                 antrag = CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
                 vollstaendig = CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG")))
@@ -2665,11 +2669,16 @@ Public Class Form1
                 zeile.Append(eingang.ToString("yyyy") & t) 'jahr
                 zeile.Append("PROUMWELT" & t) '
                 zeile.Append(Bezeichnung & t) ' 
-                zeile.Append(eingang.ToString("yyyyMMdd") & t) 'datum
-                zeile.Append(antrag.ToString("yyyyMMdd") & t) 'datum
-                zeile.Append(vollstaendig.ToString("yyyyMMdd") & t) 'datum
-                zeile.Append(bescheid.ToString("yyyyMMdd") & t) 'datum
-                zeile.Append(abgeschlossen.ToString("yyyyMMdd") & t) 'datum
+                'zeile.Append(eingang.ToString("yyyyMMdd") & t) 'datum
+                'zeile.Append(antrag.ToString("yyyyMMdd") & t) 'datum
+                'zeile.Append(vollstaendig.ToString("yyyyMMdd") & t) 'datum
+                'zeile.Append(bescheid.ToString("yyyyMMdd") & t) 'datum
+                'zeile.Append(abgeschlossen.ToString("yyyyMMdd") & t) 'datum
+                zeile.Append(eingang.ToString("dd.MM.yyyy") & t) 'datum
+                zeile.Append(antrag.ToString("dd.MM.yyyy") & t) 'datum
+                zeile.Append(vollstaendig.ToString("dd.MM.yyyy") & t) 'datum
+                zeile.Append(bescheid.ToString("dd.MM.yyyy") & t) 'datum
+                zeile.Append(abgeschlossen.ToString("dd.MM.yyyy") & t) 'datum
                 zeile.Append(aktenstandort & t) ' 
                 zeile.Append(sachgebiet & t) ' 
                 zeile.Append(Verfahrensart & t) ' 
@@ -2678,7 +2687,7 @@ Public Class Form1
                 zeile.Append(sachbearbeiter & t) ' 
                 zeile.Append("" & t) ' 
                 zeile.Append((cleanString(Hauptaktenzeichen)) & t) '   
-                zeile.Append(hauptaktenjahr.ToString("yyyyMMdd") & t) 'datum 
+                zeile.Append(hauptaktenjahr.ToString("dd.MM.yyyy") & t) 'datum 
                 zeile.Append(cleanString(Notiz) & t) ' 
                 'zeileAntragsteller.Append(geschlossen)
                 'If iblock < blockMAX Then
@@ -2911,7 +2920,7 @@ Public Class Form1
         Sql = "select * from Pa_mitRH as a, raumbezug as r " &
                 "where a.id=r.sekid  and typ=1	order by az"  ' bitte ordnung einbauen
 
-
+        Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
 
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
@@ -3046,7 +3055,7 @@ Public Class Form1
         Dim Sql As String
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
-
+        Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         Sql = "select * from PF_mitRH as a, raumbezug as r  where a.id=r.sekid and typ=2      order by vid desc  "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
@@ -3189,6 +3198,7 @@ Public Class Form1
         Sql = "select * FROM [Paradigma].[dbo].[STAKEHOLDER]    order by rolle desc  "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
+        Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         'writeKatasterausgabePU(puFehler, sammelStream, Sql, maxobj)
         'writeAntragstellerausgabePU()
         writeStakeholderAusgabePU(puFehler, puAusgabeStream, Sql, maxobj)
@@ -3213,6 +3223,7 @@ Public Class Form1
               "where w.VORGANGSID=t.VORGANGSID   order by w.VORGANGSID desc"
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
+        Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         'writeStakeholderAusgabePU(puFehler, sammelStream, Sql, maxobj)
         writeWiedervorlageAusgabePU(puFehler, puAusgabeStream, Sql, maxobj)
         puAusgabeStream.Close()
@@ -3267,7 +3278,7 @@ Public Class Form1
                 vid = CStr(clsDBtools.fieldvalue(drr.Item("vorgangsid")))
                 eingang = cleanString(CStr(clsDBtools.fieldvalueDate(drr.Item("teingang"))))
                 Form1.vid = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("TODO"))))
-                datum = CDate(clsDBtools.fieldvalueDate(drr.Item("datum")))  '==FÄLLIG
+                datum = CDate(clsDBtools.fieldvalueDate(drr.Item("datum"))) '==FÄLLIG
                 sachbearbeiter = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter"))))
                 Betreff = "Wartenauf: " & cleanString(CStr(clsDBtools.fieldvalue(drr.Item("wartenauf"))))
                 info = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Bemerkung"))))
@@ -3281,7 +3292,7 @@ Public Class Form1
                 Application.DoEvents()
                 'zeilebilden
                 zeile.Append(vid & t) 'Az
-                zeile.Append(eingang.ToString("yyyy") & t) 'jahr 
+                zeile.Append(eingang.ToString("dd.MM.yyyy") & t) 'jahr .ToString("dd.MM.yyyy") 
                 zeile.Append(Form1.vid & t) 'Az 
                 zeile.Append(datum & t) ' 
                 zeile.Append(sachbearbeiter & t) ' 
@@ -3485,7 +3496,7 @@ Public Class Form1
         Dim Sql As String
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
-
+        Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         'Sql = "select vorgangsid,datum from stammdaten_tutti     order by vorgangsid desc   "
         Sql = "select vorgangsid,eingang from stammdaten_tutti     order by vorgangsid desc   "
         TextBox1.Text = puAusgabe
@@ -3825,7 +3836,7 @@ Public Class Form1
         Dim Sql As String
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
-
+        Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         Sql = "select *   FROM [Paradigma].[dbo].[BEARBEITER_T5] where aktiv=1      order by abteilung desc  "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
@@ -3968,6 +3979,7 @@ Public Class Form1
         Dim Sql As String
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
+        Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         'Sql = "SELECT *  FROM [Paradigma].[dbo].[EREIGNIS_T16]  where not( art like '%email%' or art like '%wiederv%')  order by id desc "
         Sql = "    Select   * FROM [Paradigma].[dbo].[EREIGNIS_T16]    e, " &
                 "  [Paradigma].[dbo].[stammdaten_tutti] s " &
@@ -4057,7 +4069,7 @@ Public Class Form1
                     Continue For
                 End If
                 l(eid & " " & CStr(art) & " " & ic)
-                outfile = dbdatum.ToString("yyyyMMdd_hhmmss") & "_" & cleanString(art) & "_" & cleanString(richtung) & ".txt"
+                outfile = dbdatum.ToString("yyyyMMdd_hhmmss") & "_Ereignis_" & cleanString(art) & "_" & cleanString(richtung) & ".txt"
                 outfile = relativpfad & vid & "\" & eid & "\" & outfile
                 IO.Directory.CreateDirectory(relativpfad & vid & "\" & eid)
                 outstring = erzeugeEreignisString(beschreibung, richtung, art, dbdatum, vid, eid, typnr, notiz)
@@ -4072,7 +4084,7 @@ Public Class Form1
                 'zeilebilden
                 zeile.Append(vid & t) 'Az
                 zeile.Append(eingang.ToString("yyyy") & t) 'jahr
-                zeile.Append(dbdatum.ToString("yyyyMMdd_hhmmss") & t) 'datum
+                zeile.Append(dbdatum.ToString("dd.MM.yyyy") & t) 'datum
                 zeile.Append(art & t) 'oberbegriff Protokolle
                 zeile.Append((cleanString(beschreibung)) & t) 'bezeichnung beschreibung
                 zeile.Append((outfile) & t) 'pfad
@@ -4160,6 +4172,7 @@ Public Class Form1
         Dim maxobj As Integer = 10000000
         Dim endvid As Integer
         Dim startvid = setMaxObj(maxobj)
+        Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         puFehler = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_verlauf_" & startvid & ".log"
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
