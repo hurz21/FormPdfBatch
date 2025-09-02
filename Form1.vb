@@ -2582,7 +2582,7 @@ Public Class Form1
                   " FROM [Paradigma].[dbo].[VORGANG_T43] as s,  [Paradigma].[dbo].[verwandte_t44] v " &
                  "   where v.FREMDVORGANGSID=s.VORGANGSID  order by  s.VORGANGSID desc"
         alleFremdvorgaengeMitSGNR = alleDokumentDatenHolen(sql)
-
+        Dim sgnr As String = ""
         Dim ic As Integer = 0
         Dim igesamt As Integer = 0
         Dim sachgebiet, Verfahrensart, Vorhaben, Bezeichnung, Vorhabensmerkmal, Notiz, sachbearbeiter As String
@@ -2610,7 +2610,7 @@ Public Class Form1
         zeile.Append("ort" & t) '                 (sgtext + / + paragraf + / + vorgangsgegenstand + ) Überwachung einer Kleinkläranlage
         zeile.Append("Eingangsdatum" & t) '              (datum)
         zeile.Append("Antragsdatum" & t) '               (aufnahme)
-        zeile.Append("Datum Vollstandigkeit gepruft" & t) '(letztebearbeitung)
+        zeile.Append("Datum Vollst gepruft" & t) '(letztebearbeitung)
         zeile.Append("Bescheid Datum" & t) '
         zeile.Append("Datum Abgeschlossen am " & t) '   (letztebearbeitung falls erledigt=1)
         zeile.Append("Kurzel Stando" & t) ' (storaumnr)	3.b.11 oder  mu  des Aktenstandorts
@@ -2618,7 +2618,7 @@ Public Class Form1
         zeile.Append("Verfahrensart" & t) '
         zeile.Append("Vorhaben" & t) '
         zeile.Append("Vorhabensmerkmal" & t) '
-        zeile.Append("Zust. Sachbearbeiter" & t) '      (bearbeiter) schu
+        zeile.Append("Zust. SB" & t) '      (bearbeiter) schuSachbearbeiter
         zeile.Append("Objektnummer" & t) '
         zeile.Append("Hauptaktenzeichen" & t) ' (Hauptaktenzeichen) 
         zeile.Append("Hauptaktenjahr" & t) '
@@ -2645,6 +2645,8 @@ Public Class Form1
                 abgeschlossen = makeAbgeschlossen(CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG"))),
                                                   CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))) 'falls erledigt
                 aktenstandort = CStr(clsDBtools.fieldvalue(drr.Item("STORAUMNR")))
+                'sgnr = clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))
+
                 sachgebiet = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 1))
                 Verfahrensart = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 2))
                 Vorhaben = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 3))
@@ -2660,7 +2662,17 @@ Public Class Form1
                                                    CStr(clsDBtools.fieldvalue(drr.Item("internenr"))),
                                                    CStr(clsDBtools.fieldvalue(drr.Item("beschreibung"))),
                                                     verwandteString))
-
+                If umlautwandeln Then
+                    Bezeichnung = clsString.umlaut2ue(Bezeichnung)
+                    aktenstandort = clsString.umlaut2ue(aktenstandort)
+                    sachgebiet = clsString.umlaut2ue(sachgebiet)
+                    Verfahrensart = clsString.umlaut2ue(Verfahrensart)
+                    Vorhaben = clsString.umlaut2ue(Vorhaben)
+                    Vorhabensmerkmal = clsString.umlaut2ue(Vorhabensmerkmal)
+                    sachbearbeiter = clsString.umlaut2ue(sachbearbeiter)
+                    Notiz = clsString.umlaut2ue(Notiz)
+                    ' Bezeichnung = clsString.umlaut2ue(Bezeichnung)
+                End If
 
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
                 Application.DoEvents()
@@ -2804,7 +2816,7 @@ Public Class Form1
             sachgebietnr = Trim(sachgebietnr)
             sachgebiettext = Trim(sachgebiettext)
             sachgebiettext = sachgebiettext.Replace(sachgebietnr, "")
-            If sachgebietnr.Contains("-") Then '
+            If sachgebietnr.Contains("-") Then 'wasserbehörde
                 'a = sachgebietnr.Split("-"c)
                 If modus = "1" Then
                     If sachgebietnr.Substring(0, 1) Then
@@ -2841,10 +2853,10 @@ Public Class Form1
                     Return sachgebietnr & " - " & sachgebiettext
                 End If
                 If modus = "2" Then
-                    Return sachgebietnr.Substring(1, 3) & " - " & sachgebiettext
+                    Return sachgebietnr.Substring(1, 1) & " - " & sachgebiettext
                 End If
                 If modus = "3" Then
-                    Return sachgebietnr.Substring(2, 2) & " - " & sachgebiettext
+                    Return sachgebietnr.Substring(2, 1) & " - " & sachgebiettext
                 End If
                 If modus = "4" Then
                     Return sachgebietnr.Substring(3, 1) & " - " & sachgebiettext
@@ -2924,14 +2936,15 @@ Public Class Form1
 
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        writeAdresseausgabePU(puFehler, puAusgabeStream, Sql, maxobj)
+        writeAdresseausgabePU(puFehler, puAusgabeStream, Sql, maxobj, umlautwandeln)
         puAusgabeStream.Close()
         puAusgabeStream.Dispose()
         swfehlt.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
     End Sub
 
-    Private Sub writeAdresseausgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
+    Private Sub writeAdresseausgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String,
+                                      maxobj As Integer, umlautwandeln As Boolean)
         Dim DT As DataTable
         Dim idok As Integer = 0
         puAusgabeStream.AutoFlush = True
@@ -2994,6 +3007,16 @@ Public Class Form1
                 freitext = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("abteilung"))))
                 abstrakt = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("abstract"))))
                 fs = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fs"))))
+
+
+                If umlautwandeln Then
+                    strasse = clsString.umlaut2ue(strasse)
+                    ort = clsString.umlaut2ue(ort)
+                    funktion = clsString.umlaut2ue(funktion)
+                    freitext = clsString.umlaut2ue(freitext)
+                    abstrakt = clsString.umlaut2ue(abstrakt)
+
+                End If
 
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
                 Application.DoEvents()
@@ -3060,14 +3083,15 @@ Public Class Form1
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         'writeAdresseausgabePU(puFehler, ausgabeAntragsteller, Sql, maxobj)
-        writeKatasterausgabePU(puFehler, puAusgabeStream, Sql, maxobj)
+        writeKatasterausgabePU(puFehler, puAusgabeStream, Sql, maxobj, umlautwandeln)
         puAusgabeStream.Close()
         puAusgabeStream.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung")
         swfehlt.Dispose()
     End Sub
 
-    Private Sub writeKatasterausgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
+    Private Sub writeKatasterausgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String,
+                                       maxobj As Integer, umlautwandeln As Boolean)
         Dim DT As DataTable
         Dim idok As Integer = 0
         puAusgabeStream.AutoFlush = True
@@ -3132,8 +3156,18 @@ Public Class Form1
                 gemcode = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fax"))))
                 FS = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fs"))))
                 flaecheqm = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("flaecheqm"))))
-                'abteilung = CDate(clsDBtools.fieldvalueDate(drr.Item("abteilung")))
-                'initial_1 = CDate(clsDBtools.fieldvalueDate(drr.Item("initial_1"))) 
+
+
+
+
+                If umlautwandeln Then
+                    gemarkung = clsString.umlaut2ue(gemarkung)
+                    funktion = clsString.umlaut2ue(funktion)
+                    freitext = clsString.umlaut2ue(freitext)
+                    abstrakt = clsString.umlaut2ue(abstrakt)
+                End If
+
+
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
                 Application.DoEvents()
                 'zeilebilden
@@ -3225,13 +3259,13 @@ Public Class Form1
         TextBox2.Text = Sql
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         'writeStakeholderAusgabePU(puFehler, sammelStream, Sql, maxobj)
-        writeWiedervorlageAusgabePU(puFehler, puAusgabeStream, Sql, maxobj)
+        writeWiedervorlageAusgabePU(puFehler, puAusgabeStream, Sql, maxobj, umlautwandeln)
         puAusgabeStream.Close()
         puAusgabeStream.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
         swfehlt.Dispose()
     End Sub
-    Private Sub writeWiedervorlageAusgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
+    Private Sub writeWiedervorlageAusgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer, umlautwandeln As Boolean)
         Dim DT As DataTable
         Dim idok As Integer = 0
         puAusgabeStream.AutoFlush = True
@@ -3240,7 +3274,7 @@ Public Class Form1
 
         Dim ic As Integer = 0
         Dim igesamt As Integer = 0
-        Dim gemarkung, flur, flurstueck, ost, info, funktion, gemcode, bearbeiterid, FS, Betreff As String
+        Dim gemarkung, flur, flurstueck, ost, info, funktion, gemcode, bearbeiterid, FS, Betreff, todo As String
         Dim newsavemode As Boolean
         Dim istRevisionssicher As Boolean
         Dim dbdatum, hauptaktenjahr As Date
@@ -3277,7 +3311,7 @@ Public Class Form1
                 igesamt += 1
                 vid = CStr(clsDBtools.fieldvalue(drr.Item("vorgangsid")))
                 eingang = cleanString(CStr(clsDBtools.fieldvalueDate(drr.Item("teingang"))))
-                Form1.vid = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("TODO"))))
+                todo = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("TODO"))))
                 datum = CDate(clsDBtools.fieldvalueDate(drr.Item("datum"))) '==FÄLLIG
                 sachbearbeiter = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter"))))
                 Betreff = "Wartenauf: " & cleanString(CStr(clsDBtools.fieldvalue(drr.Item("wartenauf"))))
@@ -3287,14 +3321,20 @@ Public Class Form1
                 erledigtam = cleanString(CStr(clsDBtools.fieldvalueDate(drr.Item("erledigtam"))))
                 erledigt = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("erledigt"))))
                 'angelegtam = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("weingang"))))
+                If umlautwandeln Then
+                    todo = clsString.umlaut2ue(todo)
+                    sachbearbeiter = clsString.umlaut2ue(sachbearbeiter)
+                    Betreff = clsString.umlaut2ue(Betreff)
+                    info = clsString.umlaut2ue(info)
+                End If
 
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
                 Application.DoEvents()
                 'zeilebilden
                 zeile.Append(vid & t) 'Az
-                zeile.Append(eingang.ToString("dd.MM.yyyy") & t) 'jahr .ToString("dd.MM.yyyy") 
-                zeile.Append(Form1.vid & t) 'Az 
-                zeile.Append(datum & t) ' 
+                zeile.Append(eingang.ToString("yyyy") & t) 'jahr .ToString("dd.MM.yyyy") 
+                zeile.Append(todo & t) 'Az 
+                zeile.Append(datum.ToString("dd.MM.yyyy") & t) ' 
                 zeile.Append(sachbearbeiter & t) ' 
                 zeile.Append(Betreff & t) ' 
                 zeile.Append(info & t) ' 
@@ -3501,7 +3541,7 @@ Public Class Form1
         Sql = "select vorgangsid,eingang from stammdaten_tutti     order by vorgangsid desc   "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        writeAntragstellerausgabePU(puFehler, ausgabeAntragsteller, ausgabeBeteiligte, Sql, maxobj)
+        writeAntragstellerausgabePU(puFehler, ausgabeAntragsteller, ausgabeBeteiligte, Sql, maxobj, umlautwandeln)
         ausgabeAntragsteller.Close()
         ausgabeAntragsteller.Dispose()
         ausgabeBeteiligte.Close()
@@ -3510,7 +3550,8 @@ Public Class Form1
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
     End Sub
 
-    Private Sub writeAntragstellerausgabePU(puFehler As String, ausgabeAntragsteller As IO.StreamWriter, ausgabeBeteiligte As IO.StreamWriter, sql As String, maxobj As Integer)
+    Private Sub writeAntragstellerausgabePU(puFehler As String, ausgabeAntragsteller As IO.StreamWriter, ausgabeBeteiligte As IO.StreamWriter,
+                                            sql As String, maxobj As Integer, umlautwandeln As Boolean)
         Dim DT As DataTable
         Dim idok As Integer = 0
         ausgabeAntragsteller.AutoFlush = True
@@ -3546,7 +3587,7 @@ Public Class Form1
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
                 vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
                 eingang = CStr(clsDBtools.fieldvalueDate(drr.Item("eingang")))
-                perscoll = getAllBeteiligte4vorgang(perstemp, vid)
+                perscoll = getAllBeteiligte4vorgang(perstemp, vid, umlautwandeln)
                 If hatAntragsteller(perscoll) Then
                     antragsteller = getAntragsteller(perscoll)
                     If antragsteller Is Nothing Then Exit For
@@ -3769,7 +3810,7 @@ Public Class Form1
         Return (perso.Kontakt.Org.Name & ", " & perso.Kontakt.Org.Zusatz & ", " & perso.Kontakt.Org.Bemerkung & ", " & perso.Kontakt.GesellFunktion).Replace(", , , ", "")
     End Function
 
-    Private Function getAllBeteiligte4vorgang(perstemp As person, vid As String) As List(Of person)
+    Private Function getAllBeteiligte4vorgang(perstemp As person, vid As String, umlautwandeln As Boolean) As List(Of person)
         Dim sql As String = "select * from beteiligte_t6 where vorgangsid=" & vid
         Dim per As New person
         Dim perlist As New List(Of person)
@@ -3812,6 +3853,23 @@ Public Class Form1
                 'für die sepa daten muss man über die personenid holen
 
                 per.Kontakt.BankkontoID = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("personenid"))))
+                If umlautwandeln Then
+                    per.Rolle = clsString.umlaut2ue(per.Rolle)
+                    per.Name = clsString.umlaut2ue(per.Name)
+                    per.Vorname = clsString.umlaut2ue(per.Vorname)
+                    per.Bemerkung = clsString.umlaut2ue(per.Bemerkung)
+                    per.Namenszusatz = clsString.umlaut2ue(per.Namenszusatz)
+                    per.Kontakt.Anschrift.Gemeindename = clsString.umlaut2ue(per.Kontakt.Anschrift.Gemeindename)
+                    per.Kontakt.Anschrift.Strasse = clsString.umlaut2ue(per.Kontakt.Anschrift.Strasse)
+                    per.Kontakt.Org.Name = clsString.umlaut2ue(per.Kontakt.Org.Name)
+                    per.Kontakt.Org.Zusatz = clsString.umlaut2ue(per.Kontakt.Org.Zusatz)
+                    per.Kontakt.Org.Typ1 = clsString.umlaut2ue(per.Kontakt.Org.Typ1)
+                    per.Kontakt.Org.Typ2 = clsString.umlaut2ue(per.Kontakt.Org.Typ2)
+                    per.Kontakt.Org.Eigentuemer = clsString.umlaut2ue(per.Kontakt.Org.Eigentuemer)
+                    per.Kontakt.Org.Bemerkung = clsString.umlaut2ue(per.Kontakt.Org.Bemerkung)
+                    per.Quelle = clsString.umlaut2ue(per.Quelle)
+                    per.Kontakt.GesellFunktion = clsString.umlaut2ue(per.Kontakt.GesellFunktion)
+                End If
                 perlist.Add(per)
             Next
             Return perlist
