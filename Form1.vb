@@ -3,14 +3,16 @@
 'Imports Microsoft.Office.Interop.Excel
 Imports System.Data
 Imports System.Diagnostics.Eventing.Reader
+Imports System.IO
+Imports Microsoft.Office.Interop.Word
 'Imports Acrobat
 'Imports Microsoft.Office.Interop
 'Imports Microsoft.Office.Interop.Word
 
 Public Class Form1
 
-    Public wordVorlagen As New Microsoft.Office.Interop.Word.Application 'habe hier new ergänzt ????
-    Public docVorlagen As New Microsoft.Office.Interop.Word.Document
+    'Public wordVorlagen As New Microsoft.Office.Interop.Word.Application 'habe hier new ergänzt ????
+    'Public docVorlagen As New Microsoft.Office.Interop.Word.Document
     Private immerUeberschreiben As Boolean
     Private nichtUeberschreibenAusserWennNeuer As Boolean
     Property dt As New Data.DataTable
@@ -265,7 +267,7 @@ Public Class Form1
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-        DOCXumwandeln(2113, False)
+        'DOCXumwandeln(2113, False)
     End Sub
 
 
@@ -631,195 +633,195 @@ Public Class Form1
 
     End Sub
 
-    Friend Sub DOCXumwandeln(vid As Integer, isDebugmode As Boolean)
-        '    If Not IsNumeric(vid) Then Exit Sub
-        Dim inputfile, outfileJPG, parameter As String
-        Dim innDir, outDir, checkoutfile, pdffile As String
-        'Dim checkoutRoot As String = "C:\muell\" 
-        parameter = " /1 1"
-        Dim dateifehlt As String = "\\file-paradigma\paradigma\test\thumbnails\dateifehlt_doc2" & Environment.UserName & ".txt"
-        swfehlt = New IO.StreamWriter(dateifehlt)
-        swfehlt.AutoFlush = True
-        swfehlt.WriteLine(Now)
+    'Friend Sub DOCXumwandeln(vid As Integer, isDebugmode As Boolean)
+    '    '    If Not IsNumeric(vid) Then Exit Sub
+    '    Dim inputfile, outfileJPG, parameter As String
+    '    Dim innDir, outDir, checkoutfile, pdffile As String
+    '    'Dim checkoutRoot As String = "C:\muell\" 
+    '    parameter = " /1 1"
+    '    Dim dateifehlt As String = "\\file-paradigma\paradigma\test\thumbnails\dateifehlt_doc2" & Environment.UserName & ".txt"
+    '    swfehlt = New IO.StreamWriter(dateifehlt)
+    '    swfehlt.AutoFlush = True
+    '    swfehlt.WriteLine(Now)
 
 
-        Dim checkoutRoot As String = "C:\muell\"
-        innDir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv" '"\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
-        outDir = "\\file-paradigma\paradigma\test\thumbnails\"
-        'outDir = "c:\muell\"
-        l("DOCXumwandeln         ")
-        l(innDir)
-        l(outDir)
-        If isDebugmode Then
-            '  outDir = "l:\cache\paradigma\thumbnails\"
-        End If
+    '    Dim checkoutRoot As String = "C:\muell\"
+    '    innDir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv" '"\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
+    '    outDir = "\\file-paradigma\paradigma\test\thumbnails\"
+    '    'outDir = "c:\muell\"
+    '    l("DOCXumwandeln         ")
+    '    l(innDir)
+    '    l(outDir)
+    '    If isDebugmode Then
+    '        '  outDir = "l:\cache\paradigma\thumbnails\"
+    '    End If
 
 
-        '  DBfestlegen()
-        l("in getallin")
-        Dim Sql As String
-        Dim oben, unten As String
-        ' oben = "200000" : unten = "142568" ' muss am schluss nachgeholt werden
-        oben = "2000000" : unten = "0"
-        '  oben = "139340" : unten = "0"
-        'oben = "134133" : unten = "0"
-        'oben = "40777" : unten = "0"
+    '    '  DBfestlegen()
+    '    l("in getallin")
+    '    Dim Sql As String
+    '    Dim oben, unten As String
+    '    ' oben = "200000" : unten = "142568" ' muss am schluss nachgeholt werden
+    '    oben = "2000000" : unten = "0"
+    '    '  oben = "139340" : unten = "0"
+    '    'oben = "134133" : unten = "0"
+    '    'oben = "40777" : unten = "0"
 
-        Sql = "SELECT * FROM dokumente where   ort > " & unten & "  and ort < " & oben & "  " &
-              "and ( Vorhaben='docx' or  Vorhaben='doc'  or  Vorhaben='rtf' )  " &
-              "order by ort desc"
-        'Sql = "SELECT * FROM dokumente where   vid=9609 " &
-        '      "and ( Vorhaben='docx' or  Vorhaben='doc' or  Vorhaben='rtf')  " &
-        '      "order by ort desc"
-        l(Sql)
+    '    Sql = "SELECT * FROM dokumente where   ort > " & unten & "  and ort < " & oben & "  " &
+    '          "and ( Vorhaben='docx' or  Vorhaben='doc'  or  Vorhaben='rtf' )  " &
+    '          "order by ort desc"
+    '    'Sql = "SELECT * FROM dokumente where   vid=9609 " &
+    '    '      "and ( Vorhaben='docx' or  Vorhaben='doc' or  Vorhaben='rtf')  " &
+    '    '      "order by ort desc"
+    '    l(Sql)
 
-        immerUeberschreiben = True
-        dt = getDT(Sql)
+    '    immerUeberschreiben = True
+    '    dt = getDT(Sql)
 
-        l("nach getDT")
-        Dim relativpfad As String = "", dateinameext As String = "", typ As String, logfile As String
-        Dim newsavemode As Boolean
+    '    l("nach getDT")
+    '    Dim relativpfad As String = "", dateinameext As String = "", typ As String, logfile As String
+    '    Dim newsavemode As Boolean
 
-        Dim dokumentid As Integer = 0
-        'l("nach 1: " & outDir & vid.ToString)
-        IO.Directory.CreateDirectory(outDir & vid.ToString)
-        'l("nach 2")
-        logfile = outDir & "\tnmaker_" & Environment.UserName & "wordgen.txt"
-        'l("nach 3")
-        Dim ic As Integer = 0
-        Dim ierfolg As Integer = 0
-        Dim soll As Integer = 0
-        Dim dbdatum As Date
-        Dim initial As String
-        typ = "1"
-        Using sw As New IO.StreamWriter(logfile)
-            sw.AutoFlush = True
-            Application.DoEvents()
-            For Each drr As DataRow In dt.Rows
-                TextBox3.Text = ic & " von " & dt.Rows.Count
-
-
-                ic += 1
-                TextBox2.Text = " " & ierfolg & "   konvertierungen von word nach jpg erfolgreich von " & soll & Environment.NewLine
-                Application.DoEvents()
-                datenholden(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, initial)
+    '    Dim dokumentid As Integer = 0
+    '    'l("nach 1: " & outDir & vid.ToString)
+    '    IO.Directory.CreateDirectory(outDir & vid.ToString)
+    '    'l("nach 2")
+    '    logfile = outDir & "\tnmaker_" & Environment.UserName & "wordgen.txt"
+    '    'l("nach 3")
+    '    Dim ic As Integer = 0
+    '    Dim ierfolg As Integer = 0
+    '    Dim soll As Integer = 0
+    '    Dim dbdatum As Date
+    '    Dim initial As String
+    '    typ = "1"
+    '    Using sw As New IO.StreamWriter(logfile)
+    '        sw.AutoFlush = True
+    '        Application.DoEvents()
+    '        For Each drr As DataRow In dt.Rows
+    '            TextBox3.Text = ic & " von " & dt.Rows.Count
 
 
-                If vid < 1000 Then
-                    Continue For
-                End If
-                If dokumentid = 174865 Then
-                    Debug.Print("")
-
-                End If
-                Console.Write(vid & "/" & dokumentid & "----")
-                If newsavemode Then
-                    inputfile = GetInputfileWordFullPath(innDir, relativpfad, dokumentid)
-                Else
-                    inputfile = GetInputfile1WordFullPath(innDir, relativpfad, dateinameext)
-                End If
-
-                Dim fi As New IO.FileInfo(inputfile.Replace(Chr(34), ""))
-                If Not fi.Exists Then
-                    'swfehlt.WriteLine(vid & "," & ort & ", " & dbdatum & "," & initial & ", " & Vorhabensmerkmal & "")
-                    swfehlt.WriteLine(vid & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
-                    Continue For
-                Else
-                    TextBox1.Text = dateinameext & " ist dran  " & Environment.NewLine
-                    Application.DoEvents()
-                End If
-
-                'inputFileReadonlyEntfernen(Vorhabensmerkmal)
-                checkoutfile = getCheckoutfileWord(inputfile, checkoutRoot, dokumentid, vid, Format(Now, "yyMMddmm_"))
-
-                'checkoutfile = checkoutfile.Replace("\muell\", "\muell\AA_")
+    '            ic += 1
+    '            TextBox2.Text = " " & ierfolg & "   konvertierungen von word nach jpg erfolgreich von " & soll & Environment.NewLine
+    '            Application.DoEvents()
+    '            datenholden(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, initial)
 
 
-                pdffile = checkoutfile & ".pdf"
-                checkoutfile = checkoutfile & "." & typ
+    '            If vid < 1000 Then
+    '                Continue For
+    '            End If
+    '            If dokumentid = 174865 Then
+    '                Debug.Print("")
 
-                outfileJPG = GetOutfileWORD(vid, outDir, dokumentid)
-                Dim fo As New IO.FileInfo(outfileJPG)
-                fi = New IO.FileInfo(inputfile)
-                If fo.Exists Then
-                    If fo.LastWriteTime > fi.LastWriteTime Then
-                        'keine änderung
-                        Continue For
-                    Else
+    '            End If
+    '            Console.Write(vid & "/" & dokumentid & "----")
+    '            If newsavemode Then
+    '                inputfile = GetInputfileWordFullPath(innDir, relativpfad, dokumentid)
+    '            Else
+    '                inputfile = GetInputfile1WordFullPath(innDir, relativpfad, dateinameext)
+    '            End If
 
-                    End If
+    '            Dim fi As New IO.FileInfo(inputfile.Replace(Chr(34), ""))
+    '            If Not fi.Exists Then
+    '                'swfehlt.WriteLine(vid & "," & ort & ", " & dbdatum & "," & initial & ", " & Vorhabensmerkmal & "")
+    '                swfehlt.WriteLine(vid & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
+    '                Continue For
+    '            Else
+    '                TextBox1.Text = dateinameext & " ist dran  " & Environment.NewLine
+    '                Application.DoEvents()
+    '            End If
 
-                End If
-                soll += 1
-                IO.Directory.CreateDirectory(checkoutRoot & vid.ToString)
+    '            'inputFileReadonlyEntfernen(Vorhabensmerkmal)
+    '            checkoutfile = getCheckoutfileWord(inputfile, checkoutRoot, dokumentid, vid, Format(Now, "yyMMddmm_"))
 
-                If Not auscheckenword(inputfile, checkoutfile, sw, CType(vid, String), CType(dokumentid, String)) Then
-                    l("-- " & dateinameext)
-                    'sw.WriteLine("-- " & Verfahrensart)
-                    Continue For
-                Else
-                    'l(" ")
-                    'sw.WriteLine("-- " & Verfahrensart)
-                    inputFileReadonlyEntfernen(checkoutfile)
-                End If
-                TextBox1.Text = checkoutfile & " checkout erfolgreich   " & Environment.NewLine
-                Application.DoEvents()
-                If clsWordTest.konvOneDoc2pdf(checkoutfile, pdffile) Then
-                    TextBox1.Text = TextBox1.Text & " " & pdffile & " pdf erfolgreich" & Environment.NewLine
-                    Application.DoEvents()
-                    If convertPDF2(pdffile, outfileJPG) Then
-                        l("erfolg")
-                        ic += 1
-                        TextBox1.Text = TextBox1.Text & " / " & dateinameext & " " & "jpg erfolgreich: " & ic.ToString & Environment.NewLine & " " &
-                            outfileJPG & Environment.NewLine &
-                            vid & "/" & dokumentid & " " & ic & "(" & dt.Rows.Count.ToString & ")"
-                        Application.DoEvents()
-                        ierfolg += 1
-                    Else
-                        l("pdf2jpg erfolglos " & ic.ToString & Environment.NewLine & " " &
-                            outfileJPG & Environment.NewLine &
-                            vid & "/" & dokumentid & " " & ic & "(" & dt.Rows.Count.ToString & ")")
-                        TextBox2.Text = TextBox1.Text & " " & "jpg nicht erfolgreich: " & ic.ToString & Environment.NewLine & " " &
-                            inputfile & Environment.NewLine &
-                            vid & "/" & dokumentid & " " & ic & "(" & dt.Rows.Count.ToString & ")" & Environment.NewLine &
-                            TextBox2.Text
-                        sw.WriteLine("fehlerin convertPDF2: " & vid & "/" & dokumentid & " " & outfileJPG & " " & inputfile)
-                        Application.DoEvents()
-                    End If
-                Else
-                    l("word2pdf erfolglos " & ic.ToString & Environment.NewLine & " " &
-                        outfileJPG & Environment.NewLine &
-                        vid & "/" & dokumentid & " " & ic & "(" & dt.Rows.Count.ToString & ")")
-                    sw.WriteLine("fehlerin word2pdf: " & vid & "/" & dokumentid & " " & outfileJPG & " " & inputfile)
-                    Application.DoEvents()
-                End If
+    '            'checkoutfile = checkoutfile.Replace("\muell\", "\muell\AA_")
 
 
+    '            pdffile = checkoutfile & ".pdf"
+    '            checkoutfile = checkoutfile & "." & typ
+
+    '            outfileJPG = GetOutfileWORD(vid, outDir, dokumentid)
+    '            Dim fo As New IO.FileInfo(outfileJPG)
+    '            fi = New IO.FileInfo(inputfile)
+    '            If fo.Exists Then
+    '                If fo.LastWriteTime > fi.LastWriteTime Then
+    '                    'keine änderung
+    '                    Continue For
+    '                Else
+
+    '                End If
+
+    '            End If
+    '            soll += 1
+    '            IO.Directory.CreateDirectory(checkoutRoot & vid.ToString)
+
+    '            If Not auscheckenword(inputfile, checkoutfile, sw, CType(vid, String), CType(dokumentid, String)) Then
+    '                l("-- " & dateinameext)
+    '                'sw.WriteLine("-- " & Verfahrensart)
+    '                Continue For
+    '            Else
+    '                'l(" ")
+    '                'sw.WriteLine("-- " & Verfahrensart)
+    '                inputFileReadonlyEntfernen(checkoutfile)
+    '            End If
+    '            TextBox1.Text = checkoutfile & " checkout erfolgreich   " & Environment.NewLine
+    '            Application.DoEvents()
+    '            If clsWordTest.konvOneDoc2pdf(checkoutfile, pdffile) Then
+    '                TextBox1.Text = TextBox1.Text & " " & pdffile & " pdf erfolgreich" & Environment.NewLine
+    '                Application.DoEvents()
+    '                If convertPDF2(pdffile, outfileJPG) Then
+    '                    l("erfolg")
+    '                    ic += 1
+    '                    TextBox1.Text = TextBox1.Text & " / " & dateinameext & " " & "jpg erfolgreich: " & ic.ToString & Environment.NewLine & " " &
+    '                        outfileJPG & Environment.NewLine &
+    '                        vid & "/" & dokumentid & " " & ic & "(" & dt.Rows.Count.ToString & ")"
+    '                    Application.DoEvents()
+    '                    ierfolg += 1
+    '                Else
+    '                    l("pdf2jpg erfolglos " & ic.ToString & Environment.NewLine & " " &
+    '                        outfileJPG & Environment.NewLine &
+    '                        vid & "/" & dokumentid & " " & ic & "(" & dt.Rows.Count.ToString & ")")
+    '                    TextBox2.Text = TextBox1.Text & " " & "jpg nicht erfolgreich: " & ic.ToString & Environment.NewLine & " " &
+    '                        inputfile & Environment.NewLine &
+    '                        vid & "/" & dokumentid & " " & ic & "(" & dt.Rows.Count.ToString & ")" & Environment.NewLine &
+    '                        TextBox2.Text
+    '                    sw.WriteLine("fehlerin convertPDF2: " & vid & "/" & dokumentid & " " & outfileJPG & " " & inputfile)
+    '                    Application.DoEvents()
+    '                End If
+    '            Else
+    '                l("word2pdf erfolglos " & ic.ToString & Environment.NewLine & " " &
+    '                    outfileJPG & Environment.NewLine &
+    '                    vid & "/" & dokumentid & " " & ic & "(" & dt.Rows.Count.ToString & ")")
+    '                sw.WriteLine("fehlerin word2pdf: " & vid & "/" & dokumentid & " " & outfileJPG & " " & inputfile)
+    '                Application.DoEvents()
+    '            End If
 
 
-                GC.Collect()
-                GC.WaitForFullGCComplete()
-                IO.Directory.CreateDirectory(outDir & vid.ToString)
 
-                deleteCheckoutfileWord(checkoutfile)
-                deleteCheckoutfileWord(pdffile)
 
-                Threading.Thread.Sleep(1000)
-                Try
-                    IO.Directory.Delete(checkoutRoot & "\" & vid)
-                Catch ex As Exception
+    '            GC.Collect()
+    '            GC.WaitForFullGCComplete()
+    '            IO.Directory.CreateDirectory(outDir & vid.ToString)
 
-                End Try
+    '            deleteCheckoutfileWord(checkoutfile)
+    '            deleteCheckoutfileWord(pdffile)
 
-            Next
-        End Using
-        swfehlt.Close()
-        Try
-            Process.Start(logfile)
-        Catch ex As Exception
-            l("fehler : " & ex.ToString)
-        End Try
-    End Sub
+    '            Threading.Thread.Sleep(1000)
+    '            Try
+    '                IO.Directory.Delete(checkoutRoot & "\" & vid)
+    '            Catch ex As Exception
+
+    '            End Try
+
+    '        Next
+    '    End Using
+    '    swfehlt.Close()
+    '    Try
+    '        Process.Start(logfile)
+    '    Catch ex As Exception
+    '        l("fehler : " & ex.ToString)
+    '    End Try
+    'End Sub
 
 
 
@@ -1166,12 +1168,12 @@ Public Class Form1
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
-        Try
-            PDFumwandeln()
-            DOCXumwandeln(2113, False)
-        Catch ex As Exception
-            Debug.Print("")
-        End Try
+        'Try
+        '    PDFumwandeln()
+        '    DOCXumwandeln(2113, False)
+        'Catch ex As Exception
+        '    Debug.Print("")
+        'End Try
     End Sub
 
     Public Sub dirSearch(strDir As String, zieldir As String)
@@ -1219,7 +1221,7 @@ Public Class Form1
                     If fi.LastWriteTime.Day = Now.Day And fi.LastWriteTime.Month = Now.Month And fi.LastWriteTime.Year = Now.Year Then
                         Continue For
                     End If
-                    cntBookmark = TM_ernteBookmarksAusVorlagenDoc(strFile)
+                    'cntBookmark = TM_ernteBookmarksAusVorlagenDoc(strFile)
                     TextBox3.Text = count.ToString & ", " & cntBookmark
                     '  If cntBookmark > 0 Then loescheBookmarktsAusDocX(strFile)
                 Next
@@ -1230,140 +1232,140 @@ Public Class Form1
         End Try
     End Sub
 
-    Private Function loescheBookmarktsAusDocX(vorlageFullname As String) As Integer
-        nachricht("cropBookmarksList ---------------------- ")
-        Dim obj As Object
-        Try
-            Dim int As Integer
-            nachricht("cropBookmarksList vor öffnen ")
-            obj = vorlageFullname
-            docVorlagen = wordVorlagen.Documents.OpenNoRepairDialog(obj)
-            docVorlagen.Activate()
-            nachricht("cropBookmarksList nach activate - vor schleife")
-            nachricht("cropBookmarksList anzahl textmarken: " & docVorlagen.Bookmarks.Count)
-            TextBox1.Text = TextBox1.Text & " " & "loeschen " & Environment.NewLine
-            'ReDim bookmarkArray(.Bookmarks.Count - 1)
-            For int = 1 To docVorlagen.Bookmarks.Count
-                'bookmarkArray(int - 1) = .Bookmarks(int).Name
-                nachricht("Textmarke gefunden: " & docVorlagen.Bookmarks(int).Name)
-                TextBox1.Text = TextBox1.Text & " " & "löschen " & docVorlagen.Bookmarks(int).Name
-                DeleteBookmark(docVorlagen.Bookmarks(int).Name, "#" & docVorlagen.Bookmarks(int).Name & "#", docVorlagen)
-            Next
-            Return docVorlagen.Bookmarks.Count
-        Catch ex As Exception
-            nachricht("cropBookmarksList: " & ex.ToString)
-            If docVorlagen IsNot Nothing Then
-                docVorlagen.Close()
-                docVorlagen = Nothing
-            End If
-            'wordVorla
-            'wordVorlagen.Application.Quit()
-            'wordVorlagen = Nothing
-            Return -1
-        Finally
-            If docVorlagen IsNot Nothing Then
-                docVorlagen.Close()
-                docVorlagen = Nothing
-            End If
-            'wordVorlagen.Application.Quit()
-            'wordVorlagen = Nothing
-            'ReleaseComObj(word)
-            'ReleaseComObj(doc)
-            ' Die Speichert freigeben
-            GC.Collect()
-            GC.WaitForPendingFinalizers()
-            GC.Collect()
-            'GC.WaitForPendingFinalizers() 
-        End Try
-    End Function
+    'Private Function loescheBookmarktsAusDocX(vorlageFullname As String) As Integer
+    '    nachricht("cropBookmarksList ---------------------- ")
+    '    Dim obj As Object
+    '    Try
+    '        Dim int As Integer
+    '        nachricht("cropBookmarksList vor öffnen ")
+    '        obj = vorlageFullname
+    '        docVorlagen = wordVorlagen.Documents.OpenNoRepairDialog(obj)
+    '        docVorlagen.Activate()
+    '        nachricht("cropBookmarksList nach activate - vor schleife")
+    '        nachricht("cropBookmarksList anzahl textmarken: " & docVorlagen.Bookmarks.Count)
+    '        TextBox1.Text = TextBox1.Text & " " & "loeschen " & Environment.NewLine
+    '        'ReDim bookmarkArray(.Bookmarks.Count - 1)
+    '        For int = 1 To docVorlagen.Bookmarks.Count
+    '            'bookmarkArray(int - 1) = .Bookmarks(int).Name
+    '            nachricht("Textmarke gefunden: " & docVorlagen.Bookmarks(int).Name)
+    '            TextBox1.Text = TextBox1.Text & " " & "löschen " & docVorlagen.Bookmarks(int).Name
+    '            DeleteBookmark(docVorlagen.Bookmarks(int).Name, "#" & docVorlagen.Bookmarks(int).Name & "#", docVorlagen)
+    '        Next
+    '        Return docVorlagen.Bookmarks.Count
+    '    Catch ex As Exception
+    '        nachricht("cropBookmarksList: " & ex.ToString)
+    '        If docVorlagen IsNot Nothing Then
+    '            docVorlagen.Close()
+    '            docVorlagen = Nothing
+    '        End If
+    '        'wordVorla
+    '        'wordVorlagen.Application.Quit()
+    '        'wordVorlagen = Nothing
+    '        Return -1
+    '    Finally
+    '        If docVorlagen IsNot Nothing Then
+    '            docVorlagen.Close()
+    '            docVorlagen = Nothing
+    '        End If
+    '        'wordVorlagen.Application.Quit()
+    '        'wordVorlagen = Nothing
+    '        'ReleaseComObj(word)
+    '        'ReleaseComObj(doc)
+    '        ' Die Speichert freigeben
+    '        GC.Collect()
+    '        GC.WaitForPendingFinalizers()
+    '        GC.Collect()
+    '        'GC.WaitForPendingFinalizers() 
+    '    End Try
+    'End Function
 
-    Public Function TM_ernteBookmarksAusVorlagenDoc(vorlageFullname As String) As Integer 'liefert leere bookmarks
-        nachricht("cropBookmarksList ---------------------- ")
-        Dim obj As Object
-        Try
-            Dim int As Integer
-            nachricht("cropBookmarksList vor öffnen ")
-            obj = vorlageFullname
-            docVorlagen = wordVorlagen.Documents.OpenNoRepairDialog(obj)
-            docVorlagen.Activate()
-            TextBox1.Text = TextBox1.Text & " " & "geöffnet" & docVorlagen.Bookmarks.Count & Environment.NewLine
-            nachricht("cropBookmarksList nach activate - vor schleife " & docVorlagen.Bookmarks.Count)
-            nachricht("cropBookmarksList anzahl textmarken: " & docVorlagen.Bookmarks.Count)
+    'Public Function TM_ernteBookmarksAusVorlagenDoc(vorlageFullname As String) As Integer 'liefert leere bookmarks
+    '    nachricht("cropBookmarksList ---------------------- ")
+    '    Dim obj As Object
+    '    Try
+    '        Dim int As Integer
+    '        nachricht("cropBookmarksList vor öffnen ")
+    '        obj = vorlageFullname
+    '        docVorlagen = wordVorlagen.Documents.OpenNoRepairDialog(obj)
+    '        docVorlagen.Activate()
+    '        TextBox1.Text = TextBox1.Text & " " & "geöffnet" & docVorlagen.Bookmarks.Count & Environment.NewLine
+    '        nachricht("cropBookmarksList nach activate - vor schleife " & docVorlagen.Bookmarks.Count)
+    '        nachricht("cropBookmarksList anzahl textmarken: " & docVorlagen.Bookmarks.Count)
 
-            For int = 1 To docVorlagen.Bookmarks.Count
-                'bookmarkArray(int - 1) = .Bookmarks(int).Name
-                nachricht("Textmarke gefunden: " & docVorlagen.Bookmarks(int).Name)
-                TextBox1.Text = TextBox1.Text & " " & "change" & docVorlagen.Bookmarks(int).Name
-                changeAndDeleteBookmark(docVorlagen.Bookmarks(int).Name, "#" & docVorlagen.Bookmarks(int).Name & "#", docVorlagen)
-                TextBox1.Text = TextBox1.Text & " " & "change fertig" & Environment.NewLine
-            Next
-            Return docVorlagen.Bookmarks.Count
-        Catch ex As Exception
-            nachricht("cropBookmarksList: " & ex.ToString)
-            If docVorlagen IsNot Nothing Then
-                docVorlagen.Close()
-                docVorlagen = Nothing
-            End If
-            'wordVorla
-            'wordVorlagen.Application.Quit()
-            'wordVorlagen = Nothing
-            Return -1
-        Finally
-            If docVorlagen IsNot Nothing Then
-                docVorlagen.Close()
-                docVorlagen = Nothing
-            End If
-            'wordVorlagen.Application.Quit()
-            'wordVorlagen = Nothing
-            'ReleaseComObj(word)
-            'ReleaseComObj(doc)
-            ' Die Speichert freigeben
-            'GC.Collect()
-            'GC.WaitForPendingFinalizers()
-            'GC.Collect()
-            'GC.WaitForPendingFinalizers() 
-        End Try
-    End Function
-    Private Shared Function changeAndDeleteBookmark(ByVal textmarke As String, ByVal textm_value As String, ByVal doc As Microsoft.Office.Interop.Word.Document) As Integer
-        Try
-            '   nachricht("In changeBookmark------------------")
-            Dim test = textm_value.Trim.Replace("""", "")
+    '        For int = 1 To docVorlagen.Bookmarks.Count
+    '            'bookmarkArray(int - 1) = .Bookmarks(int).Name
+    '            nachricht("Textmarke gefunden: " & docVorlagen.Bookmarks(int).Name)
+    '            TextBox1.Text = TextBox1.Text & " " & "change" & docVorlagen.Bookmarks(int).Name
+    '            changeAndDeleteBookmark(docVorlagen.Bookmarks(int).Name, "#" & docVorlagen.Bookmarks(int).Name & "#", docVorlagen)
+    '            TextBox1.Text = TextBox1.Text & " " & "change fertig" & Environment.NewLine
+    '        Next
+    '        Return docVorlagen.Bookmarks.Count
+    '    Catch ex As Exception
+    '        nachricht("cropBookmarksList: " & ex.ToString)
+    '        If docVorlagen IsNot Nothing Then
+    '            docVorlagen.Close()
+    '            docVorlagen = Nothing
+    '        End If
+    '        'wordVorla
+    '        'wordVorlagen.Application.Quit()
+    '        'wordVorlagen = Nothing
+    '        Return -1
+    '    Finally
+    '        If docVorlagen IsNot Nothing Then
+    '            docVorlagen.Close()
+    '            docVorlagen = Nothing
+    '        End If
+    '        'wordVorlagen.Application.Quit()
+    '        'wordVorlagen = Nothing
+    '        'ReleaseComObj(word)
+    '        'ReleaseComObj(doc)
+    '        ' Die Speichert freigeben
+    '        'GC.Collect()
+    '        'GC.WaitForPendingFinalizers()
+    '        'GC.Collect()
+    '        'GC.WaitForPendingFinalizers() 
+    '    End Try
+    'End Function
+    'Private Shared Function changeAndDeleteBookmark(ByVal textmarke As String, ByVal textm_value As String, ByVal doc As Microsoft.Office.Interop.Word.Document) As Integer
+    '    Try
+    '        '   nachricht("In changeBookmark------------------")
+    '        Dim test = textm_value.Trim.Replace("""", "")
 
-            If test = "0" Then
-                Return 0
-            End If
-            If doc.Range.Bookmarks.Exists(textmarke) Then
-                doc.Bookmarks().Item(textmarke).Range.Text = textm_value
-                doc.Bookmarks().Item(textmarke).Delete()
-                Return 1
-            Else
-                Return 0
-            End If
-        Catch ex As Exception
-            nachricht(String.Format("Fehler in changeBookmark:{0}{1}", vbCrLf, ex))
-            nachricht("Fehler bei: " & textmarke & "_" & textm_value)
-            Return -1
-        End Try
-    End Function
-    Private Shared Function DeleteBookmark(ByVal textmarke As String, ByVal textm_value As String, ByVal doc As Microsoft.Office.Interop.Word.Document) As Integer
-        Try
-            Dim test = textm_value.Trim.Replace("""", "")
-            If test = "0" Then
-                Return 0
-            End If
-            If doc.Range.Bookmarks.Exists(textmarke) Then
-                doc.Bookmarks().Item(textmarke).Delete()
-                Return 1
-            Else
-                '  nachricht("Warnung:changeBookmark: Textmarke nicht vorhanden: " & textmarke)
-                Return 0
-            End If
-        Catch ex As Exception
-            nachricht(String.Format("Fehler in changeBookmark:{0}{1}", vbCrLf, ex))
-            nachricht("Fehler bei: " & textmarke & "_" & textm_value)
-            Return -1
-        End Try
-    End Function
+    '        If test = "0" Then
+    '            Return 0
+    '        End If
+    '        If doc.Range.Bookmarks.Exists(textmarke) Then
+    '            doc.Bookmarks().Item(textmarke).Range.Text = textm_value
+    '            doc.Bookmarks().Item(textmarke).Delete()
+    '            Return 1
+    '        Else
+    '            Return 0
+    '        End If
+    '    Catch ex As Exception
+    '        nachricht(String.Format("Fehler in changeBookmark:{0}{1}", vbCrLf, ex))
+    '        nachricht("Fehler bei: " & textmarke & "_" & textm_value)
+    '        Return -1
+    '    End Try
+    'End Function
+    'Private Shared Function DeleteBookmark(ByVal textmarke As String, ByVal textm_value As String, ByVal doc As Microsoft.Office.Interop.Word.Document) As Integer
+    '    Try
+    '        Dim test = textm_value.Trim.Replace("""", "")
+    '        If test = "0" Then
+    '            Return 0
+    '        End If
+    '        If doc.Range.Bookmarks.Exists(textmarke) Then
+    '            doc.Bookmarks().Item(textmarke).Delete()
+    '            Return 1
+    '        Else
+    '            '  nachricht("Warnung:changeBookmark: Textmarke nicht vorhanden: " & textmarke)
+    '            Return 0
+    '        End If
+    '    Catch ex As Exception
+    '        nachricht(String.Format("Fehler in changeBookmark:{0}{1}", vbCrLf, ex))
+    '        nachricht("Fehler bei: " & textmarke & "_" & textm_value)
+    '        Return -1
+    '    End Try
+    'End Function
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click
         Dim quellverz As String
         quellverz = "O:\UMWELT\B\Vordruck_paradigma_hashtag"
@@ -1762,25 +1764,25 @@ Public Class Form1
         End Try
     End Function
     Private Function worddateiAlsDocxSpeichern(strFile As String, quellDir As String, zieldir As String, zielname As String) As Boolean
-        clsWordTest.konvOneDoc2Docx(strFile, zielname)
+        'clsWordTest.konvOneDoc2Docx(strFile, zielname)
         Return True
     End Function
 
 
 
     Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles Me.Shown
-        IO.Directory.SetCurrentDirectory("L:\system\batch\margit")
-        'MessageBox.Show("You are in the Form.Shown event.")
-        If Environment.CommandLine.ToLower.Contains("batchmode=true") Then
-            Application.DoEvents()
-            batchmode = True
-            PDFumwandeln()
-            Button7.Text = "jetzt DOCXs"
-            DOCXumwandeln(2113, False)
-            BackColor = Color.Aquamarine
-            '  MessageBox.Show("fertig")
-            End
-        End If
+        'IO.Directory.SetCurrentDirectory("L:\system\batch\margit")
+        ''MessageBox.Show("You are in the Form.Shown event.")
+        'If Environment.CommandLine.ToLower.Contains("batchmode=true") Then
+        '    Application.DoEvents()
+        '    batchmode = True
+        '    PDFumwandeln()
+        '    Button7.Text = "jetzt DOCXs"
+        '    DOCXumwandeln(2113, False)
+        '    BackColor = Color.Aquamarine
+        '    '  MessageBox.Show("fertig")
+        '    End
+        'End If
     End Sub
     Private Sub Button13_Click(sender As Object, e As EventArgs) Handles Button13.Click
         'revisionssichere Dokumente zusätzlich nach BLOB sichern
@@ -2584,15 +2586,36 @@ Public Class Form1
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
-        Sql = "SELECT * FROM [Paradigma].[dbo].[stammdaten_tutti]  order by vorgangsid desc "
+        Sql = "SELECT * FROM [Paradigma].[dbo].[stammdaten_tutti] " &
+            " where vorgangsid< " & maxobj &
+            " order by vorgangsid desc "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         'writeDokumentePU(puFehler, ausgabeAntragsteller, Sql, maxobj)
+
+
         writeStammdatenPU(puFehler, puAusgabeStream, Sql, maxobj, umlautwandeln)
         puAusgabeStream.Close()
         puAusgabeStream.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\")
         End
+    End Sub
+
+    Private Sub getSGDictionary(dictionary As Dictionary(Of String, String), sgfile As String)
+        Dim tmpstream As StreamReader = File.OpenText(sgfile)
+        Dim strlines() As String
+        Dim strline() As String
+
+        strlines = tmpstream.ReadToEnd().Split(Environment.NewLine)
+        Dim num_rows = UBound(strlines)
+
+        For x = 0 To num_rows - 1
+            strline = (strlines(x)).Split(";")
+
+            'sgdict(x, y) = strline(y)
+            dictionary.Add(cleanString(strline(0)), cleanString(strline(1)))
+
+        Next
     End Sub
 
     Private Sub writeStammdatenPU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String,
@@ -2601,6 +2624,10 @@ Public Class Form1
         Dim idok As Integer = 0
         puAusgabeStream.AutoFlush = True
         swfehlt.WriteLine("writeStammdatenPU---")
+        Dim sgdict As New Dictionary(Of String, String)
+        Dim sgfile = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\SG_alleTiefenKorrekturNeu.csv"
+        getSGDictionary(sgdict, sgfile)
+
         DT = alleDokumentDatenHolen(sql)
         sql = "SELECT s.[VORGANGSID] ,[FREMDVORGANGSID] " &
                      "From [Paradigma].[dbo].[stammdaten_tutti]  s, [Paradigma].[dbo].[verwandte_t44] v " &
@@ -2676,10 +2703,31 @@ Public Class Form1
                 aktenstandort = CStr(clsDBtools.fieldvalue(drr.Item("STORAUMNR")))
                 sgnr = clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))
 
-                sachgebiet = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 1))
-                Verfahrensart = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 2))
-                Vorhaben = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 3))
-                Vorhabensmerkmal = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 4))
+
+
+                sgdict.TryGetValue(sgnr.Substring(0, 1), sachgebiet) : sachgebiet = sgnr.Substring(0, 1) & "-" & sachgebiet
+
+                sgdict.TryGetValue(sgnr.Substring(0, 2), Verfahrensart)
+                If String.IsNullOrEmpty(Verfahrensart) Then Verfahrensart = ""
+                Verfahrensart = sgnr.Substring(0, 2) & "-" & Verfahrensart
+
+                sgdict.TryGetValue(sgnr.Substring(0, 3), Vorhaben)
+                If String.IsNullOrEmpty(Vorhaben) Then Vorhaben = ""
+                Vorhaben = sgnr.Substring(0, 3) & "-" & Vorhaben
+
+                sgdict.TryGetValue(sgnr.Substring(0, 4), Vorhabensmerkmal)
+                If String.IsNullOrEmpty(Vorhabensmerkmal) Then Vorhabensmerkmal = ""
+                Vorhabensmerkmal = sgnr.Substring(0, 4) & "-" & Vorhabensmerkmal
+
+
+                'sachgebiet = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 1))
+                'Verfahrensart = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 2))
+                'Vorhaben = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 3))
+                'Vorhabensmerkmal = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 4))
+
+
+
+
                 sachbearbeiter = CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter"))) & "," & CStr(clsDBtools.fieldvalue(drr.Item("weiterebearb")))
                 Hauptaktenzeichen = CStr(clsDBtools.fieldvalue(drr.Item("probaugaz")))
                 hauptaktenjahr = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
@@ -4458,13 +4506,13 @@ Public Class Form1
         Try
             pu.Append(art & t)
             pu.Append(dbdatum.ToString("yyyyMMdd_hhmmss") & t)
-            pu.Append(cleanString(richtung) & t)
-            pu.Append(cleanString(quelle) & t)
-            pu.Append(cleanString(beschreibung) & t)
-            pu.Append(cleanString(dateinameext) & t)
-            pu.Append(cleanString(d_beschreibung) & t)
-            pu.Append(cleanString(typ) & t)
-            pu.Append(cleanString(REVISIONSSICHER) & t)
+            pu.Append(clsString.umlaut2ue2(cleanString(richtung)) & t)
+            pu.Append(clsString.umlaut2ue2(cleanString(quelle)) & t)
+            pu.Append(clsString.umlaut2ue2(cleanString(beschreibung)) & t)
+            pu.Append(clsString.umlaut2ue2(cleanString(dateinameext)) & t)
+            pu.Append(clsString.umlaut2ue2(cleanString(d_beschreibung)) & t)
+            pu.Append(clsString.umlaut2ue2(cleanString(typ)) & t)
+            pu.Append(clsString.umlaut2ue2(cleanString(REVISIONSSICHER)) & t)
             If clsDBtools.fieldvalueDate(FILEDATUM) < "1/1/1990" Then
                 pu.Append("" & t)
             Else

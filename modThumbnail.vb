@@ -90,14 +90,14 @@ Module modThumbnail
         Return outfile
     End Function
 
-    Public Function wordJob1(inputfile As String, outfile As String) As Boolean
-        Dim aaa As New clsWordTest
-        Dim resilt As Boolean = aaa.konvOneDoc2pdf(inputfile, outfile)
-        aaa = Nothing
-        GC.Collect()
-        GC.WaitForFullGCComplete()
-        Return resilt
-    End Function
+    'Public Function wordJob1(inputfile As String, outfile As String) As Boolean
+    '    Dim aaa As New clsWordTest
+    '    Dim resilt As Boolean = aaa.konvOneDoc2pdf(inputfile, outfile)
+    '    aaa = Nothing
+    '    GC.Collect()
+    '    GC.WaitForFullGCComplete()
+    '    Return resilt
+    'End Function
     Public Function GetOutfileWORD(ByVal vid As Integer, ByVal outDir As String, ByVal dokumentid As Integer) As String
         Dim outfile As String
         outfile = outDir & IO.Path.Combine(vid.ToString, CType(dokumentid, String)) & ".jpg"

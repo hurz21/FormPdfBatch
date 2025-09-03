@@ -39,81 +39,81 @@ Public Class clsWordTest
             Return ""
         End Try
     End Function
-    Public Shared Function konvOneDoc2pdf(infile As String, Pdffile As String) As Boolean
-        Dim objWord As New Application
-        Dim objDoc As Document
-        Dim YourSourcePath, pdfpath As Object
-        Dim retvalue As Boolean = False
-        YourSourcePath = CType(infile, Object)
-        pdfpath = CType(Pdffile, Object)
-        ' YourSourcePath = "C:\muell\34463\16070850_174865.docx"
-        If YourSourcePath = "C:\muell\34463\16070850_174865.docx" Then
-            Debug.Print("")
-        End If
-        Try
-            objDoc = objWord.Documents.OpenNoRepairDialog(YourSourcePath)
-            If objDoc.HasPassword Then
-                objDoc.Close()
-                retvalue = True
-                Return retvalue
-            End If
-            objDoc.SaveAs2(pdfpath, 17)
-            If objDoc IsNot Nothing Then
-                objDoc.Close()
-                retvalue = True
-            Else
-                retvalue = True
-            End If
+    'Public Shared Function konvOneDoc2pdf(infile As String, Pdffile As String) As Boolean
+    '    Dim objWord As New Application
+    '    Dim objDoc As Document
+    '    Dim YourSourcePath, pdfpath As Object
+    '    Dim retvalue As Boolean = False
+    '    YourSourcePath = CType(infile, Object)
+    '    pdfpath = CType(Pdffile, Object)
+    '    ' YourSourcePath = "C:\muell\34463\16070850_174865.docx"
+    '    If YourSourcePath = "C:\muell\34463\16070850_174865.docx" Then
+    '        Debug.Print("")
+    '    End If
+    '    Try
+    '        objDoc = objWord.Documents.OpenNoRepairDialog(YourSourcePath)
+    '        If objDoc.HasPassword Then
+    '            objDoc.Close()
+    '            retvalue = True
+    '            Return retvalue
+    '        End If
+    '        objDoc.SaveAs2(pdfpath, 17)
+    '        If objDoc IsNot Nothing Then
+    '            objDoc.Close()
+    '            retvalue = True
+    '        Else
+    '            retvalue = True
+    '        End If
 
-            Return retvalue
-        Catch ex As Exception
-            Console.WriteLine(("fehler: " & ex.Message.ToString()))
-            Return False
-        Finally
+    '        Return retvalue
+    '    Catch ex As Exception
+    '        Console.WriteLine(("fehler: " & ex.Message.ToString()))
+    '        Return False
+    '    Finally
 
-            objWord.Application.Quit(False)
-            objDoc = Nothing
-            objWord = Nothing
-            ReleaseComObject(objWord)
-            ReleaseComObject(objDoc)
+    '        objWord.Application.Quit(False)
+    '        objDoc = Nothing
+    '        objWord = Nothing
+    '        ReleaseComObject(objWord)
+    '        ReleaseComObject(objDoc)
 
-        End Try
-    End Function
-    Public Shared Function konvOneDoc2Docx(infile As String, Pdffile As String) As Boolean
-        Dim objWord As New Application
-        Dim objDoc As Document
-        Dim YourSourcePath, pdfpath As Object
-        Dim retvalue As Boolean = False
-        YourSourcePath = CType(infile, Object)
-        pdfpath = CType(Pdffile, Object)
-        ' YourSourcePath = "C:\muell\34463\16070850_174865.docx"
-        If YourSourcePath = "C:\muell\34463\16070850_174865.docx" Then
-            Debug.Print("")
-        End If
-        Try
-            objDoc = objWord.Documents.OpenNoRepairDialog(YourSourcePath)
-            objDoc.SaveAs2(pdfpath, 16) '16 'objDoc.wWdSaveFormat.WordProcessingML
-            If objDoc IsNot Nothing Then
-                objDoc.Close()
-                retvalue = True
-            Else
-                retvalue = True
-            End If
+    '    End Try
+    'End Function
+    'Public Shared Function konvOneDoc2Docx(infile As String, Pdffile As String) As Boolean
+    '    Dim objWord As New Application
+    '    Dim objDoc As Document
+    '    Dim YourSourcePath, pdfpath As Object
+    '    Dim retvalue As Boolean = False
+    '    YourSourcePath = CType(infile, Object)
+    '    pdfpath = CType(Pdffile, Object)
+    '    ' YourSourcePath = "C:\muell\34463\16070850_174865.docx"
+    '    If YourSourcePath = "C:\muell\34463\16070850_174865.docx" Then
+    '        Debug.Print("")
+    '    End If
+    '    Try
+    '        objDoc = objWord.Documents.OpenNoRepairDialog(YourSourcePath)
+    '        objDoc.SaveAs2(pdfpath, 16) '16 'objDoc.wWdSaveFormat.WordProcessingML
+    '        If objDoc IsNot Nothing Then
+    '            objDoc.Close()
+    '            retvalue = True
+    '        Else
+    '            retvalue = True
+    '        End If
 
-            Return retvalue
-        Catch ex As Exception
-            Console.WriteLine(("fehler: " & ex.Message.ToString()))
-            Return False
-        Finally
+    '        Return retvalue
+    '    Catch ex As Exception
+    '        Console.WriteLine(("fehler: " & ex.Message.ToString()))
+    '        Return False
+    '    Finally
 
-            objWord.Application.Quit(False)
-            objDoc = Nothing
-            objWord = Nothing
-            ReleaseComObject(objWord)
-            ReleaseComObject(objDoc)
+    '        objWord.Application.Quit(False)
+    '        objDoc = Nothing
+    '        objWord = Nothing
+    '        ReleaseComObject(objWord)
+    '        ReleaseComObject(objDoc)
 
-        End Try
-    End Function
+    '    End Try
+    'End Function
     'Private Function GetEncoder(ByVal format As ImageFormat) As ImageCodecInfo
 
     '    Dim codecs As ImageCodecInfo() = ImageCodecInfo.GetImageDecoders()
