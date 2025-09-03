@@ -2044,6 +2044,7 @@ Public Class Form1
 
     Private Sub Button16_Click(sender As Object, e As EventArgs) Handles Button16.Click
         fullpathdokumenteErzeugen()
+        End
     End Sub
 
     Private Sub fullpathdokumenteErzeugen()
@@ -2375,6 +2376,7 @@ Public Class Form1
         l("fertig  " & puFehler)
 
         'Process.Start(puAusgabe)
+        End
     End Sub
 
     Private Function setMaxObj(maxobj As Integer) As Integer
@@ -2564,6 +2566,7 @@ Public Class Form1
         puAusgabeStream.Close()
         puAusgabeStream.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\")
+        End
     End Sub
 
     Private Sub writeStammdatenPU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String,
@@ -2645,7 +2648,7 @@ Public Class Form1
                 abgeschlossen = makeAbgeschlossen(CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG"))),
                                                   CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))) 'falls erledigt
                 aktenstandort = CStr(clsDBtools.fieldvalue(drr.Item("STORAUMNR")))
-                'sgnr = clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))
+                sgnr = clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))
 
                 sachgebiet = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 1))
                 Verfahrensart = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 2))
@@ -2853,10 +2856,10 @@ Public Class Form1
                     Return sachgebietnr & " - " & sachgebiettext
                 End If
                 If modus = "2" Then
-                    Return sachgebietnr.Substring(1, 1) & " - " & sachgebiettext
+                    Return sachgebietnr.Substring(1, 1) '& " - " & sachgebiettext
                 End If
                 If modus = "3" Then
-                    Return sachgebietnr.Substring(2, 1) & " - " & sachgebiettext
+                    Return sachgebietnr.Substring(2, 1) '& " - " & sachgebiettext
                 End If
                 If modus = "4" Then
                     Return sachgebietnr.Substring(3, 1) & " - " & sachgebiettext
@@ -2941,6 +2944,7 @@ Public Class Form1
         puAusgabeStream.Dispose()
         swfehlt.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
+        End
     End Sub
 
     Private Sub writeAdresseausgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String,
@@ -3088,6 +3092,7 @@ Public Class Form1
         puAusgabeStream.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung")
         swfehlt.Dispose()
+        End
     End Sub
 
     Private Sub writeKatasterausgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String,
@@ -3240,6 +3245,7 @@ Public Class Form1
         puAusgabeStream.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
         swfehlt.Dispose()
+        End
     End Sub
     Private Sub Button25_Click(sender As Object, e As EventArgs) Handles Button25.Click
         'wiedervorlagen
@@ -3264,6 +3270,7 @@ Public Class Form1
         puAusgabeStream.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
         swfehlt.Dispose()
+        End
     End Sub
     Private Sub writeWiedervorlageAusgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer, umlautwandeln As Boolean)
         Dim DT As DataTable
@@ -3548,6 +3555,7 @@ Public Class Form1
         ausgabeBeteiligte.Dispose()
         swfehlt.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
+        End
     End Sub
 
     Private Sub writeAntragstellerausgabePU(puFehler As String, ausgabeAntragsteller As IO.StreamWriter, ausgabeBeteiligte As IO.StreamWriter,
@@ -3903,6 +3911,7 @@ Public Class Form1
         puAusgabeStream.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
         swfehlt.Dispose()
+        End
     End Sub
 
     Private Sub writeSachbearbeiterPU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
@@ -4071,6 +4080,7 @@ Public Class Form1
         puAusgabeStream.Dispose()
         swfehlt.Close()
         l("fertig  " & puFehler)
+        End
     End Sub
 
     Private Sub writeEreignissePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer, relativpfad As String)
@@ -4275,6 +4285,7 @@ Public Class Form1
 
         swfehlt.Close()
         l("fertig  " & puFehler)
+        End
     End Sub
 
     Private Sub writeVerlaufPU(puFehler As String, sammelStream As IO.StreamWriter, sql As String, maxobj As Integer, relativpfad As String, startVID As String)
