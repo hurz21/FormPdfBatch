@@ -105,7 +105,7 @@ ByRef initial As String, ByRef eid As String, ByRef beschreibung As String, ByRe
             End If
 
             datumDB = CDate(drr.Item("checkindatum"))
-            eingang = CDate(drr.Item("checkindatum"))
+            eingang = CDate(drr.Item("eingang"))
             initial = CStr(drr.Item("initial_"))
             test = CStr((drr.Item("revisionssicher")))
             If test <> String.Empty Or test Is Nothing Then

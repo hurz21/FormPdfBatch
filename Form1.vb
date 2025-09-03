@@ -2313,6 +2313,7 @@ Public Class Form1
         swfehlt.Close()
         l("fertig  " & dateifehlt)
         Process.Start(dateifehlt)
+        End
     End Sub
 
     Private Sub Button20_Click(sender As Object, e As EventArgs) Handles Button20.Click
@@ -2344,6 +2345,16 @@ Public Class Form1
         Sql = "SELECT   *   FROM (select vid from [Paradigma].[dbo].[dokumentfullpath2] " &
               "union all  SELECT  vid from [Paradigma].[dbo].dokumente) as a order by dokumentid desc "
 
+        'Sql = "SELECT  *   FROM " &
+        '      "(select vid,dokumentid,eid,relativpfad,dateinameext,newsavemode," &
+        '      "checkindatum,initial_,revisionssicher,Beschreibung,tooltip,typ from [Paradigma].[dbo].[dokumentfullpath2] " &
+        'bis hierher sind das nur die refenezdokus
+
+        '      "union all  " &
+        '      "SELECT  vid,dokumentid,eid,relativpfad,dateinameext,newsavemode," &
+        '      "checkindatum,initial_,revisionssicher,Beschreibung,tooltip,typ from [Paradigma].[dbo].dokumente) as a " &
+        '      "where vid <" & maxobj & " and vid>" & untergrenze & " order by vid,checkindatum desc;"
+
         Sql = "SELECT  *   FROM " &
               "(select vid,dokumentid,eid,relativpfad,dateinameext,newsavemode," &
               "checkindatum,initial_,revisionssicher,Beschreibung,tooltip,typ from [Paradigma].[dbo].[dokumentfullpath2] " &
@@ -2354,7 +2365,22 @@ Public Class Form1
 
 
 
+        Sql = "SELECT  *   FROM " &
+              "(select vid,dokumentid,eid,relativpfad,dateinameext,newsavemode," &
+              "checkindatum,initial_,revisionssicher,Beschreibung,tooltip,typ,eingang from [Paradigma].[dbo].[dokumentfullpath2] " &
+              "union all  " &
+              "SELECT  vid,dokumentid,eid,relativpfad,dateinameext,newsavemode," &
+              "checkindatum,initial_,revisionssicher,Beschreibung,tooltip,typ,eingang from [Paradigma].[dbo].DokusMitEingang) as a " &
+              "where vid <" & maxobj & " and vid>" & untergrenze & " order by vid,checkindatum desc;"
 
+
+        'Sql = "SELECT  *   FROM " &
+        '      "(select vid,dokumentid,eid,relativpfad,dateinameext,newsavemode," &
+        '      "checkindatum,initial_,revisionssicher,Beschreibung,tooltip,typ,eingang from [Paradigma].[dbo].[dokumentfullpath2] " &
+        '      "union all  " &
+        '      "SELECT  vid,dokumentid,eid,relativpfad,dateinameext,newsavemode," &
+        '      "checkindatum,initial_,revisionssicher,Beschreibung,tooltip,typ,eingang from [Paradigma].[dbo].DokusMitEingang) as a " &
+        '      "where vid <" & 2000 & " and vid>" & 1860 & " order by vid,checkindatum desc;"
 
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
@@ -2463,11 +2489,11 @@ Public Class Form1
                 Application.DoEvents()
                 'zeilebilden
                 zeile.Append(vid & t) 'Az
-                zeile.Append("" & t) 'jahr leer weil nicht vorhanden
+                zeile.Append(eingang.ToString("yyyy") & t) ' 
                 ' zeile.Append(eingang.ToString("yyyy") & t) 'jahr
                 zeile.Append(dbdatum.ToString("dd.MM.yyyy") & t) 'datum
-                zeile.Append(typ & t) 'oberbegriff Protokolle
-                zeile.Append((cleanString(beschreibung)) & t) 'bezeichnung beschreibung
+                zeile.Append(clsString.umlaut2ue(typ) & t) 'oberbegriff Protokolle
+                zeile.Append(clsString.umlaut2ue(cleanString(beschreibung)) & t) 'bezeichnung beschreibung
                 zeile.Append((fullfilename) & t) 'pfad
                 zeile.Append(dbdatum.ToString("yyyyMMdd") & "_" & cleanString(dateinameext).Trim & t) 'ordner im mediencenter
                 zeile.Append(CInt(istRevisionssicher) & t) 'ordner im mediencenter
