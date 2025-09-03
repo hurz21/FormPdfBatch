@@ -2492,9 +2492,9 @@ Public Class Form1
                 zeile.Append(eingang.ToString("yyyy") & t) ' 
                 ' zeile.Append(eingang.ToString("yyyy") & t) 'jahr
                 zeile.Append(dbdatum.ToString("dd.MM.yyyy") & t) 'datum
-                zeile.Append(clsString.umlaut2ue(typ) & t) 'oberbegriff Protokolle
-                zeile.Append(clsString.umlaut2ue(cleanString(beschreibung)) & t) 'bezeichnung beschreibung
-                zeile.Append((fullfilename) & t) 'pfad
+                zeile.Append(clsString.umlaut2ue2(typ) & t) 'oberbegriff Protokolle
+                zeile.Append(clsString.umlaut2ue2(cleanString(beschreibung)) & t) 'bezeichnung beschreibung
+                zeile.Append((clsString.umlaut2ue2(fullfilename)) & t) 'pfad
                 zeile.Append(dbdatum.ToString("yyyyMMdd") & "_" & cleanString(dateinameext).Trim & t) 'ordner im mediencenter
                 zeile.Append(CInt(istRevisionssicher) & t) 'ordner im mediencenter
                 zeile.Append(CInt(bearbeiterid) & t) 'ordner im mediencenter
@@ -2692,14 +2692,17 @@ Public Class Form1
                                                    CStr(clsDBtools.fieldvalue(drr.Item("beschreibung"))),
                                                     verwandteString))
                 If umlautwandeln Then
-                    Bezeichnung = clsString.umlaut2ue(Bezeichnung)
-                    aktenstandort = clsString.umlaut2ue(aktenstandort)
-                    sachgebiet = clsString.umlaut2ue(sachgebiet)
-                    Verfahrensart = clsString.umlaut2ue(Verfahrensart)
-                    Vorhaben = clsString.umlaut2ue(Vorhaben)
-                    Vorhabensmerkmal = clsString.umlaut2ue(Vorhabensmerkmal)
-                    sachbearbeiter = clsString.umlaut2ue(sachbearbeiter)
-                    Notiz = clsString.umlaut2ue(Notiz)
+                    sgnr = clsString.umlaut2ue2(sgnr)
+                    Hauptaktenzeichen = clsString.umlaut2ue2(Hauptaktenzeichen)
+                    geschlossen = clsString.umlaut2ue2(geschlossen)
+                    Bezeichnung = clsString.umlaut2ue2(Bezeichnung)
+                    aktenstandort = clsString.umlaut2ue2(aktenstandort)
+                    sachgebiet = clsString.umlaut2ue2(sachgebiet)
+                    Verfahrensart = clsString.umlaut2ue2(Verfahrensart)
+                    Vorhaben = clsString.umlaut2ue2(Vorhaben)
+                    Vorhabensmerkmal = clsString.umlaut2ue2(Vorhabensmerkmal)
+                    sachbearbeiter = clsString.umlaut2ue2(sachbearbeiter)
+                    Notiz = clsString.umlaut2ue2(Notiz)
                     ' Bezeichnung = clsString.umlaut2ue(Bezeichnung)
                 End If
 
@@ -2726,9 +2729,9 @@ Public Class Form1
                 zeile.Append(Vorhaben & t) ' 
                 zeile.Append(Vorhabensmerkmal & t) ' 
                 zeile.Append(sachbearbeiter & t) ' 
-                zeile.Append("" & t) ' 
+                zeile.Append("" & t) ' objektnummer
                 zeile.Append((cleanString(Hauptaktenzeichen)) & t) '   
-                zeile.Append(hauptaktenjahr.ToString("dd.MM.yyyy") & t) 'datum 
+                zeile.Append(hauptaktenjahr.ToString("yyyy") & t) 'datum 
                 zeile.Append(cleanString(Notiz) & t) ' 
                 'zeileAntragsteller.Append(geschlossen)
                 'If iblock < blockMAX Then
@@ -3040,11 +3043,14 @@ Public Class Form1
 
 
                 If umlautwandeln Then
-                    strasse = clsString.umlaut2ue(strasse)
-                    ort = clsString.umlaut2ue(ort)
-                    funktion = clsString.umlaut2ue(funktion)
-                    freitext = clsString.umlaut2ue(freitext)
-                    abstrakt = clsString.umlaut2ue(abstrakt)
+                    strasse = clsString.umlaut2ue2(strasse)
+                    nummer = clsString.umlaut2ue2(nummer)
+                    gemeindenr = clsString.umlaut2ue2(gemeindenr)
+
+                    ort = clsString.umlaut2ue2(ort)
+                    funktion = clsString.umlaut2ue2(funktion)
+                    freitext = clsString.umlaut2ue2(freitext)
+                    abstrakt = clsString.umlaut2ue2(abstrakt)
 
                 End If
 

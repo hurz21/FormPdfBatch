@@ -174,42 +174,59 @@ ende:
                 Return False
             End Try
         End Function
-        '		Public Shared Function normalize_db(ByVal s$) As String
-        '		On Error GoTo normalize_db_Err
-        '		normalize_db = s$
-        '		s$ = Replace$(s$, " ", "_")
-        '		s$ = Replace(s$, "ä", "ae")
-        '		s$ = Replace(s$, "ü", "ue")
-        '		s$ = Replace(s$, "ö", "oe")
-        '		s$ = Replace(s$, "Ä", "Ae")
-        '		s$ = Replace(s$, "Ü", "Ue")
-        '		s$ = Replace(s$, "Ö", "Oe")
-        '		s$ = Replace(s$, "ß", "sz")
-        '		normalize_db = s$
-        '		Exit Function
-        'normalize_db_Err:
-        '		myLog.log(Err.Description & vbCrLf & _
-        '		 "in dbdirekt.dbdirect.normalize_db " & _
-        '		 "at line " & Erl() & _
-        '		 "Application Error")
-        '		Resume Next
-        '	End Function
-        Public Shared Function umlaut2ue(ByVal s As String) As String ' von byref auf byval umgestellt
-            Try
-                If String.IsNullOrEmpty(s) Then Return s$
-                s$ = s$.Replace("ü", "ue")
-                s$ = s$.Replace("ö", "oe")
-                s$ = s$.Replace("ä", "ae")
-                s$ = s$.Replace("Ä", "Ae")
-                s$ = s$.Replace("Ü", "Ue")
-                s$ = s$.Replace("Ö", "Oe")
-                s$ = s$.Replace("ß", "ss")
-                Return s$
-            Catch e As Exception
-                Return s
-            End Try
-        End Function
-        Public Shared Function explode(ByVal layerstring$, ByVal delim As Char) As String()
+    '		Public Shared Function normalize_db(ByVal s$) As String
+    '		On Error GoTo normalize_db_Err
+    '		normalize_db = s$
+    '		s$ = Replace$(s$, " ", "_")
+    '		s$ = Replace(s$, "ä", "ae")
+    '		s$ = Replace(s$, "ü", "ue")
+    '		s$ = Replace(s$, "ö", "oe")
+    '		s$ = Replace(s$, "Ä", "Ae")
+    '		s$ = Replace(s$, "Ü", "Ue")
+    '		s$ = Replace(s$, "Ö", "Oe")
+    '		s$ = Replace(s$, "ß", "sz")
+    '		normalize_db = s$
+    '		Exit Function
+    'normalize_db_Err:
+    '		myLog.log(Err.Description & vbCrLf & _
+    '		 "in dbdirekt.dbdirect.normalize_db " & _
+    '		 "at line " & Erl() & _
+    '		 "Application Error")
+    '		Resume Next
+    '	End Function
+    Public Shared Function umlaut2ue(ByVal s As String) As String ' von byref auf byval umgestellt
+        Try
+            If String.IsNullOrEmpty(s) Then Return s$
+            s$ = s$.Replace("ü", "ue")
+            s$ = s$.Replace("ö", "oe")
+            s$ = s$.Replace("ä", "ae")
+            s$ = s$.Replace("Ä", "Ae")
+            s$ = s$.Replace("Ü", "Ue")
+            s$ = s$.Replace("Ö", "Oe")
+            s$ = s$.Replace("ß", "ss")
+            Return s$
+        Catch e As Exception
+            Return s
+        End Try
+    End Function
+    Public Shared Function umlaut2ue2(ByVal s As String) As String ' MIT SEMIKOLON
+        Try
+            If String.IsNullOrEmpty(s) Then Return s$
+            s$ = s$.Replace("ü", "ue")
+            s$ = s$.Replace("ö", "oe")
+            s$ = s$.Replace("ä", "ae")
+            s$ = s$.Replace("Ä", "Ae")
+            s$ = s$.Replace("Ü", "Ue")
+            s$ = s$.Replace("Ö", "Oe")
+            s$ = s$.Replace("ß", "ss")
+            s$ = s$.Replace(";", "_")
+            Return s$
+        Catch e As Exception
+            Return s
+        End Try
+    End Function
+
+    Public Shared Function explode(ByVal layerstring$, ByVal delim As Char) As String()
             Dim farr$()
             Try
                 layerstring$ = layerstring$.Replace(delim & delim, delim)
