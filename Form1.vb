@@ -2050,7 +2050,7 @@ Public Class Form1
     End Sub
 
     Private Sub fullpathdokumenteErzeugen()
-        Dim dateifehlt As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\auffueller" & Environment.UserName & ".log"
+        Dim dateifehlt As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\auffueller" & Environment.UserName & ".log"
         dateifehlt = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\auffueller" & Environment.UserName & ".log"
         swfehlt = New IO.StreamWriter(dateifehlt)
         swfehlt.AutoFlush = True
@@ -2225,7 +2225,7 @@ Public Class Form1
         Dim Sql As String
         Sql = "SELECT * FROM dokumentefull where   dokumentid<20000000 and dokumentid>0  and fullname is null " &
                   "  order by dokumentid desc "
-        Sql = "SELECT * FROM dokumente where   dokumentid<20000000 and dokumentid>0  and (tooltip ='' or    tooltip is null) " &
+        Sql = "SELECT * FROM dokusmiteingang where   dokumentid<20000000 and dokumentid>0  and (tooltip ='' or    tooltip is null) " &
                   "  order by dokumentid desc "
         DT = alleDokumentDatenHolen(Sql)
         'teil1 = pdf -----------------------------------------------
@@ -2303,7 +2303,7 @@ Public Class Form1
 
     Private Sub Button19_Click(sender As Object, e As EventArgs) Handles Button19.Click
 
-        Dim dateifehlt As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\referenzdokus" & Environment.UserName & ".log"
+        Dim dateifehlt As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\referenzdokus" & Environment.UserName & ".log"
         dateifehlt = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\referenzdokus" & Environment.UserName & ".log"
         swfehlt = New IO.StreamWriter(dateifehlt)
         swfehlt.AutoFlush = True
@@ -2319,7 +2319,7 @@ Public Class Form1
     End Sub
 
     Private Sub Button20_Click(sender As Object, e As EventArgs) Handles Button20.Click
-        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_ausgabeDoku" & Environment.UserName & "-" & Now.ToString("yyyy-MM-dd_HH_mm_ss") & ".log"
+        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\PU_ausgabeDoku" & Environment.UserName & "-" & Now.ToString("yyyy-MM-dd_HH_mm_ss") & ".log"
         Dim puAusgabe As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "dokumente" & ".csv"
         '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".log"
 
@@ -2337,7 +2337,7 @@ Public Class Form1
             untergrenze = maxobj - 10000
         End If
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
-        puFehler = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_ausgabeDoku" & Environment.UserName & "-" & maxobj & ".txt"
+        puFehler = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\PU_ausgabeDoku" & Environment.UserName & "-" & maxobj & ".txt"
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_ab_" & maxobj & ".csv"
