@@ -212,13 +212,13 @@ ende:
     Public Shared Function umlaut2ue2(ByVal s As String) As String ' MIT SEMIKOLON
         Try
             If String.IsNullOrEmpty(s) Then Return s$
-            s$ = s$.Replace("ü", "ue")
-            s$ = s$.Replace("ö", "oe")
-            s$ = s$.Replace("ä", "ae")
-            s$ = s$.Replace("Ä", "Ae")
-            s$ = s$.Replace("Ü", "Ue")
-            s$ = s$.Replace("Ö", "Oe")
-            s$ = s$.Replace("ß", "ss")
+            's$ = s$.Replace("ü", "ue")
+            's$ = s$.Replace("ö", "oe")
+            's$ = s$.Replace("ä", "ae")
+            's$ = s$.Replace("Ä", "Ae")
+            's$ = s$.Replace("Ü", "Ue")
+            's$ = s$.Replace("Ö", "Oe")
+            's$ = s$.Replace("ß", "ss")
             s$ = s$.Replace(";", "_")
             Return s$
         Catch e As Exception

@@ -2341,7 +2341,7 @@ Public Class Form1
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_ab_" & maxobj & ".csv"
-        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
 
         Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_vorgang]  order by dokumentid desc "
         Sql = "SELECT   *   FROM (select vid from [Paradigma].[dbo].[dokumentfullpath2] " &
@@ -2579,7 +2579,7 @@ Public Class Form1
         'probaugstammdaten
         Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_Stammdaten" & Environment.UserName & ".log"
         Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "Stammdaten" & ".csv"
-        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
@@ -2999,7 +2999,7 @@ Public Class Form1
         'adresse
         Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_LageAdresse" & Environment.UserName & ".log"
         Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "PU_LageAdresse" & ".csv"
-        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
@@ -3156,7 +3156,7 @@ Public Class Form1
         'kataster 
         Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_kataster" & Environment.UserName & ".log"
         Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "PU_kataster" & ".csv"
-        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
@@ -3308,7 +3308,7 @@ Public Class Form1
         'beteiligte 2_stakeholder 
         Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_beteiligte" & Environment.UserName & ".log"
         Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "beteiligte_2_stakeholder" & ".csv"
-        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
@@ -3331,7 +3331,7 @@ Public Class Form1
         'wiedervorlagen
         Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_wiedervorlagen" & Environment.UserName & ".log"
         Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "PU_wiedervorlagen" & ".csv"
-        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
@@ -3616,8 +3616,8 @@ Public Class Form1
         Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_antragsteller" & Environment.UserName & ".log"
         Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "PU_antragsteller" & ".csv"
         Dim pubeteiligte As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "PU_beteiligte_1" & ".csv"
-        Dim ausgabeAntragsteller As New IO.StreamWriter(puAusgabe)
-        Dim ausgabeBeteiligte As New IO.StreamWriter(pubeteiligte)
+        Dim ausgabeAntragsteller As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
+        Dim ausgabeBeteiligte As New IO.StreamWriter(pubeteiligte, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
@@ -3976,7 +3976,7 @@ Public Class Form1
         'sachbearbeiter 
         Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_sachbearbeiter" & Environment.UserName & ".log"
         Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "sachbearbeiter" & ".csv"
-        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
@@ -4115,7 +4115,7 @@ Public Class Form1
     Private Sub Button28_Click(sender As Object, e As EventArgs) Handles Button28.Click
         Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_ausgabeEreignisse" & Environment.UserName & ".log"
         Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_ereignisse" & ".csv"
-        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".log"
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -4309,7 +4309,7 @@ Public Class Form1
     Private Sub Button36_Click(sender As Object, e As EventArgs) Handles Button36.Click
         Dim puFehler As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_verlauf" & Environment.UserName & ".log"
         Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_verlaufSummary" & ".csv"
-        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe)
+        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".log"
 
         '  swfehlt.WriteLine(Now)
