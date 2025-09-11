@@ -3010,7 +3010,7 @@ Public Class Form1
                "     order by VORGANGSID desc "
         Sql = "select * from  [Paradigma].[dbo].[PA_mitRH]      order by VORGANGSID desc "
         Sql = "select * from Pa_mitRH as a, raumbezug as r " &
-                "where a.id=r.sekid  and typ=1	order by az"  ' bitte ordnung einbauen
+                "where a.id=r.sekid  and typ=1	order by vid desc"  ' bitte ordnung einbauen
 
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
 
@@ -3073,7 +3073,7 @@ Public Class Form1
             Try
                 igesamt += 1
                 vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("datum")))
+                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                 ort = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemeindetext"))))
                 ortsteil = ""
                 strasse = (clsDBtools.fieldvalue(drr.Item("strassenname")))
@@ -3085,7 +3085,7 @@ Public Class Form1
                 ost = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("rechts"))))
                 nord = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("hoch"))))
                 funktion = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("titel"))))
-                freitext = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("abteilung"))))
+                freitext = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("freitext"))))
                 abstrakt = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("abstract"))))
                 fs = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fs"))))
 
@@ -3154,8 +3154,8 @@ Public Class Form1
 
     Private Sub Button26_Click(sender As Object, e As EventArgs) Handles Button26.Click
         'kataster 
-        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_kataster" & Environment.UserName & ".log"
-        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "PU_kataster" & ".csv"
+        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\kataster" & Environment.UserName & ".log"
+        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "kataster" & ".csv"
         Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -3226,9 +3226,9 @@ Public Class Form1
             Try
                 igesamt += 1
                 vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("datum")))
+                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                 gemarkung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemarkungstext"))))
-                flur = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("nachname"))))
+                flur = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("flur"))))
                 flurstueck = cleanString((clsDBtools.fieldvalue(drr.Item("znkombi"))))
                 ost = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("rechts"))))
                 nord = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("hoch"))))
@@ -3236,9 +3236,9 @@ Public Class Form1
                 spalte1 = ""
                 spalte1 = ""
                 funktion = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("titel"))))
-                freitext = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("abteilung"))))
+                freitext = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("freitext"))))
                 abstrakt = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("abstract"))))
-                gemcode = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fax"))))
+                gemcode = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemcode"))))
                 FS = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fs"))))
                 flaecheqm = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("flaecheqm"))))
 
