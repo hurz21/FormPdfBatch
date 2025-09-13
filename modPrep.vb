@@ -46,14 +46,14 @@
         Try
             vid = CStr(clsDBtools.fieldvalue(drr.Item("vorgangsid"))) 'vid 
             eid = CStr(clsDBtools.fieldvalue(drr.Item("id")))
-            richtung = clsString.umlaut2ue2(CStr(clsDBtools.fieldvalue(drr.Item("richtung"))))
-            typnr = clsString.umlaut2ue2(CStr(clsDBtools.fieldvalue(drr.Item("typnr"))))
-            notiz = clsString.umlaut2ue2(CStr(clsDBtools.fieldvalue(drr.Item("notiz"))))
+            richtung = clsString.removeSemikolon(CStr(clsDBtools.fieldvalue(drr.Item("richtung"))))
+            typnr = clsString.removeSemikolon(CStr(clsDBtools.fieldvalue(drr.Item("typnr"))))
+            notiz = clsString.removeSemikolon(CStr(clsDBtools.fieldvalue(drr.Item("notiz"))))
             datum = CDate(clsDBtools.fieldvalueDate(drr.Item("datum")))
             eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
-            beschreibung = clsString.umlaut2ue2(CStr(clsDBtools.fieldvalue(drr.Item("Beschreibung"))))
+            beschreibung = clsString.removeSemikolon(CStr(clsDBtools.fieldvalue(drr.Item("Beschreibung"))))
 
-            art = clsString.umlaut2ue2(CStr(clsDBtools.fieldvalue(drr.Item("art"))))
+            art = clsString.removeSemikolon(CStr(clsDBtools.fieldvalue(drr.Item("art"))))
         Catch ex As Exception
             l("fehler in DbMetaDatenDokumentHolen:" & vid & ex.ToString)
         End Try

@@ -2456,15 +2456,28 @@ Public Class Form1
         '  Using sw As New IO.StreamWriter(logfile)
         bearbeiterid = 0
         'kopfzeile
+        'zeile.Append("az" & t) 'Az
+        'zeile.Append("jahr" & t) 'jahr
+        'zeile.Append("datum" & t) 'datum
+        'zeile.Append("oberbegriff" & t) 'oberbegriff Protokolle
+        'zeile.Append((cleanString("bezeichnung")) & t) 'bezeichnung beschreibung
+        'zeile.Append(("pfad") & t) 'pfad
+        'zeile.Append("ordner" & t) 'ordner im mediencenter
+        'zeile.Append("revisionssicher" & t) ' 
+        'zeile.Append("bearbeiterid" & t) ' 
+
         zeile.Append("az" & t) 'Az
         zeile.Append("jahr" & t) 'jahr
+        zeile.Append("obergruppe" & t) 'jahr
         zeile.Append("datum" & t) 'datum
-        zeile.Append("oberbegriff" & t) 'oberbegriff Protokolle
+        zeile.Append("oberbegriff" & t) 'oberbegriff Protokolle leer
         zeile.Append((cleanString("bezeichnung")) & t) 'bezeichnung beschreibung
         zeile.Append(("pfad") & t) 'pfad
         zeile.Append("ordner" & t) 'ordner im mediencenter
-        zeile.Append("revisionssicher" & t) ' 
-        zeile.Append("bearbeiterid" & t) ' 
+        zeile.Append("docid" & t) 'ordner im mediencenter
+        zeile.Append("_revisionssicher" & t) ' 
+        zeile.Append("_bearbeiterid" & t) ' 
+
         csvzeileSpeichern(zeile.ToString, puAusgabeStream)
         zeile.Clear()
 
@@ -2492,14 +2505,16 @@ Public Class Form1
                 'zeilebilden
                 zeile.Append(vid & t) 'Az
                 zeile.Append(eingang.ToString("yyyy") & t) ' 
+                zeile.Append("" & t) 'obergruppe leer 
                 ' zeile.Append(eingang.ToString("yyyy") & t) 'jahr
                 zeile.Append(dbdatum.ToString("dd.MM.yyyy") & t) 'datum
-                zeile.Append(clsString.umlaut2ue2(typ) & t) 'oberbegriff Protokolle
-                zeile.Append(clsString.umlaut2ue2(cleanString(beschreibung)) & t) 'bezeichnung beschreibung
-                zeile.Append((clsString.umlaut2ue2(fullfilename)) & t) 'pfad
+                zeile.Append(clsString.removeSemikolon(typ) & t) 'oberbegriff Protokolle
+                zeile.Append(clsString.removeSemikolon(cleanString(beschreibung)) & t) 'bezeichnung beschreibung
+                zeile.Append((clsString.removeSemikolon(fullfilename)) & t) 'pfad
+                'zeile.Append("Paradigma" & t) 'ordner leer 
                 zeile.Append(dbdatum.ToString("yyyyMMdd") & "_" & cleanString(dateinameext).Trim & t) 'ordner im mediencenter
+                zeile.Append(CInt(dokumentid) & t) 'ordner im mediencenter
                 zeile.Append(CInt(istRevisionssicher) & t) 'ordner im mediencenter
-                zeile.Append(CInt(bearbeiterid) & t) 'ordner im mediencenter
 
                 'If iblock < blockMAX Then
                 '    block.AppendLine(zeileAntragsteller.ToString)
@@ -2625,7 +2640,7 @@ Public Class Form1
         puAusgabeStream.AutoFlush = True
         swfehlt.WriteLine("writeStammdatenPU---")
         Dim sgdict As New Dictionary(Of String, String)
-        Dim sgfile = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\SG_alleTiefenKorrekturNeu.csv"
+        Dim sgfile = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\sachgebiete\SG_alleTiefenKorrekturNeu.csv"
         getSGDictionary(sgdict, sgfile)
 
         DT = alleDokumentDatenHolen(sql)
@@ -2740,17 +2755,17 @@ Public Class Form1
                                                    CStr(clsDBtools.fieldvalue(drr.Item("beschreibung"))),
                                                     verwandteString))
                 If umlautwandeln Then
-                    sgnr = clsString.umlaut2ue2(sgnr)
-                    Hauptaktenzeichen = clsString.umlaut2ue2(Hauptaktenzeichen)
-                    geschlossen = clsString.umlaut2ue2(geschlossen)
-                    Bezeichnung = clsString.umlaut2ue2(Bezeichnung)
-                    aktenstandort = clsString.umlaut2ue2(aktenstandort)
-                    sachgebiet = clsString.umlaut2ue2(sachgebiet)
-                    Verfahrensart = clsString.umlaut2ue2(Verfahrensart)
-                    Vorhaben = clsString.umlaut2ue2(Vorhaben)
-                    Vorhabensmerkmal = clsString.umlaut2ue2(Vorhabensmerkmal)
-                    sachbearbeiter = clsString.umlaut2ue2(sachbearbeiter)
-                    Notiz = clsString.umlaut2ue2(Notiz)
+                    sgnr = clsString.removeSemikolon(sgnr)
+                    Hauptaktenzeichen = clsString.removeSemikolon(Hauptaktenzeichen)
+                    geschlossen = clsString.removeSemikolon(geschlossen)
+                    Bezeichnung = clsString.removeSemikolon(Bezeichnung)
+                    aktenstandort = clsString.removeSemikolon(aktenstandort)
+                    sachgebiet = clsString.removeSemikolon(sachgebiet)
+                    Verfahrensart = clsString.removeSemikolon(Verfahrensart)
+                    Vorhaben = clsString.removeSemikolon(Vorhaben)
+                    Vorhabensmerkmal = clsString.removeSemikolon(Vorhabensmerkmal)
+                    sachbearbeiter = clsString.removeSemikolon(sachbearbeiter)
+                    Notiz = clsString.removeSemikolon(Notiz)
                     ' Bezeichnung = clsString.umlaut2ue(Bezeichnung)
                 End If
 
@@ -3091,14 +3106,14 @@ Public Class Form1
 
 
                 If umlautwandeln Then
-                    strasse = clsString.umlaut2ue2(strasse)
-                    nummer = clsString.umlaut2ue2(nummer)
-                    gemeindenr = clsString.umlaut2ue2(gemeindenr)
+                    strasse = clsString.removeSemikolon(strasse)
+                    nummer = clsString.removeSemikolon(nummer)
+                    gemeindenr = clsString.removeSemikolon(gemeindenr)
 
-                    ort = clsString.umlaut2ue2(ort)
-                    funktion = clsString.umlaut2ue2(funktion)
-                    freitext = clsString.umlaut2ue2(freitext)
-                    abstrakt = clsString.umlaut2ue2(abstrakt)
+                    ort = clsString.removeSemikolon(ort)
+                    funktion = clsString.removeSemikolon(funktion)
+                    freitext = clsString.removeSemikolon(freitext)
+                    abstrakt = clsString.removeSemikolon(abstrakt)
 
                 End If
 
@@ -3306,8 +3321,8 @@ Public Class Form1
 
     Private Sub Button23_Click(sender As Object, e As EventArgs) Handles Button23.Click
         'beteiligte 2_stakeholder 
-        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_beteiligte" & ".log"
-        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "beteiligte_2_stakeholder" & ".csv"
+        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\stakeholder" & ".log"
+        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "stakeholder" & ".csv"
         Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -4506,13 +4521,13 @@ Public Class Form1
         Try
             pu.Append(art & t)
             pu.Append(dbdatum.ToString("yyyyMMdd_hhmmss") & t)
-            pu.Append(clsString.umlaut2ue2(cleanString(richtung)) & t)
-            pu.Append(clsString.umlaut2ue2(cleanString(quelle)) & t)
-            pu.Append(clsString.umlaut2ue2(cleanString(beschreibung)) & t)
-            pu.Append(clsString.umlaut2ue2(cleanString(dateinameext)) & t)
-            pu.Append(clsString.umlaut2ue2(cleanString(d_beschreibung)) & t)
-            pu.Append(clsString.umlaut2ue2(cleanString(typ)) & t)
-            pu.Append(clsString.umlaut2ue2(cleanString(REVISIONSSICHER)) & t)
+            pu.Append(clsString.removeSemikolon(cleanString(richtung)) & t)
+            pu.Append(clsString.removeSemikolon(cleanString(quelle)) & t)
+            pu.Append(clsString.removeSemikolon(cleanString(beschreibung)) & t)
+            pu.Append(clsString.removeSemikolon(cleanString(dateinameext)) & t)
+            pu.Append(clsString.removeSemikolon(cleanString(d_beschreibung)) & t)
+            pu.Append(clsString.removeSemikolon(cleanString(typ)) & t)
+            pu.Append(clsString.removeSemikolon(cleanString(REVISIONSSICHER)) & t)
             If clsDBtools.fieldvalueDate(FILEDATUM) < "1/1/1990" Then
                 pu.Append("" & t)
             Else

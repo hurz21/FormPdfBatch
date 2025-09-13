@@ -209,7 +209,7 @@ ende:
             Return s
         End Try
     End Function
-    Public Shared Function umlaut2ue2(ByVal s As String) As String ' MIT SEMIKOLON
+    Public Shared Function removeSemikolon(ByVal s As String) As String ' MIT SEMIKOLON
         Try
             If String.IsNullOrEmpty(s) Then Return s$
             's$ = s$.Replace("ü", "ue")
