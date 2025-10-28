@@ -1,9 +1,10 @@
-﻿Imports System.Drawing.Imaging
+﻿Imports OfficeOpenXml
+Imports System.IO
+Imports System.Drawing.Imaging
 'Imports System.Runtime.InteropServices
 'Imports Microsoft.Office.Interop.Excel
 Imports System.Data
 Imports System.Diagnostics.Eventing.Reader
-Imports System.IO
 Imports Microsoft.Office.Interop.Word
 'Imports Acrobat
 'Imports Microsoft.Office.Interop
@@ -2051,7 +2052,7 @@ Public Class Form1
 
     Private Sub fullpathdokumenteErzeugen()
         Dim dateifehlt As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\auffueller" & Environment.UserName & ".log"
-        dateifehlt = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\auffueller" & Environment.UserName & ".log"
+        dateifehlt = "e:\proumwelt\log\auffueller.log"
         swfehlt = New IO.StreamWriter(dateifehlt)
         swfehlt.AutoFlush = True
         swfehlt.WriteLine(Now)
@@ -2304,7 +2305,7 @@ Public Class Form1
     Private Sub Button19_Click(sender As Object, e As EventArgs) Handles Button19.Click
 
         Dim dateifehlt As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\referenzdokus" & Environment.UserName & ".log"
-        dateifehlt = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\referenzdokus" & Environment.UserName & ".log"
+        dateifehlt = "e:\proumwelt\log\referenzdokus" & ".log"
         swfehlt = New IO.StreamWriter(dateifehlt)
         swfehlt.AutoFlush = True
         swfehlt.WriteLine(Now)
@@ -2334,7 +2335,7 @@ Public Class Form1
         If maxobj - 10000 < 0 Then
             untergrenze = 0
         Else
-            untergrenze = maxobj - 10000
+            untergrenze = maxobj - 10 '000
         End If
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         puFehler = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\" & "dokumente_ab_" & maxobj & ".log"
@@ -2428,7 +2429,8 @@ Public Class Form1
         l("PDFumwandeln ")
         swfehlt.WriteLine("Teil2 normale Dokumente ausschreiben ---------------------")
 
-        inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
+        'inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
+        Dim outdirROOT = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\dateiausgabe"
         If vid = "fehler" Then End
         DT = alleDokumentDatenHolen(sql)
         l("vor csvverarbeiten")
@@ -2480,7 +2482,8 @@ Public Class Form1
 
         csvzeileSpeichern(zeile.ToString, puAusgabeStream)
         zeile.Clear()
-
+        Dim newdir As String
+        Dim erfolg As Boolean
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
@@ -2496,6 +2499,24 @@ Public Class Form1
                 '    Vorhabensmerkmal = GetInputfile1Name(inndir, sachgebiet, Verfahrensart)
                 'End If
                 'End If
+                If vid = "44400" Then
+                    'dateiUmkopieren
+                    newdir = IO.Path.Combine(outdirROOT, eingang.ToString("yyyy"))
+                    If Not IO.Directory.Exists(newdir) Then
+                        IO.Directory.CreateDirectory(newdir)
+                    End If
+                    newdir = IO.Path.Combine(newdir, vid)
+                    If Not IO.Directory.Exists(newdir) Then
+                        IO.Directory.CreateDirectory(newdir)
+                    End If
+                    newdir = IO.Path.Combine(newdir, dokumentid)
+                    If Not IO.Directory.Exists(newdir) Then
+                        IO.Directory.CreateDirectory(newdir)
+                    End If
+                    newdir = IO.Path.Combine(newdir, dateinameext)
+                    IO.File.Copy(fullfilename, newdir)
+                End If
+
                 If vid = String.Empty Then
                     Continue For
                 End If
@@ -2592,9 +2613,9 @@ Public Class Form1
 
     Private Sub Button21_Click(sender As Object, e As EventArgs) Handles Button21.Click
         'probaugstammdaten
-        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\Stammdaten" & Environment.UserName & ".log"
-        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "Stammdaten" & ".csv"
-        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
+        Dim puFehler As String = "e:\proumwelt\log\Stammdaten.log"
+        Dim puAusgabe As String = "e:\proumwelt\xls\" & "Stammdaten" & ".xlsx"
+        'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
@@ -2609,10 +2630,10 @@ Public Class Form1
         'writeDokumentePU(puFehler, ausgabeAntragsteller, Sql, maxobj)
 
 
-        writeStammdatenPU(puFehler, puAusgabeStream, Sql, maxobj, umlautwandeln)
-        puAusgabeStream.Close()
-        puAusgabeStream.Dispose()
-        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\")
+        writeStammdatenPU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln)
+        'puAusgabeStream.Close()
+        'puAusgabeStream.Dispose()
+        System.Diagnostics.Process.Start("explorer", "e:\proumwelt\xls\")
         End
     End Sub
 
@@ -2633,14 +2654,15 @@ Public Class Form1
         Next
     End Sub
 
-    Private Sub writeStammdatenPU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String,
+    Private Sub writeStammdatenPU(puFehler As String, puAusgabe As String, sql As String,
                                   maxobj As Integer, umlautwandeln As Boolean)
         Dim DT, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR As DataTable
         Dim idok As Integer = 0
-        puAusgabeStream.AutoFlush = True
+        'puAusgabeStream.AutoFlush = True
         swfehlt.WriteLine("writeStammdatenPU---")
         Dim sgdict As New Dictionary(Of String, String)
-        Dim sgfile = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\sachgebiete\SG_alleTiefenKorrekturNeu.csv"
+        Dim sgfile = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\sachgebiete\SG_alleTiefenKorrekturNeuUmlaut.csv"
+        sgfile = "E:\proumwelt\SG_alleTiefenKorrekturNeuUmlaut.csv"
         getSGDictionary(sgdict, sgfile)
 
         DT = alleDokumentDatenHolen(sql)
@@ -2650,8 +2672,9 @@ Public Class Form1
                      " order by s.vorgangsid desc  "
         alleVIDmitVerwandten = alleDokumentDatenHolen(sql)
         sql = "SELECT distinct  s.[VORGANGSID] ,v.FREMDVORGANGSID     ,  s.[SACHGEBIETNR]" &
-                  " FROM [Paradigma].[dbo].[VORGANG_T43] as s,  [Paradigma].[dbo].[verwandte_t44] v " &
-                 "   where v.FREMDVORGANGSID=s.VORGANGSID  order by  s.VORGANGSID desc"
+                 " FROM [Paradigma].[dbo].[VORGANG_T43] as s,  [Paradigma].[dbo].[verwandte_t44] v " &
+                 " where v.FREMDVORGANGSID=s.VORGANGSID  " &
+                 " order by  s.VORGANGSID desc"
         alleFremdvorgaengeMitSGNR = alleDokumentDatenHolen(sql)
         Dim sgnr As String = ""
         Dim ic As Integer = 0
@@ -2673,6 +2696,32 @@ Public Class Form1
         Dim t As String = ";"
         Dim geschlossen As String = "0"
         l("stammdaten")
+
+        ' Lizenz kontext (erforderlich ab EPPlus 5)
+        'ExcelPackage.LicenseContext = LicenseContext.NonCommercial
+        ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
+
+        ' Neues Excel-Dokument
+        Using package As New ExcelPackage()
+            Dim ws = package.Workbook.Worksheets.Add("Daten")
+
+            ' Kopfzeile
+            ws.Cells("A1").Value = "Name"
+            ws.Cells("B1").Value = "Alter"
+
+            ' Datenzeilen
+            ws.Cells("A2").Value = "Annaäöüß"
+            ws.Cells("B2").Value = 28
+            ws.Cells("A3").Value = "MaxÄÖÜ"
+            ws.Cells("B3").Value = 35
+
+            ' Datei speichern
+            Dim fi As New FileInfo(puAusgabe)
+            package.SaveAs(fi)
+        End Using
+
+        Console.WriteLine("Excel-Datei erfolgreich erstellt.")
+
 
         'kopfzeile
         zeile.Append("az" & t) '                           (VID)
@@ -2697,7 +2746,7 @@ Public Class Form1
         'zeileAntragsteller.Append("geschlossen" & t) '  
 
         Dim jump = 0
-        csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
+        'csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
 
         For Each drr As DataRow In DT.Rows
             Try
@@ -2753,7 +2802,7 @@ Public Class Form1
                                                    CStr(clsDBtools.fieldvalue(drr.Item("altaz"))),
                                                    CStr(clsDBtools.fieldvalue(drr.Item("internenr"))),
                                                    CStr(clsDBtools.fieldvalue(drr.Item("beschreibung"))),
-                                                    verwandteString))
+                                                    verwandteString, vid))
                 If umlautwandeln Then
                     sgnr = clsString.removeSemikolon(sgnr)
                     Hauptaktenzeichen = clsString.removeSemikolon(Hauptaktenzeichen)
@@ -2796,19 +2845,13 @@ Public Class Form1
                 zeile.Append((cleanString(Hauptaktenzeichen)) & t) '   
                 zeile.Append(hauptaktenjahr.ToString("yyyy") & t) 'datum 
                 zeile.Append(cleanString(Notiz) & t) ' 
-                'zeileAntragsteller.Append(geschlossen)
-                'If iblock < blockMAX Then
-                '    block.AppendLine(zeileAntragsteller.ToString)
-                '    zeileAntragsteller.Clear()
-                '    iblock += 1
+
+                'If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
+
+                '    zeile.Clear()
                 'Else
-                If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
-                    'iblock = 0
-                    'block.Clear()
-                    zeile.Clear()
-                Else
-                    Debug.Print("oooo")
-                End If
+                '    Debug.Print("oooo")
+                'End If
 
 
                 'zeileAntragsteller.Clear()
@@ -2964,7 +3007,7 @@ Public Class Form1
         End Try
     End Function
 
-    Private Function makeStammNotiz(az As String, altaz As String, interne As String, beschreibung As String, verw As String) As String
+    Private Function makeStammNotiz(az As String, altaz As String, interne As String, beschreibung As String, verw As String, vid As String) As String
         Dim t As Char = ","
         Dim ret As String = ""
         Try
@@ -2982,7 +3025,7 @@ Public Class Form1
             Else
                 interne = ", IntNr: " & interne
             End If
-            Return az & altaz & interne & t & " " & beschreibung & " " & verw
+            Return az & altaz & interne & t & " " & beschreibung & " " & verw & "#" & vid & "#"
 
         Catch ex As Exception
             l("fehler  " & ex.ToString)
@@ -4590,9 +4633,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
 
-    End Sub
 
 
 

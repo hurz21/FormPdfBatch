@@ -119,7 +119,7 @@ ByRef initial As String, ByRef eid As String, ByRef beschreibung As String, ByRe
             typ = CStr(drr.Item("typ"))
         Catch ex As Exception
             l("fehler in DbMetaDatenDokumentHolen:" & vid & ex.ToString)
-            vid = ""
+            'vid = ""
         End Try
     End Sub
     Public Function GetInputfilename(ByVal innDir As String, ByVal relativpfad As String, ByVal dokumentid As Integer) As String

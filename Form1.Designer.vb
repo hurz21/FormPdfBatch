@@ -48,6 +48,7 @@ Partial Class Form1
         Me.Button20 = New System.Windows.Forms.Button()
         Me.Button21 = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.CheckBox2 = New System.Windows.Forms.CheckBox()
         Me.Button36 = New System.Windows.Forms.Button()
         Me.Button35 = New System.Windows.Forms.Button()
         Me.Button34 = New System.Windows.Forms.Button()
@@ -65,7 +66,6 @@ Partial Class Form1
         Me.Button24 = New System.Windows.Forms.Button()
         Me.Button23 = New System.Windows.Forms.Button()
         Me.Button22 = New System.Windows.Forms.Button()
-        Me.CheckBox2 = New System.Windows.Forms.CheckBox()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -339,6 +339,18 @@ Partial Class Form1
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "ProbauG Umsetzung"
         '
+        'CheckBox2
+        '
+        Me.CheckBox2.AutoSize = True
+        Me.CheckBox2.Checked = True
+        Me.CheckBox2.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBox2.Location = New System.Drawing.Point(639, 22)
+        Me.CheckBox2.Name = "CheckBox2"
+        Me.CheckBox2.Size = New System.Drawing.Size(103, 17)
+        Me.CheckBox2.TabIndex = 43
+        Me.CheckBox2.Text = "umlautewandeln"
+        Me.CheckBox2.UseVisualStyleBackColor = True
+        '
         'Button36
         '
         Me.Button36.Location = New System.Drawing.Point(251, 153)
@@ -426,7 +438,7 @@ Partial Class Form1
         Me.TextBox4.Name = "TextBox4"
         Me.TextBox4.Size = New System.Drawing.Size(107, 20)
         Me.TextBox4.TabIndex = 33
-        Me.TextBox4.Text = "100"
+        Me.TextBox4.Text = "0"
         '
         'Button28
         '
@@ -490,18 +502,6 @@ Partial Class Form1
         Me.Button22.TabIndex = 26
         Me.Button22.Text = "5.Lage-Adresse"
         Me.Button22.UseVisualStyleBackColor = True
-        '
-        'CheckBox2
-        '
-        Me.CheckBox2.AutoSize = True
-        Me.CheckBox2.Checked = True
-        Me.CheckBox2.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox2.Location = New System.Drawing.Point(639, 22)
-        Me.CheckBox2.Name = "CheckBox2"
-        Me.CheckBox2.Size = New System.Drawing.Size(103, 17)
-        Me.CheckBox2.TabIndex = 43
-        Me.CheckBox2.Text = "umlautewandeln"
-        Me.CheckBox2.UseVisualStyleBackColor = True
         '
         'Form1
         '
