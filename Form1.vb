@@ -2538,8 +2538,8 @@ Public Class Form1
                 zeile.Append(CInt(istRevisionssicher) & t) 'ordner im mediencenter
 
                 'If iblock < blockMAX Then
-                '    block.AppendLine(zeileAntragsteller.ToString)
-                '    zeileAntragsteller.Clear()
+                '    block.AppendLine(ws.ToString)
+                '    ws.Clear()
                 '    iblock += 1
                 'Else
                 If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
@@ -2551,7 +2551,7 @@ Public Class Form1
                 End If
 
 
-                'zeileAntragsteller.Clear()
+                'ws.Clear()
                 idok += 1
                 'If idok > maxobj Then Exit For
             Catch ex As Exception
@@ -2927,7 +2927,7 @@ Public Class Form1
                 GC.Collect()
                 GC.WaitForFullGCComplete()
             Next
-            'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
+            'csvzeileSpeichern(ws.ToString, ausgabeAntragsteller)
             'zeile.Clear()
 
             swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
@@ -3308,7 +3308,7 @@ Public Class Form1
                 GC.Collect()
                 GC.WaitForFullGCComplete()
             Next
-            'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
+            'csvzeileSpeichern(ws.ToString, ausgabeAntragsteller)
             'zeile.Clear()
 
             swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
@@ -3409,8 +3409,8 @@ Public Class Form1
             'zeile.Append("gemarkungscode" & t) 'fax
             'zeile.Append("initial_2" & t) 'fs
             'zeile.Append("flaeche" & t) 'flaecheqm
-            'zeileAntragsteller.Append("Funktion" & t) ' 
-            'zeileAntragsteller.Append("Freitext" & t) ' 
+            'ws.Append("Funktion" & t) ' 
+            'ws.Append("Freitext" & t) ' 
             'csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
 
             For Each drr As DataRow In DT.Rows
@@ -3486,7 +3486,7 @@ Public Class Form1
                 GC.Collect()
                 GC.WaitForFullGCComplete()
             Next
-            'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
+            'csvzeileSpeichern(ws.ToString, ausgabeAntragsteller)
             zeile.Clear()
 
             swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
@@ -3647,7 +3647,7 @@ Public Class Form1
             GC.Collect()
             GC.WaitForFullGCComplete()
         Next
-        'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
+        'csvzeileSpeichern(ws.ToString, ausgabeAntragsteller)
         zeile.Clear()
 
         swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
@@ -3688,7 +3688,7 @@ Public Class Form1
             perscoll = getAllStakeholders(perstemp, DT)
 
             For Each perso As person In perscoll
-                zeileBeteiligte = bildeZeilePerson(eingang, t, perso)
+                'zeileBeteiligte = bildeZeilePerson(eingang, t, perso)  
                 If csvzeileSpeichern(zeileBeteiligte.ToString, puAusgabeStream) Then
                     zeileBeteiligte.Clear()
                 End If
@@ -3810,10 +3810,10 @@ Public Class Form1
     Private Sub Button30_Click(sender As Object, e As EventArgs) Handles Button30.Click
         'antragsteller
         Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\antragsteller" & ".log"
-        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "antragsteller" & ".csv"
-        Dim pubeteiligte As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "beteiligte_1" & ".csv"
-        Dim ausgabeAntragsteller As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
-        Dim ausgabeBeteiligte As New IO.StreamWriter(pubeteiligte, False, System.Text.Encoding.GetEncoding(1252))
+        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "antragsteller" & ".xlsx"
+        Dim pubeteiligte As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "beteiligte_1" & ".xlsx"
+        'Dim ausgabeAntragsteller As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
+        'Dim ausgabeBeteiligte As New IO.StreamWriter(pubeteiligte, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
@@ -3824,21 +3824,24 @@ Public Class Form1
         Sql = "select vorgangsid,eingang from stammdaten_tutti     order by vorgangsid desc   "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        writeAntragstellerausgabePU(puFehler, ausgabeAntragsteller, ausgabeBeteiligte, Sql, maxobj, umlautwandeln)
-        ausgabeAntragsteller.Close()
-        ausgabeAntragsteller.Dispose()
-        ausgabeBeteiligte.Close()
-        ausgabeBeteiligte.Dispose()
+        writeAntragstellerausgabePU(puFehler, puAusgabe, pubeteiligte, Sql, maxobj, umlautwandeln)
+        'ausgabeAntragsteller.Close()
+        'ausgabeAntragsteller.Dispose()
+        'ausgabeBeteiligte.Close()
+        'ausgabeBeteiligte.Dispose()
         swfehlt.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
         End
     End Sub
 
-    Private Sub writeAntragstellerausgabePU(puFehler As String, ausgabeAntragsteller As IO.StreamWriter, ausgabeBeteiligte As IO.StreamWriter,
+    Private Sub writeAntragstellerausgabePU(puFehler As String, ausgabeAntragsteller As String, ausgabeBeteiligte As String,
                                             sql As String, maxobj As Integer, umlautwandeln As Boolean)
         Dim DT As DataTable
+        Dim row As Integer = 1
+        ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
+        Dim erfolg As Boolean
         Dim idok As Integer = 0
-        ausgabeAntragsteller.AutoFlush = True
+        'ausgabeAntragsteller.AutoFlush = True
         swfehlt.WriteLine("writeKatasterausgabePU---")
         DT = alleDokumentDatenHolen(sql)
 
@@ -3849,107 +3852,137 @@ Public Class Form1
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
         myoracle.Open()
-        Dim zeileAntragsteller As New Text.StringBuilder
-        Dim zeileBeteiligte As New Text.StringBuilder
+        'Dim ws As New Text.StringBuilder
+        'Dim zeileBeteiligte As New Text.StringBuilder
         Dim t As String = ";"
         Dim geschlossen As String = "0"
         l("writeKatasterausgabePU")
         Dim perstemp As New person
         Dim perscoll As New List(Of person)
         'kopfzeile
-        'bildeKopfZeile(zeileAntragsteller, t)
-        bildeKopfZeileAntragsteller(zeileAntragsteller, t)
-        bildeKopfZeile(zeileBeteiligte, t)
-        csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller) : zeileAntragsteller.Clear()
-        csvzeileSpeichern(zeileBeteiligte.ToString, ausgabeBeteiligte) : zeileBeteiligte.Clear()
-        Dim antragsteller As New person
-        Dim beteiligter As New person
-        For Each drr As DataRow In DT.Rows  'alle vorgänge
-            Try
-                antragsteller = New person
-                igesamt += 1
-                TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
-                vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                eingang = CStr(clsDBtools.fieldvalueDate(drr.Item("eingang")))
-                perscoll = getAllBeteiligte4vorgang(perstemp, vid, umlautwandeln)
-                If hatAntragsteller(perscoll) Then
-                    antragsteller = getAntragsteller(perscoll)
-                    If antragsteller Is Nothing Then Exit For
-                    zeileAntragsteller = bildeZeileantragsteller(eingang, t, antragsteller)
-                    'zeile Nach antragsteller ausschreiben
-                    csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
-                    zeileAntragsteller.Clear()
-                Else
-                    'getErstenEintragOrDummy(persocoll)
-                    antragsteller = getErstenEintrag(perscoll)
-                    If antragsteller Is Nothing Then
-                        antragsteller = New person
-                        antragsteller.Name = "dummy"
-                        antragsteller.Vorname = "dummy"
-                        antragsteller.Rolle = "dummy"
+        Using package As New ExcelPackage()
+            Dim wsAntragst = package.Workbook.Worksheets.Add("Antragsteller")
+            Dim wsBeteiligte = package.Workbook.Worksheets.Add("Beteiligte")
+            bildeKopfZeileAntragsteller(wsAntragst, t)
+            bildeKopfZeileBeteiligt(wsBeteiligte, t)
+            'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller) : zeileAntragsteller.Clear()
+            'csvzeileSpeichern(zeileBeteiligte.ToString, ausgabeBeteiligte) : zeileBeteiligte.Clear()
+            Dim antragsteller As New person
+            Dim beteiligter As New person
+            For Each drr As DataRow In DT.Rows  'alle vorgänge
+                Try
+                    row += 1
+                    antragsteller = New person
+                    igesamt += 1
+                    TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
+                    vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+                    eingang = CStr(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+                    perscoll = getAllBeteiligte4vorgang(perstemp, vid, umlautwandeln)
+                    If hatAntragsteller(perscoll) Then
+                        antragsteller = getAntragsteller(perscoll)
+                        If antragsteller Is Nothing Then Exit For
+                        erfolg = bildeZeileantragsteller(eingang, wsAntragst, antragsteller, row)
+                        'zeile Nach antragsteller ausschreiben
+                        'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
+                        'zeileAntragsteller.Clear()
+                    Else
+                        'getErstenEintragOrDummy(persocoll)
+                        antragsteller = getErstenEintrag(perscoll)
+                        If antragsteller Is Nothing Then
+                            antragsteller = New person
+                            antragsteller.Name = "dummy"
+                            antragsteller.Vorname = "dummy"
+                            antragsteller.Rolle = "dummy"
+                        End If
+                        erfolg = bildeZeileantragsteller(eingang, wsAntragst, antragsteller, row)
+                        'zeile Nach antragsteller ausschreiben
+                        'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
+                        'zeileAntragsteller.Clear()
                     End If
-                    zeileAntragsteller = bildeZeileantragsteller(eingang, t, antragsteller)
-                    'zeile Nach antragsteller ausschreiben
-                    csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
-                    zeileAntragsteller.Clear()
-                End If
-                For Each perso As person In perscoll
-                    zeileBeteiligte = bildeZeilePerson(eingang, t, perso)
-                    If csvzeileSpeichern(zeileBeteiligte.ToString, ausgabeBeteiligte) Then
-                        zeileBeteiligte.Clear()
-                    End If
-                Next
-            Catch ex As Exception
-                l("fehler2: " & ex.ToString)
-                TextBox2.Text = ic.ToString & Environment.NewLine & " " &
-                          Environment.NewLine &
-                       vid & "/" & vid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
-                       TextBox2.Text
-                Application.DoEvents()
-            End Try
-            GC.Collect()
-            GC.WaitForFullGCComplete()
-            idok += 1
-            If idok > maxobj Then Exit For
-        Next
-        'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
-        zeileAntragsteller.Clear()
+                    For Each perso As person In perscoll
+                        erfolg = bildeZeilePerson(eingang, wsBeteiligte, perso, row)
+                        'If csvzeileSpeichern(zeileBeteiligte.ToString, ausgabeBeteiligte) Then
+                        '    zeileBeteiligte.Clear()
+                        'End If
+                    Next
+                Catch ex As Exception
+                    l("fehler2: " & ex.ToString)
+                    TextBox2.Text = ic.ToString & Environment.NewLine & " " &
+                              Environment.NewLine &
+                           vid & "/" & vid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                           TextBox2.Text
+                    Application.DoEvents()
+                End Try
+                GC.Collect()
+                GC.WaitForFullGCComplete()
+                idok += 1
+                If idok > maxobj Then Exit For
+            Next
+            'csvzeileSpeichern(ws.ToString, ausgabeAntragsteller)
+            'zeileAntragsteller.Clear()
 
-        swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
-
+            swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
+            Dim fi As New FileInfo(ausgabeAntragsteller)
+            package.SaveAs(fi)
+        End Using
         '####
         'swfehlt.Close()
         l("fertig  " & puFehler)
         ' Process.Start(puFehler)
     End Sub
 
-    Private Sub bildeKopfZeileAntragsteller(zeileAntragsteller As System.Text.StringBuilder, t As String)
-        zeileAntragsteller.Append("az" & t) '     vid   
-        zeileAntragsteller.Append("jahr" & t) '     datum
-        'zeileAntragsteller.Append("Obergruppe" & t) '  rolle    
-        zeileAntragsteller.Append("Anrede" & t) '   
-        zeileAntragsteller.Append("Firma" & t) '  znkombi
-        zeileAntragsteller.Append("Titel" & t) '   rechts    
-        zeileAntragsteller.Append("Vorname" & t) ' hoch
-        zeileAntragsteller.Append("nachname" & t) '
-        zeileAntragsteller.Append("strasse" & t)
-        zeileAntragsteller.Append("hausnr" & t) ' 
-        zeileAntragsteller.Append("hausnr bis" & t) 'titel
-        zeileAntragsteller.Append("land" & t) 'abteilung
-        zeileAntragsteller.Append("plz" & t) 'telefon
-        zeileAntragsteller.Append("ort" & t) 'fax
-        zeileAntragsteller.Append("adreszusatzzeile1" & t) 'fs
-        zeileAntragsteller.Append("adreszusatzzeile2" & t) 'fs
-        zeileAntragsteller.Append("telefon" & t) 'fs
-        zeileAntragsteller.Append("fax" & t) 'fs
-        zeileAntragsteller.Append("mobil" & t) 'fs
-        zeileAntragsteller.Append("email" & t) 'fs
-        zeileAntragsteller.Append("de-mail" & t) 'fs
-        zeileAntragsteller.Append("web" & t) 'fs
-        zeileAntragsteller.Append("zeichen" & t) 'fs
-        zeileAntragsteller.Append("personennummer" & t) 'fs
-        zeileAntragsteller.Append("spalte1" & t)
-        zeileAntragsteller.Append("KASSENKONTO" & t)
+    Private Sub bildeKopfZeileAntragsteller(ws As ExcelWorksheet, t As String)
+        ws.Cells("A1").Value = "az"
+        ws.Cells("B1").Value = "jahr"
+        ws.Cells("c1").Value = "obergruppe"
+        ws.Cells("d1").Value = "Anrede"
+        ws.Cells("e1").Value = "Firma"
+        ws.Cells("f1").Value = "Titel1"
+        ws.Cells("g1").Value = "Vorname1"
+        ws.Cells("h1").Value = "nachname1"
+        ws.Cells("l1").Value = "strasse"
+        ws.Cells("m1").Value = "hausnr"
+        ws.Cells("n1").Value = "hausnrbis"
+        ws.Cells("o1").Value = "land"
+        ws.Cells("p1").Value = "plz"
+        ws.Cells("q1").Value = "ort"
+        ws.Cells("r1").Value = "adreszusatzzeile1"
+        ws.Cells("s1").Value = "adreszusatzzeile2"
+        ws.Cells("t1").Value = "telefon"
+        ws.Cells("u1").Value = "fax"
+        ws.Cells("v1").Value = "mobil"
+        ws.Cells("w1").Value = "email"
+        ws.Cells("x1").Value = "demail"
+        ws.Cells("y1").Value = "web"
+        ws.Cells("z1").Value = "zeichen"
+        ws.Cells("aa1").Value = "personennummer"
+        ws.Cells("ab1").Value = "kassenkonto"
+        ws.Cells("ac1").Value = "rolle"
+
+
+        'ws.Append("Anrede" & t) '   
+        'ws.Append("Firma" & t) '  znkombi
+        'ws.Append("Titel" & t) '   rechts    
+        'ws.Append("Vorname" & t) ' hoch
+        'ws.Append("nachname" & t) '
+        'ws.Append("strasse" & t)
+        'ws.Append("hausnr" & t) ' 
+        'ws.Append("hausnr bis" & t) 'titel
+        'ws.Append("land" & t) 'abteilung
+        'ws.Append("plz" & t) 'telefon
+        'ws.Append("ort" & t) 'fax
+        'ws.Append("adreszusatzzeile1" & t) 'fs
+        'ws.Append("adreszusatzzeile2" & t) 'fs
+        'ws.Append("telefon" & t) 'fs
+        'ws.Append("fax" & t) 'fs
+        'ws.Append("mobil" & t) 'fs
+        'ws.Append("email" & t) 'fs
+        'ws.Append("de-mail" & t) 'fs
+        'ws.Append("web" & t) 'fs
+        'ws.Append("zeichen" & t) 'fs
+        'ws.Append("personennummer" & t) 'fs
+        'ws.Append("spalte1" & t)
+        'ws.Append("KASSENKONTO" & t)
     End Sub
 
     Private Function getErstenEintrag(perscoll As List(Of person)) As person
@@ -3980,33 +4013,60 @@ Public Class Form1
         End Try
     End Function
 
-    Private Shared Sub bildeKopfZeile(zeileAntragsteller As System.Text.StringBuilder, t As String)
-        zeileAntragsteller.Append("az" & t) '     vid   
-        zeileAntragsteller.Append("jahr" & t) '     datum
-        zeileAntragsteller.Append("Obergruppe" & t) '  rolle    
-        zeileAntragsteller.Append("Anrede" & t) '   
-        zeileAntragsteller.Append("Firma" & t) '  znkombi
-        zeileAntragsteller.Append("Titel" & t) '   rechts    
-        zeileAntragsteller.Append("Vorname" & t) ' hoch
-        zeileAntragsteller.Append("nachname" & t) '
-        zeileAntragsteller.Append("strasse" & t)
-        zeileAntragsteller.Append("hausnr" & t) ' 
-        zeileAntragsteller.Append("hausnr bis" & t) 'titel
-        zeileAntragsteller.Append("land" & t) 'abteilung
-        zeileAntragsteller.Append("plz" & t) 'telefon
-        zeileAntragsteller.Append("ort" & t) 'fax
-        zeileAntragsteller.Append("adreszusatzzeile1" & t) 'fs
-        zeileAntragsteller.Append("adreszusatzzeile2" & t) 'fs
-        zeileAntragsteller.Append("telefon" & t) 'fs
-        zeileAntragsteller.Append("fax" & t) 'fs
-        zeileAntragsteller.Append("mobil" & t) 'fs
-        zeileAntragsteller.Append("email" & t) 'fs
-        zeileAntragsteller.Append("de-mail" & t) 'fs
-        zeileAntragsteller.Append("web" & t) 'fs
-        zeileAntragsteller.Append("zeichen" & t) 'fs
-        zeileAntragsteller.Append("personennummer" & t) 'fs
-        zeileAntragsteller.Append("spalte1" & t)
-        zeileAntragsteller.Append("KASSENKONTO" & t)
+    Private Shared Sub bildeKopfZeileBeteiligt(ws As ExcelWorksheet, t As String)
+        ws.Cells("A1").Value = "az"
+        ws.Cells("B1").Value = "jahr"
+        ws.Cells("c1").Value = "obergruppe"
+        ws.Cells("d1").Value = "adressobergruppe"
+        ws.Cells("e1").Value = "Anrede"
+        ws.Cells("f1").Value = "Firma"
+        ws.Cells("g1").Value = "Titel1"
+        ws.Cells("h1").Value = "Vorname1"
+        ws.Cells("i1").Value = "nachname1"
+        ws.Cells("m1").Value = "strasse"
+        ws.Cells("n1").Value = "hausnr"
+        ws.Cells("o1").Value = "hausnrbis"
+        ws.Cells("p1").Value = "land"
+        ws.Cells("q1").Value = "plz"
+        ws.Cells("r1").Value = "ort"
+        ws.Cells("s1").Value = "adreszusatzzeile1"
+        ws.Cells("t1").Value = "adreszusatzzeile2"
+        ws.Cells("u1").Value = "telefon"
+        ws.Cells("v1").Value = "fax"
+        ws.Cells("w1").Value = "mobil"
+        ws.Cells("x1").Value = "email"
+        ws.Cells("y1").Value = "demail"
+        ws.Cells("z1").Value = "web"
+        ws.Cells("aa1").Value = "zeichen"
+        ws.Cells("ab1").Value = "personennummer"
+        ws.Cells("ac1").Value = "kassenkonto"
+        ws.Cells("ad1").Value = "rolle"
+        'ws.Append("az" & t) '     vid   
+        'ws.Append("jahr" & t) '     datum
+        'ws.Append("Obergruppe" & t) '  rolle    
+        'ws.Append("Anrede" & t) '   
+        'ws.Append("Firma" & t) '  znkombi
+        'ws.Append("Titel" & t) '   rechts    
+        'ws.Append("Vorname" & t) ' hoch
+        'ws.Append("nachname" & t) '
+        'ws.Append("strasse" & t)
+        'ws.Append("hausnr" & t) ' 
+        'ws.Append("hausnr bis" & t) 'titel
+        'ws.Append("land" & t) 'abteilung
+        'ws.Append("plz" & t) 'telefon
+        'ws.Append("ort" & t) 'fax
+        'ws.Append("adreszusatzzeile1" & t) 'fs
+        'ws.Append("adreszusatzzeile2" & t) 'fs
+        'ws.Append("telefon" & t) 'fs
+        'ws.Append("fax" & t) 'fs
+        'ws.Append("mobil" & t) 'fs
+        'ws.Append("email" & t) 'fs
+        'ws.Append("de-mail" & t) 'fs
+        'ws.Append("web" & t) 'fs
+        'ws.Append("zeichen" & t) 'fs
+        'ws.Append("personennummer" & t) 'fs
+        'ws.Append("spalte1" & t)
+        'ws.Append("KASSENKONTO" & t)
     End Sub
 
     Private Function hatAntragsteller(perscoll As List(Of person)) As Boolean
@@ -4023,71 +4083,118 @@ Public Class Form1
         End Try
     End Function
 
-    Private Shared Function bildeZeilePerson(eingang As Date, t As String, perso As person) As Text.StringBuilder
-        Dim zeileAntragsteller As New Text.StringBuilder
-
-        zeileAntragsteller.Clear()
-        zeileAntragsteller.Append(vid & t) 'Az
-        zeileAntragsteller.Append(eingang.ToString("yyyy") & t) 'jahr 
-
-        zeileAntragsteller.Append(perso.Rolle & t) ' 
-        zeileAntragsteller.Append(perso.Anrede & t) ' 
-        zeileAntragsteller.Append(bildeFirma(perso) & t) ' 
-        zeileAntragsteller.Append(perso.Namenszusatz & t) ' 
-        zeileAntragsteller.Append(perso.Vorname & t) ' 
-        zeileAntragsteller.Append(perso.Name & t) ' 
-        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Strasse & t) ' 
-        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr
-        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr bis
-        zeileAntragsteller.Append("Deutschland" & t) ' 
-        zeileAntragsteller.Append(perso.Kontakt.Anschrift.PLZ & t) ' 
-        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Gemeindename & t) ' 
-        zeileAntragsteller.Append(perso.Bemerkung & t) ' zusatz1
-        zeileAntragsteller.Append("" & perso.Kontakt.Anschrift.Postfach & t) ' zusatz2
-        zeileAntragsteller.Append((perso.Kontakt.elektr.Telefon1 & ", " & perso.Kontakt.elektr.Telefon2).Replace(", ", "") & t) ' 
-        zeileAntragsteller.Append((perso.Kontakt.elektr.Fax1 & ", " & perso.Kontakt.elektr.Fax2).Replace(", ", "") & t) ' 
-        zeileAntragsteller.Append(perso.Kontakt.elektr.MobilFon & t) ' 
-        zeileAntragsteller.Append(perso.Kontakt.elektr.Email & t) ' 
-        zeileAntragsteller.Append("" & t) ' de-mail
-        zeileAntragsteller.Append(perso.Kontakt.elektr.Homepage & t) ' 
-        zeileAntragsteller.Append(perso.Kassenkonto & t) ' ZEICHEN IHAH
-        zeileAntragsteller.Append(perso.PersonenID & t) ' 
-        zeileAntragsteller.Append("" & t) ' spalte1
-        zeileAntragsteller.Append(perso.Kassenkonto & t) '  
-        Return zeileAntragsteller
-    End Function
-    Private Shared Function bildeZeileantragsteller(eingang As Date, t As String, perso As person) As Text.StringBuilder
-        Dim zeileAntragsteller As New Text.StringBuilder
-
-        zeileAntragsteller.Clear()
-        zeileAntragsteller.Append(vid & t) 'Az
-        zeileAntragsteller.Append(eingang.ToString("yyyy") & t) 'jahr 
-
+    Private Shared Function bildeZeilePerson(eingang As Date, ws As ExcelWorksheet, perso As person, row As Integer) As Boolean
+        ws.Cells("A" & row).Value = vid
+        ws.Cells("b" & row).Value = eingang.ToString("yyyy")
+        ws.Cells("c" & row).Value = "???"
+        ws.Cells("d" & row).Value = "???" 'adressog
+        ws.Cells("e" & row).Value = perso.Anrede
+        ws.Cells("f" & row).Value = bildeFirma(perso)
+        ws.Cells("g" & row).Value = perso.Namenszusatz
+        ws.Cells("h" & row).Value = perso.Vorname
+        ws.Cells("i" & row).Value = perso.Name
+        ws.Cells("m" & row).Value = perso.Kontakt.Anschrift.Strasse
+        ws.Cells("n" & row).Value = perso.Kontakt.Anschrift.Hausnr
+        ws.Cells("o" & row).Value = perso.Kontakt.Anschrift.Hausnr
+        ws.Cells("p" & row).Value = "hessen"
+        ws.Cells("q" & row).Value = perso.Kontakt.Anschrift.PLZ
+        ws.Cells("r" & row).Value = perso.Kontakt.Anschrift.Gemeindename
+        ws.Cells("s" & row).Value = perso.Bemerkung
+        ws.Cells("t" & row).Value = "pf: " & perso.Kontakt.Anschrift.Postfach
+        ws.Cells("u" & row).Value = perso.Kontakt.elektr.Telefon1
+        ws.Cells("v" & row).Value = perso.Kontakt.elektr.Fax1
+        ws.Cells("w" & row).Value = perso.Kontakt.elektr.MobilFon
+        ws.Cells("x" & row).Value = perso.Kontakt.elektr.Email
+        ws.Cells("y" & row).Value = ""
+        ws.Cells("z" & row).Value = perso.Kontakt.elektr.Homepage
+        ws.Cells("aa" & row).Value = ""
+        ws.Cells("ab" & row).Value = ""
+        ws.Cells("ac" & row).Value = perso.Kassenkonto
+        ws.Cells("ad" & row).Value = perso.Rolle
+        'zeileAntragsteller.Append(vid & t) 'Az
+        'zeileAntragsteller.Append(eingang.ToString("yyyy") & t) 'jahr 
         'zeileAntragsteller.Append(perso.Rolle & t) ' 
-        zeileAntragsteller.Append(perso.Anrede & t) ' 
-        zeileAntragsteller.Append(bildeFirma(perso) & t) ' 
-        zeileAntragsteller.Append(perso.Namenszusatz & t) ' 
-        zeileAntragsteller.Append(perso.Vorname & t) ' 
-        zeileAntragsteller.Append(perso.Name & t) ' 
-        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Strasse & t) ' 
-        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr
-        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr bis
-        zeileAntragsteller.Append("Deutschland" & t) ' 
-        zeileAntragsteller.Append(perso.Kontakt.Anschrift.PLZ & t) ' 
-        zeileAntragsteller.Append(perso.Kontakt.Anschrift.Gemeindename & t) ' 
-        zeileAntragsteller.Append(perso.Bemerkung & t) ' zusatz1
-        zeileAntragsteller.Append("" & perso.Kontakt.Anschrift.Postfach & t) ' zusatz2
-        zeileAntragsteller.Append((perso.Kontakt.elektr.Telefon1 & ", " & perso.Kontakt.elektr.Telefon2).Replace(", ", "") & t) ' 
-        zeileAntragsteller.Append((perso.Kontakt.elektr.Fax1 & ", " & perso.Kontakt.elektr.Fax2).Replace(", ", "") & t) ' 
-        zeileAntragsteller.Append(perso.Kontakt.elektr.MobilFon & t) ' 
-        zeileAntragsteller.Append(perso.Kontakt.elektr.Email & t) ' 
-        zeileAntragsteller.Append("" & t) ' de-mail
-        zeileAntragsteller.Append(perso.Kontakt.elektr.Homepage & t) ' 
-        zeileAntragsteller.Append(perso.Kassenkonto & t) ' ZEICHEN IHAH
-        zeileAntragsteller.Append(perso.PersonenID & t) ' 
-        zeileAntragsteller.Append("" & t) ' spalte1
-        zeileAntragsteller.Append(perso.Kassenkonto & t) '  
-        Return zeileAntragsteller
+        'zeileAntragsteller.Append(perso.Anrede & t) ' 
+        'zeileAntragsteller.Append(bildeFirma(perso) & t) ' 
+        'zeileAntragsteller.Append(perso.Namenszusatz & t) ' 
+        'zeileAntragsteller.Append(perso.Vorname & t) ' 
+        'zeileAntragsteller.Append(perso.Name & t) ' 
+        'zeileAntragsteller.Append(perso.Kontakt.Anschrift.Strasse & t) ' 
+        'zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr
+        'zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr bis
+        'zeileAntragsteller.Append("Deutschland" & t) ' 
+        'zeileAntragsteller.Append(perso.Kontakt.Anschrift.PLZ & t) ' 
+        'zeileAntragsteller.Append(perso.Kontakt.Anschrift.Gemeindename & t) ' 
+        'zeileAntragsteller.Append(perso.Bemerkung & t) ' zusatz1
+        'zeileAntragsteller.Append("" & perso.Kontakt.Anschrift.Postfach & t) ' zusatz2
+        'zeileAntragsteller.Append((perso.Kontakt.elektr.Telefon1 & ", " & perso.Kontakt.elektr.Telefon2).Replace(", ", "") & t) ' 
+        'zeileAntragsteller.Append((perso.Kontakt.elektr.Fax1 & ", " & perso.Kontakt.elektr.Fax2).Replace(", ", "") & t) ' 
+        'zeileAntragsteller.Append(perso.Kontakt.elektr.MobilFon & t) ' 
+        'zeileAntragsteller.Append(perso.Kontakt.elektr.Email & t) ' 
+        'zeileAntragsteller.Append("" & t) ' de-mail
+        'zeileAntragsteller.Append(perso.Kontakt.elektr.Homepage & t) ' 
+        'zeileAntragsteller.Append(perso.Kassenkonto & t) ' ZEICHEN IHAH
+        'zeileAntragsteller.Append(perso.PersonenID & t) ' 
+        'zeileAntragsteller.Append("" & t) ' spalte1
+        'zeileAntragsteller.Append(perso.Kassenkonto & t) '  
+        Return True
+    End Function
+    Private Shared Function bildeZeileantragsteller(eingang As Date, ws As ExcelWorksheet, perso As person, row As Integer) As Boolean
+        ws.Cells("A" & row).Value = vid
+        ws.Cells("b" & row).Value = eingang.ToString("yyyy")
+        ws.Cells("c" & row).Value = "???"
+        ws.Cells("d" & row).Value = perso.Anrede
+        ws.Cells("e" & row).Value = bildeFirma(perso)
+        ws.Cells("f" & row).Value = perso.Namenszusatz
+        ws.Cells("g" & row).Value = perso.Vorname
+        ws.Cells("h" & row).Value = perso.Name
+        ws.Cells("l" & row).Value = perso.Kontakt.Anschrift.Strasse
+        ws.Cells("m" & row).Value = perso.Kontakt.Anschrift.Hausnr
+        ws.Cells("n" & row).Value = perso.Kontakt.Anschrift.Hausnr
+        ws.Cells("o" & row).Value = "hessen"
+        ws.Cells("p" & row).Value = perso.Kontakt.Anschrift.PLZ
+        ws.Cells("q" & row).Value = perso.Kontakt.Anschrift.Gemeindename
+        ws.Cells("r" & row).Value = perso.Bemerkung
+        ws.Cells("s" & row).Value = "pf: " & perso.Kontakt.Anschrift.Postfach
+        ws.Cells("t" & row).Value = perso.Kontakt.elektr.Telefon1
+        ws.Cells("u" & row).Value = perso.Kontakt.elektr.Fax1
+        ws.Cells("v" & row).Value = perso.Kontakt.elektr.MobilFon
+        ws.Cells("w" & row).Value = perso.Kontakt.elektr.Email
+        ws.Cells("x" & row).Value = ""
+        ws.Cells("y" & row).Value = perso.Kontakt.elektr.Homepage
+        ws.Cells("z" & row).Value = perso.Rolle
+        ws.Cells("aa" & row).Value = perso.Rolle
+        ws.Cells("ab" & row).Value = perso.Kassenkonto
+        ws.Cells("ac" & row).Value = perso.Rolle
+        'Dim zeileAntragsteller As New Text.StringBuilder
+        'zeileAntragsteller.Clear()
+        'zeileAntragsteller.Append(vid & t) 'Az
+        'zeileAntragsteller.Append(eingang.ToString("yyyy") & t) 'jahr  
+        'zeileAntragsteller.Append(perso.Anrede & t) ' 
+        'zeileAntragsteller.Append(bildeFirma(perso) & t) ' 
+        'zeileAntragsteller.Append(perso.Namenszusatz & t) ' 
+        'zeileAntragsteller.Append(perso.Vorname & t) ' 
+        'zeileAntragsteller.Append(perso.Name & t) ' 
+        'zeileAntragsteller.Append(perso.Kontakt.Anschrift.Strasse & t) ' 
+        'zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr
+        'zeileAntragsteller.Append(perso.Kontakt.Anschrift.Hausnr & t) ' hausnr bis
+        'zeileAntragsteller.Append("Deutschland" & t) ' 
+        'zeileAntragsteller.Append(perso.Kontakt.Anschrift.PLZ & t) ' 
+        'zeileAntragsteller.Append(perso.Kontakt.Anschrift.Gemeindename & t) ' 
+        'zeileAntragsteller.Append(perso.Bemerkung & t) ' zusatz1
+        'zeileAntragsteller.Append("" & perso.Kontakt.Anschrift.Postfach & t) ' zusatz2
+        'zeileAntragsteller.Append((perso.Kontakt.elektr.Telefon1 & ", " & perso.Kontakt.elektr.Telefon2).Replace(", ", "") & t) ' 
+        'zeileAntragsteller.Append((perso.Kontakt.elektr.Fax1 & ", " & perso.Kontakt.elektr.Fax2).Replace(", ", "") & t) ' 
+        'zeileAntragsteller.Append(perso.Kontakt.elektr.MobilFon & t) ' 
+        'zeileAntragsteller.Append(perso.Kontakt.elektr.Email & t) ' 
+        'zeileAntragsteller.Append("" & t) ' de-mail
+        'zeileAntragsteller.Append(perso.Kontakt.elektr.Homepage & t) ' 
+        'zeileAntragsteller.Append(perso.Kassenkonto & t) ' ZEICHEN IHAH
+        'zeileAntragsteller.Append(perso.PersonenID & t) ' 
+        'zeileAntragsteller.Append("" & t) ' spalte1
+        'zeileAntragsteller.Append(perso.Kassenkonto & t) '  
+        'Return zeileAntragsteller
+        Return True
     End Function
 
     Private Shared Function bildeFirma(perso As person) As String
@@ -4291,7 +4398,7 @@ Public Class Form1
             GC.Collect()
             GC.WaitForFullGCComplete()
         Next
-        'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
+        'csvzeileSpeichern(ws.ToString, ausgabeAntragsteller)
         zeile.Clear()
 
         swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
@@ -4437,8 +4544,8 @@ Public Class Form1
                 zeile.Append("" & t) 'ordner im mediencenter
 
                 'If iblock < blockMAX Then
-                '    block.AppendLine(zeileAntragsteller.ToString)
-                '    zeileAntragsteller.Clear()
+                '    block.AppendLine(ws.ToString)
+                '    ws.Clear()
                 '    iblock += 1
                 'Else
                 If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
@@ -4450,7 +4557,7 @@ Public Class Form1
                 End If
 
 
-                'zeileAntragsteller.Clear()
+                'ws.Clear()
                 idok += 1
                 If idok > maxobj Then Exit For
             Catch ex As Exception
