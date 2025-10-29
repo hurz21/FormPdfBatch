@@ -3118,9 +3118,9 @@ Public Class Form1
 
     Private Sub Button22_Click(sender As Object, e As EventArgs) Handles Button22.Click
         'adresse
-        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\LageAdresse" & ".log"
-        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "LageAdresse" & ".csv"
-        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
+        Dim puFehler As String = "e:\proumwelt\log\LageAdresse" & ".log"
+        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "LageAdresse" & ".xlsx"
+        'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
@@ -3137,19 +3137,19 @@ Public Class Form1
 
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        writeAdresseausgabePU(puFehler, puAusgabeStream, Sql, maxobj, umlautwandeln)
-        puAusgabeStream.Close()
-        puAusgabeStream.Dispose()
+        writeAdresseausgabePU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln)
+        'puAusgabeStream.Close()
+        'puAusgabeStream.Dispose()
         swfehlt.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
         End
     End Sub
 
-    Private Sub writeAdresseausgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String,
+    Private Sub writeAdresseausgabePU(puFehler As String, puAusgabe As String, sql As String,
                                       maxobj As Integer, umlautwandeln As Boolean)
         Dim DT As DataTable
         Dim idok As Integer = 0
-        puAusgabeStream.AutoFlush = True
+        'puAusgabeStream.AutoFlush = True
         swfehlt.WriteLine("writeStammdatenPU---")
         DT = alleDokumentDatenHolen(sql)
 
@@ -3166,107 +3166,155 @@ Public Class Form1
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
         myoracle.Open()
-        Dim zeile As New Text.StringBuilder
+        'Dim zeile As New Text.StringBuilder
         Dim fullfilename As String
         Dim t As String = ";"
+        Dim row As Integer = 1
         Dim geschlossen As String = "0"
         l("stammdaten")
+        ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
 
-        'kopfzeile
-        zeile.Append("az" & t) '       
-        zeile.Append("jahr" & t) '     
-        zeile.Append("Ort" & t) '      
-        zeile.Append("Ortsteil" & t) ' 
-        zeile.Append("Strasse" & t) '  
-        zeile.Append("nr" & t) '       
-        zeile.Append("veraltet" & t) '
-        zeile.Append("spalte1" & t) '
-        zeile.Append("gemeindenr" & t)
-        zeile.Append("strassencode" & t) ' 
-        zeile.Append("rechtswert" & t)
-        zeile.Append("hochwert" & t) '
-        zeile.Append("initial_1" & t) '
-        zeile.Append("abteilung" & t) '
-        zeile.Append("abstract" & t) 'telefon
-        zeile.Append("initial_2" & t) 'fs
-        csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
-        For Each drr As DataRow In DT.Rows
-            Try
-                igesamt += 1
-                vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
-                ort = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemeindetext"))))
-                ortsteil = ""
-                strasse = (clsDBtools.fieldvalue(drr.Item("strassenname")))
-                nummer = CStr(clsDBtools.fieldvalue(drr.Item("hausnrkombi")))
-                veraltet = ""
-                spalte1 = ""
-                gemeindenr = CStr(clsDBtools.fieldvalue(drr.Item("gemeindenr")))
-                strcode = CStr(clsDBtools.fieldvalue(drr.Item("strcode")))
-                ost = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("rechts"))))
-                nord = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("hoch"))))
-                funktion = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("titel"))))
-                freitext = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("freitext"))))
-                abstrakt = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("abstract"))))
-                fs = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fs"))))
+        ' Neues Excel-Dokument
+        Using package As New ExcelPackage()
+            Dim ws = package.Workbook.Worksheets.Add("Daten")
+            'kopfzeile
+
+            ws.Cells("A1").Value = "az"
+            ws.Cells("B1").Value = "jahr"
+            ws.Cells("c1").Value = "obergruppe"
+            ws.Cells("d1").Value = "Ort"
+            ws.Cells("e1").Value = "Ortsteil"
+            ws.Cells("f1").Value = "Strasse"
+            ws.Cells("g1").Value = "hausnummer"
+            ws.Cells("h1").Value = "veraltet"
+            ws.Cells("i1").Value = "gemeindenr"
+            ws.Cells("j1").Value = "strassencode"
+            ws.Cells("k1").Value = "rechtswert"
+            ws.Cells("l1").Value = "hochwert"
+
+            ws.Cells("m1").Value = "funktion".Trim("-")
+            ws.Cells("n1").Value = "freitext".Trim("-")
+            ws.Cells("o1").Value = "abstract".Trim("-")
+            ws.Cells("p1").Value = "fs".Trim("-")
+            'zeile.Append("az" & t) '       
+            'zeile.Append("jahr" & t) '     
+            'zeile.Append("Ort" & t) '      
+            'zeile.Append("Ortsteil" & t) ' 
+            'zeile.Append("Strasse" & t) '  
+            'zeile.Append("nr" & t) '       
+            'zeile.Append("veraltet" & t) '
+            'zeile.Append("spalte1" & t) '
+            'zeile.Append("gemeindenr" & t)
+            'zeile.Append("strassencode" & t) ' 
+            'zeile.Append("rechtswert" & t)
+            'zeile.Append("hochwert" & t) '
+            'zeile.Append("initial_1" & t) '
+            'zeile.Append("abteilung" & t) '
+            'zeile.Append("abstract" & t) 'telefon
+            'zeile.Append("initial_2" & t) 'fs 
+
+            For Each drr As DataRow In DT.Rows
+                Try
+                    row += 1
+                    igesamt += 1
+                    vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+                    eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+                    ort = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemeindetext"))))
+                    ortsteil = ""
+                    strasse = (clsDBtools.fieldvalue(drr.Item("strassenname")))
+                    nummer = CStr(clsDBtools.fieldvalue(drr.Item("hausnrkombi")))
+                    veraltet = ""
+                    spalte1 = ""
+                    gemeindenr = CStr(clsDBtools.fieldvalue(drr.Item("gemeindenr")))
+                    strcode = CStr(clsDBtools.fieldvalue(drr.Item("strcode")))
+                    ost = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("rechts"))))
+                    nord = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("hoch"))))
+                    funktion = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("titel"))))
+                    freitext = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("freitext"))))
+                    abstrakt = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("abstract"))))
+                    fs = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fs"))))
 
 
-                If umlautwandeln Then
-                    strasse = clsString.removeSemikolon(strasse)
-                    nummer = clsString.removeSemikolon(nummer)
-                    gemeindenr = clsString.removeSemikolon(gemeindenr)
+                    If umlautwandeln Then
+                        strasse = clsString.removeSemikolon(strasse)
+                        nummer = clsString.removeSemikolon(nummer)
+                        gemeindenr = clsString.removeSemikolon(gemeindenr)
 
-                    ort = clsString.removeSemikolon(ort)
-                    funktion = clsString.removeSemikolon(funktion)
-                    freitext = clsString.removeSemikolon(freitext)
-                    abstrakt = clsString.removeSemikolon(abstrakt)
+                        ort = clsString.removeSemikolon(ort)
+                        funktion = clsString.removeSemikolon(funktion)
+                        freitext = clsString.removeSemikolon(freitext)
+                        abstrakt = clsString.removeSemikolon(abstrakt)
 
-                End If
+                    End If
 
-                TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
-                Application.DoEvents()
-                'zeilebilden
-                zeile.Append(vid & t) 'Az
-                zeile.Append(eingang.ToString("yyyy") & t) 'jahr 
-                zeile.Append(ort & t) ' 
-                zeile.Append(ortsteil & t) ' 
-                zeile.Append(strasse & t) ' 
-                zeile.Append(nummer & t) ' 
-                zeile.Append(veraltet & t) ' 
-                zeile.Append(spalte1 & t) '    
-                zeile.Append(gemeindenr & t) '    
-                zeile.Append(strcode & t) '    
-                zeile.Append(ost & t) ' 
-                zeile.Append(nord & t) '  
-                zeile.Append(funktion & t) ' 
-                zeile.Append(freitext & t) ' 
-                zeile.Append(abstrakt & t) '     
-                zeile.Append(fs & t) ' 
+                    TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
+                    Application.DoEvents()
+                    'zeilebilden
+                    ws.Cells("A" & row).Value = vid
+                    'zeile.Append(vid & t) 'Az
 
-                If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
+                    ws.Cells("b" & row).Value = eingang.ToString("yyyy")
+                    'zeile.Append(eingang.ToString("yyyy") & t) 'jahr
 
-                    zeile.Clear()
-                Else
-                    Debug.Print("oooo")
-                End If
-                idok += 1
-                If idok > maxobj Then Exit For
-            Catch ex As Exception
-                l("fehler2: " & ex.ToString)
-                TextBox2.Text = ic.ToString & Environment.NewLine & " " &
-                          Environment.NewLine &
-                       vid & "/" & ort & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
-                       TextBox2.Text
-                Application.DoEvents()
-            End Try
-            GC.Collect()
-            GC.WaitForFullGCComplete()
-        Next
-        'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
-        zeile.Clear()
+                    ws.Cells("c" & row).Value = "???" 'obergruppe 
 
-        swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
+                    ws.Cells("d" & row).Value = ort
+                    'zeile.Append(ort & t) ' 
 
+                    ws.Cells("e" & row).Value = ortsteil
+                    'zeile.Append(ortsteil & t) ' 
+
+                    ws.Cells("f" & row).Value = strasse
+                    'zeile.Append(strasse & t) '
+
+                    ws.Cells("g" & row).Value = nummer
+                    'zeile.Append(nummer & t) ' 
+                    ws.Cells("h" & row).Value = veraltet
+                    'zeile.Append(veraltet & t) ' 
+
+                    ws.Cells("i" & row).Value = gemeindenr
+                    'zeile.Append(gemeindenr & t) '    
+                    ws.Cells("j" & row).Value = strcode
+                    'zeile.Append(strcode & t) '
+                    ws.Cells("k" & row).Value = ost
+                    'zeile.Append(ost & t) ' 
+                    ws.Cells("l" & row).Value = nord
+                    'zeile.Append(nord & t) '  
+                    ws.Cells("m" & row).Value = funktion
+                    'zeile.Append(funktion & t) ' 
+                    ws.Cells("n" & row).Value = freitext
+                    'zeile.Append(freitext & t) ' 
+                    ws.Cells("o" & row).Value = abstrakt
+                    'zeile.Append(abstrakt & t) '     
+                    ws.Cells("p" & row).Value = fs
+                    'zeile.Append(fs & t) ' 
+
+                    'If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
+
+                    '    zeile.Clear()
+                    'Else
+                    '    Debug.Print("oooo")
+                    'End If
+                    idok += 1
+                    If idok > maxobj Then Exit For
+                Catch ex As Exception
+                    l("fehler2: " & ex.ToString)
+                    TextBox2.Text = ic.ToString & Environment.NewLine & " " &
+                              Environment.NewLine &
+                           vid & "/" & ort & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                           TextBox2.Text
+                    Application.DoEvents()
+                End Try
+                GC.Collect()
+                GC.WaitForFullGCComplete()
+            Next
+            'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
+            'zeile.Clear()
+
+            swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
+            Dim fi As New FileInfo(puAusgabe)
+            package.SaveAs(fi)
+        End Using
         '####
         'swfehlt.Close()
         l("fertig  " & puFehler)
@@ -3276,8 +3324,8 @@ Public Class Form1
     Private Sub Button26_Click(sender As Object, e As EventArgs) Handles Button26.Click
         'kataster 
         Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\kataster" & ".log"
-        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "kataster" & ".csv"
-        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
+        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "kataster" & ".xlsx"
+        'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
@@ -3288,19 +3336,19 @@ Public Class Form1
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         'writeAdresseausgabePU(puFehler, ausgabeAntragsteller, Sql, maxobj)
-        writeKatasterausgabePU(puFehler, puAusgabeStream, Sql, maxobj, umlautwandeln)
-        puAusgabeStream.Close()
-        puAusgabeStream.Dispose()
+        writeKatasterausgabePU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln)
+        'puAusgabeStream.Close()
+        'puAusgabeStream.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung")
         swfehlt.Dispose()
         End
     End Sub
 
-    Private Sub writeKatasterausgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String,
+    Private Sub writeKatasterausgabePU(puFehler As String, puAusgabe As String, sql As String,
                                        maxobj As Integer, umlautwandeln As Boolean)
         Dim DT As DataTable
         Dim idok As Integer = 0
-        puAusgabeStream.AutoFlush = True
+        'puAusgabeStream.AutoFlush = True
         swfehlt.WriteLine("writeKatasterausgabePU---")
         DT = alleDokumentDatenHolen(sql)
 
@@ -3322,102 +3370,129 @@ Public Class Form1
         Dim t As String = ";"
         Dim geschlossen As String = "0"
         l("writeKatasterausgabePU")
+        Dim row As Integer = 1
+        ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
+        ' Neues Excel-Dokument
+        Using package As New ExcelPackage()
+            Dim ws = package.Workbook.Worksheets.Add("Daten")
 
-        'kopfzeile
-        zeile.Append("az" & t) '     vid   
-        zeile.Append("jahr" & t) '     datum
-        zeile.Append("Gemarkung" & t) '  gemarkungstext    
-        zeile.Append("nachname" & t) '  nachname
-        zeile.Append("vorname" & t) '  znkombi
-        zeile.Append("ostwert" & t) '   rechts    
-        zeile.Append("nordwert" & t) ' hoch
-        zeile.Append("veraltet" & t) '
-        zeile.Append("spalte1" & t)
-        zeile.Append("spalte2" & t) ' 
-        zeile.Append("initial_1" & t) 'titel
-        zeile.Append("abteilung" & t) 'abteilung
-        zeile.Append("abstract" & t) 'telefon
-        zeile.Append("gemarkungscode" & t) 'fax
-        zeile.Append("initial_2" & t) 'fs
-        zeile.Append("flaeche" & t) 'flaecheqm
-        'zeileAntragsteller.Append("Funktion" & t) ' 
-        'zeileAntragsteller.Append("Freitext" & t) ' 
-        csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
-        For Each drr As DataRow In DT.Rows
-            Try
-                igesamt += 1
-                vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
-                gemarkung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemarkungstext"))))
-                flur = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("flur"))))
-                flurstueck = cleanString((clsDBtools.fieldvalue(drr.Item("znkombi"))))
-                ost = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("rechts"))))
-                nord = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("hoch"))))
+            ' Kopfzeile
+            ws.Cells("A1").Value = "az"
+            ws.Cells("B1").Value = "jahr"
+            ws.Cells("c1").Value = "obergruppe"
+            ws.Cells("d1").Value = "gemarkung"
+            ws.Cells("e1").Value = "flur"
+            ws.Cells("f1").Value = "flurstück"
+            ws.Cells("g1").Value = "ost"
+            ws.Cells("h1").Value = "nord"
+            ws.Cells("i1").Value = "veraltet"
+            ws.Cells("j1").Value = "funktion"
+            ws.Cells("k1").Value = "freitext"
+            ws.Cells("l1").Value = "abstrakt"
+            ws.Cells("m1").Value = "gemcode"
+            ws.Cells("n1").Value = "fs"
+            ws.Cells("o1").Value = "flaeche"
+            'kopfzeile
+            'zeile.Append("az" & t) '     vid   
+            'zeile.Append("jahr" & t) '     datum
+            'zeile.Append("Gemarkung" & t) '  gemarkungstext    
+            'zeile.Append("nachname" & t) '  nachname
+            'zeile.Append("vorname" & t) '  znkombi
+            'zeile.Append("ostwert" & t) '   rechts    
+            'zeile.Append("nordwert" & t) ' hoch
+            'zeile.Append("veraltet" & t) '
+            'zeile.Append("spalte1" & t)
+            'zeile.Append("spalte2" & t) ' 
+            'zeile.Append("initial_1" & t) 'titel
+            'zeile.Append("abteilung" & t) 'abteilung
+            'zeile.Append("abstract" & t) 'telefon
+            'zeile.Append("gemarkungscode" & t) 'fax
+            'zeile.Append("initial_2" & t) 'fs
+            'zeile.Append("flaeche" & t) 'flaecheqm
+            'zeileAntragsteller.Append("Funktion" & t) ' 
+            'zeileAntragsteller.Append("Freitext" & t) ' 
+            'csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
 
-                spalte1 = ""
-                spalte1 = ""
-                funktion = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("titel"))))
-                freitext = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("freitext"))))
-                abstrakt = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("abstract"))))
-                gemcode = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemcode"))))
-                FS = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fs"))))
-                flaecheqm = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("flaecheqm"))))
+            For Each drr As DataRow In DT.Rows
+                Try
+                    igesamt += 1
+                    row += 1
+                    vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+                    eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+                    gemarkung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemarkungstext"))))
+                    flur = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("flur"))))
+                    flurstueck = cleanString((clsDBtools.fieldvalue(drr.Item("znkombi"))))
+                    ost = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("rechts"))))
+                    nord = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("hoch"))))
+
+                    spalte1 = ""
+                    spalte1 = ""
+                    funktion = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("titel"))))
+                    freitext = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("freitext"))))
+                    abstrakt = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("abstract"))))
+                    gemcode = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemcode"))))
+                    FS = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fs"))))
+                    flaecheqm = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("flaecheqm"))))
+                    If umlautwandeln Then
+                        gemarkung = clsString.umlaut2ue(gemarkung)
+                        funktion = clsString.umlaut2ue(funktion)
+                        freitext = clsString.umlaut2ue(freitext)
+                        abstrakt = clsString.umlaut2ue(abstrakt)
+                    End If
+                    TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
+                    Application.DoEvents()
+                    'zeilebilden
+
+                    ws.Cells("A" & row).Value = vid
+                    ws.Cells("b" & row).Value = eingang.ToString("yyyy")
+                    ws.Cells("c" & row).Value = "???"
 
 
+                    'zeile.Append(vid & t) 'Az
+                    'zeile.Append(eingang.ToString("yyyy") & t) 'jahr 
+                    ws.Cells("d" & row).Value = gemarkung
+                    'zeile.Append(gemarkung & t) ' 
+                    ws.Cells("e" & row).Value = flur
+                    'zeile.Append(flur & t)
+                    ws.Cells("f" & row).Value = flurstueck ' 
+                    'zeile.Append(flurstueck & t)
+                    ws.Cells("g" & row).Value = ost ' 
+                    'zeile.Append(ost & t)
+                    ws.Cells("h" & row).Value = nord ' 
+                    'zeile.Append(nord & t)
+                    ws.Cells("i" & row).Value = "" ' veraltet
+                    'zeile.Append(spalte1 & t) 
+                    ws.Cells("j" & row).Value = funktion ' 
+                    'zeile.Append(funktion & t)
+                    ws.Cells("k" & row).Value = freitext ' 
+                    'zeile.Append(freitext & t)
+                    ws.Cells("l" & row).Value = abstrakt ' 
+                    'zeile.Append(abstrakt & t)
+                    ws.Cells("m" & row).Value = gemcode '    
+                    'zeile.Append(gemcode & t)
+                    ws.Cells("n" & row).Value = FS '    
+                    'zeile.Append(FS & t) '    
+                    ws.Cells("o" & row).Value = flaecheqm
+                    idok += 1
+                    If idok > maxobj Then Exit For
+                Catch ex As Exception
+                    l("fehler2: " & ex.ToString)
+                    TextBox2.Text = ic.ToString & Environment.NewLine & " " &
+                              Environment.NewLine &
+                           vid & "/" & vid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                           TextBox2.Text
+                    Application.DoEvents()
+                End Try
+                GC.Collect()
+                GC.WaitForFullGCComplete()
+            Next
+            'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
+            zeile.Clear()
 
-
-                If umlautwandeln Then
-                    gemarkung = clsString.umlaut2ue(gemarkung)
-                    funktion = clsString.umlaut2ue(funktion)
-                    freitext = clsString.umlaut2ue(freitext)
-                    abstrakt = clsString.umlaut2ue(abstrakt)
-                End If
-
-
-                TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
-                Application.DoEvents()
-                'zeilebilden
-                zeile.Append(vid & t) 'Az
-                zeile.Append(eingang.ToString("yyyy") & t) 'jahr 
-                zeile.Append(gemarkung & t) ' 
-                zeile.Append(flur & t) ' 
-                zeile.Append(flurstueck & t) ' 
-                zeile.Append(ost & t) ' 
-                zeile.Append(nord & t) ' 
-                zeile.Append(spalte1 & t) ' veraltet
-                zeile.Append(spalte1 & t) ' 
-                zeile.Append(spalte1 & t) ' 
-                zeile.Append(funktion & t) ' 
-                zeile.Append(freitext & t) ' 
-                zeile.Append(abstrakt & t) '    
-                zeile.Append(gemcode & t) '    
-                zeile.Append(FS & t) '    
-                zeile.Append(flaecheqm & t) '    
-
-                If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
-
-                    zeile.Clear()
-                Else
-                    Debug.Print("oooo")
-                End If
-                idok += 1
-                If idok > maxobj Then Exit For
-            Catch ex As Exception
-                l("fehler2: " & ex.ToString)
-                TextBox2.Text = ic.ToString & Environment.NewLine & " " &
-                          Environment.NewLine &
-                       vid & "/" & vid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
-                       TextBox2.Text
-                Application.DoEvents()
-            End Try
-            GC.Collect()
-            GC.WaitForFullGCComplete()
-        Next
-        'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
-        zeile.Clear()
-
-        swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
-
+            swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
+            Dim fi As New FileInfo(puAusgabe)
+            package.SaveAs(fi)
+        End Using
         '####
         'swfehlt.Close()
         l("fertig  " & puFehler)
