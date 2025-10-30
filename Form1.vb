@@ -3526,8 +3526,8 @@ Public Class Form1
     Private Sub Button25_Click(sender As Object, e As EventArgs) Handles Button25.Click
         'wiedervorlagen
         Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\wiedervorlagen" & ".log"
-        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "wiedervorlagen" & ".csv"
-        Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
+        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "wiedervorlagen" & ".xlsx"
+        'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
@@ -3541,20 +3541,20 @@ Public Class Form1
         TextBox2.Text = Sql
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         'writeStakeholderAusgabePU(puFehler, sammelStream, Sql, maxobj)
-        writeWiedervorlageAusgabePU(puFehler, puAusgabeStream, Sql, maxobj, umlautwandeln)
-        puAusgabeStream.Close()
-        puAusgabeStream.Dispose()
+        writeWiedervorlageAusgabePU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln)
+        'puAusgabeStream.Close()
+        'puAusgabeStream.Dispose()
         System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
         swfehlt.Dispose()
         End
     End Sub
-    Private Sub writeWiedervorlageAusgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer, umlautwandeln As Boolean)
+    Private Sub writeWiedervorlageAusgabePU(puFehler As String, puAusgabe As String, sql As String, maxobj As Integer, umlautwandeln As Boolean)
         Dim DT As DataTable
         Dim idok As Integer = 0
-        puAusgabeStream.AutoFlush = True
+        'puAusgabeStream.AutoFlush = True
         swfehlt.WriteLine("Wiedervorlage---")
         DT = alleDokumentDatenHolen(sql)
-
+        Dim row As Integer = 1
         Dim ic As Integer = 0
         Dim igesamt As Integer = 0
         Dim gemarkung, flur, flurstueck, ost, info, funktion, gemcode, bearbeiterid, FS, Betreff, todo As String
@@ -3568,7 +3568,7 @@ Public Class Form1
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
         myoracle.Open()
-        Dim zeile As New Text.StringBuilder
+        'Dim zeile As New Text.StringBuilder
         Dim erledigtam As Date
         Dim erledigt As Boolean
         Dim t As String = ";"
@@ -3576,82 +3576,117 @@ Public Class Form1
         l("Wiedervorlage")
 
         'kopfzeile
-        zeile.Append("az" & t) '     vid   
-        zeile.Append("jahr" & t) '     datum
-        zeile.Append("vid" & t) '  gemarkungstext    
-        zeile.Append("datum" & t) '  nachname
-        zeile.Append("sachbearbeiter" & t) '  znkombi
-        zeile.Append("Betreff" & t) '   rechts    
-        zeile.Append("info" & t) ' hoch
+        ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
 
-        zeile.Append("bearbeiterid" & t) '  
-        zeile.Append("erledigtam" & t) '  
-        zeile.Append("erledigt" & t) '  
-        'zeile.Append("angelegtam" & t) '  
-        csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
-        For Each drr As DataRow In DT.Rows
-            Try
-                igesamt += 1
-                vid = CStr(clsDBtools.fieldvalue(drr.Item("vorgangsid")))
-                eingang = cleanString(CStr(clsDBtools.fieldvalueDate(drr.Item("teingang"))))
-                todo = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("TODO"))))
-                datum = CDate(clsDBtools.fieldvalueDate(drr.Item("datum"))) '==FÄLLIG
-                sachbearbeiter = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter"))))
-                Betreff = "Wartenauf: " & cleanString(CStr(clsDBtools.fieldvalue(drr.Item("wartenauf"))))
-                info = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Bemerkung"))))
+        ' Neues Excel-Dokument
+        Using package As New ExcelPackage()
+            Dim ws = package.Workbook.Worksheets.Add("Daten")
 
-                bearbeiterid = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("bearbeiterid"))))
-                erledigtam = cleanString(CStr(clsDBtools.fieldvalueDate(drr.Item("erledigtam"))))
-                erledigt = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("erledigt"))))
-                'angelegtam = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("weingang"))))
-                If umlautwandeln Then
-                    todo = clsString.umlaut2ue(todo)
-                    sachbearbeiter = clsString.umlaut2ue(sachbearbeiter)
-                    Betreff = clsString.umlaut2ue(Betreff)
-                    info = clsString.umlaut2ue(info)
-                End If
-
-                TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
-                Application.DoEvents()
-                'zeilebilden
-                zeile.Append(vid & t) 'Az
-                zeile.Append(eingang.ToString("yyyy") & t) 'jahr .ToString("dd.MM.yyyy") 
-                zeile.Append(todo & t) 'Az 
-                zeile.Append(datum.ToString("dd.MM.yyyy") & t) ' 
-                zeile.Append(sachbearbeiter & t) ' 
-                zeile.Append(Betreff & t) ' 
-                zeile.Append(info & t) ' 
+            ' Kopfzeile
+            ws.Cells("A1").Value = "az"
+            ws.Cells("B1").Value = "jahr"
+            ws.Cells("c1").Value = "obergruppe"
+            ws.Cells("d1").Value = "bearbeitungsart" 'todo
+            ws.Cells("e1").Value = "datum" 'datum
+            ws.Cells("f1").Value = "sachbearbeiter"
+            ws.Cells("g1").Value = "betreff"
+            'optionale
+            ws.Cells("h1").Value = "info"
+            ws.Cells("i1").Value = "erledigtam"
+            ws.Cells("j1").Value = "erledigt"
 
 
-                zeile.Append(bearbeiterid & t) ' 
-                zeile.Append(erledigtam.ToString("yyyy") & t) 'jahr 
-                zeile.Append(erledigt & t) ' 
-                'zeile.Append(angelegtam & t) ' veraltet
+            'zeile.Append("az" & t) '     vid   
+            'zeile.Append("jahr" & t) '     datum
+            'zeile.Append("vid" & t) '  gemarkungstext    
+            'zeile.Append("datum" & t) '  nachname
+            'zeile.Append("sachbearbeiter" & t) '  znkombi
+            'zeile.Append("Betreff" & t) '   rechts    
+            'zeile.Append("info" & t) ' hoch
+
+            'zeile.Append("bearbeiterid" & t) '  
+            'zeile.Append("erledigtam" & t) '  
+            'zeile.Append("erledigt" & t) '  
+            'zeile.Append("angelegtam" & t) '  
+            'csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
+            For Each drr As DataRow In DT.Rows
+                Try
+                    igesamt += 1
+                    row += 1
+                    vid = CStr(clsDBtools.fieldvalue(drr.Item("vorgangsid")))
+                    eingang = cleanString(CStr(clsDBtools.fieldvalueDate(drr.Item("teingang"))))
+                    todo = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("TODO"))))
+                    datum = CDate(clsDBtools.fieldvalueDate(drr.Item("datum"))) '==FÄLLIG
+                    sachbearbeiter = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter"))))
+                    Betreff = "Wartenauf: " & cleanString(CStr(clsDBtools.fieldvalue(drr.Item("wartenauf"))))
+                    info = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Bemerkung"))))
+
+                    bearbeiterid = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("bearbeiterid"))))
+                    erledigtam = ((clsDBtools.fieldvalueDate(drr.Item("erledigtam"))))
+                    erledigt = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("erledigt"))))
+                    'angelegtam = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("weingang"))))
+                    If umlautwandeln Then
+                        todo = clsString.umlaut2ue(todo)
+                        sachbearbeiter = clsString.umlaut2ue(sachbearbeiter)
+                        Betreff = clsString.umlaut2ue(Betreff)
+                        info = clsString.umlaut2ue(info)
+                    End If
+
+                    TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
+                    Application.DoEvents()
+                    'zeilebilden
+                    ws.Cells("A" & row).Value = vid
+                    ws.Cells("b" & row).Value = eingang.ToString("yyyy")
+                    ws.Cells("c" & row).Value = "???"
+                    ws.Cells("d" & row).Value = todo
+                    ws.Cells("e" & row).Value = datum.ToString("dd.MM.yyyy")
+                    ws.Cells("f" & row).Value = sachbearbeiter
+                    ws.Cells("g" & row).Value = Betreff
+                    ws.Cells("h" & row).Value = info
+                    ws.Cells("i" & row).Value = erledigtam.ToString("dd.MM.yyyy")
+                    ws.Cells("j" & row).Value = erledigt
+
+                    'zeile.Append(vid & t) 'Az
+                    'zeile.Append(eingang.ToString("yyyy") & t) 'jahr .ToString("dd.MM.yyyy") 
+                    'zeile.Append(todo & t) 'Az 
+                    'zeile.Append(datum.ToString("dd.MM.yyyy") & t) ' 
+                    'zeile.Append(sachbearbeiter & t) ' 
+                    'zeile.Append(Betreff & t) ' 
+                    'zeile.Append(info & t) ' 
 
 
-                If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
-                    zeile.Clear()
-                Else
-                    Debug.Print("oooo")
-                End If
-                idok += 1
-                'If idok > maxobj Then Exit For
-            Catch ex As Exception
-                l("fehler2: " & ex.ToString)
-                TextBox2.Text = ic.ToString & Environment.NewLine & " " &
+                    'zeile.Append(bearbeiterid & t) ' 
+                    'zeile.Append(erledigtam.ToString("yyyy") & t) 'jahr 
+                    'zeile.Append(erledigt & t) ' 
+                    'zeile.Append(angelegtam & t) ' veraltet
+
+
+                    'If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
+                    '    zeile.Clear()
+                    'Else
+                    '    Debug.Print("oooo")
+                    'End If
+                    idok += 1
+                    'If idok > maxobj Then Exit For
+                Catch ex As Exception
+                    l("fehler2: " & ex.ToString)
+                    TextBox2.Text = ic.ToString & Environment.NewLine & " " &
                           Environment.NewLine &
                        Form1.vid & "/" & Form1.vid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
-                Application.DoEvents()
-            End Try
-            GC.Collect()
-            GC.WaitForFullGCComplete()
-        Next
-        'csvzeileSpeichern(ws.ToString, ausgabeAntragsteller)
-        zeile.Clear()
+                    Application.DoEvents()
+                End Try
+                GC.Collect()
+                GC.WaitForFullGCComplete()
+            Next
+            'csvzeileSpeichern(ws.ToString, ausgabeAntragsteller)
+            'zeile.Clear()
 
-        swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
-
+            swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
+            ' Datei speichern
+            Dim fi As New FileInfo(puAusgabe)
+            package.SaveAs(fi)
+        End Using
         '####
         'swfehlt.Close()
         l("fertig  " & puFehler)
@@ -3837,7 +3872,8 @@ Public Class Form1
     Private Sub writeAntragstellerausgabePU(puFehler As String, ausgabeAntragsteller As String, ausgabeBeteiligte As String,
                                             sql As String, maxobj As Integer, umlautwandeln As Boolean)
         Dim DT As DataTable
-        Dim row As Integer = 1
+        Dim rowAntrag As Integer = 1
+        Dim rowBeteiligt As Integer = 1
         ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
         Dim erfolg As Boolean
         Dim idok As Integer = 0
@@ -3871,7 +3907,7 @@ Public Class Form1
             Dim beteiligter As New person
             For Each drr As DataRow In DT.Rows  'alle vorgänge
                 Try
-                    row += 1
+
                     antragsteller = New person
                     igesamt += 1
                     TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
@@ -3881,7 +3917,8 @@ Public Class Form1
                     If hatAntragsteller(perscoll) Then
                         antragsteller = getAntragsteller(perscoll)
                         If antragsteller Is Nothing Then Exit For
-                        erfolg = bildeZeileantragsteller(eingang, wsAntragst, antragsteller, row)
+                        rowAntrag += 1
+                        erfolg = bildeZeileantragsteller(eingang, wsAntragst, antragsteller, rowAntrag)
                         'zeile Nach antragsteller ausschreiben
                         'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
                         'zeileAntragsteller.Clear()
@@ -3894,13 +3931,15 @@ Public Class Form1
                             antragsteller.Vorname = "dummy"
                             antragsteller.Rolle = "dummy"
                         End If
-                        erfolg = bildeZeileantragsteller(eingang, wsAntragst, antragsteller, row)
+                        rowAntrag += 1
+                        erfolg = bildeZeileantragsteller(eingang, wsAntragst, antragsteller, rowAntrag)
                         'zeile Nach antragsteller ausschreiben
                         'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
                         'zeileAntragsteller.Clear()
                     End If
                     For Each perso As person In perscoll
-                        erfolg = bildeZeilePerson(eingang, wsBeteiligte, perso, row)
+                        rowBeteiligt += 1
+                        erfolg = bildeZeilePerson(eingang, wsBeteiligte, perso, rowBeteiligt)
                         'If csvzeileSpeichern(zeileBeteiligte.ToString, ausgabeBeteiligte) Then
                         '    zeileBeteiligte.Clear()
                         'End If
