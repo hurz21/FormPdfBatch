@@ -2335,7 +2335,8 @@ Public Class Form1
         If maxobj - 50000 < 0 Then
             untergrenze = 0
         Else
-            untergrenze = maxobj - 50000
+            'untergrenze = maxobj - 10000
+            untergrenze = maxobj - 50
         End If
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         puFehler = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\" & "dokumente_ab_" & maxobj & ".log"
@@ -2395,7 +2396,7 @@ Public Class Form1
         'Process.Start(puAusgabe)
         '######
 
-        End
+
         'puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_referenz" & ".csv"
         puAusgabe = "e:\proumwelt\xls\" & "dokumente_referenz" & ".xlsx"
         'puAusgabeStream = New IO.StreamWriter(puAusgabe)
@@ -2515,6 +2516,13 @@ Public Class Form1
                     'End If
                     'End If
                     'If vid = "44400" Then
+                    If vid = String.Empty Then
+                        Continue For
+                    End If
+                    If fullfilename = String.Empty Then
+                        Continue For
+                    End If
+
                     'dateiUmkopieren
                     newdir = IO.Path.Combine(outdirROOT, eingang.ToString("yyyy"))
                     If Not IO.Directory.Exists(newdir) Then
@@ -2529,13 +2537,14 @@ Public Class Form1
                         IO.Directory.CreateDirectory(newdir)
                     End If
                     newdir = IO.Path.Combine(newdir, dateinameext)
-                    IO.File.Copy(fullfilename, newdir)
+
+                    Dim fo As New IO.FileInfo(newdir)
+                    If Not fo.Exists Then
+                        IO.File.Copy(fullfilename, newdir)
+                    End If
                     'End If
 
-                    If vid = String.Empty Then
-                        Continue For
-                    End If
-                    If fullfilename = String.Empty Then Continue For
+
                     TextBox3.Text = vid & ", " & igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
                     Application.DoEvents()
                     'zeilebilden
@@ -2545,7 +2554,7 @@ Public Class Form1
                     ws.Cells("d" & row).Value = dbdatum.ToString("dd.MM.yyyy")
                     ws.Cells("e" & row).Value = clsString.removeSemikolon(typ)
                     ws.Cells("f" & row).Value = (cleanString(beschreibung))
-                    ws.Cells("g" & row).Value = clsString.removeSemikolon(fullfilename)
+                    ws.Cells("g" & row).Value = clsString.removeSemikolon(newdir)
                     ws.Cells("h" & row).Value = dbdatum.ToString("yyyyMMdd") & "_" & cleanString(dateinameext).Trim
                     ws.Cells("i" & row).Value = ""
                     ws.Cells("j" & row).Value = CInt(istRevisionssicher)
