@@ -2320,7 +2320,7 @@ Public Class Form1
     End Sub
 
     Private Sub Button20_Click(sender As Object, e As EventArgs) Handles Button20.Click
-        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\Dokumain.log"
+        Dim puFehlt As String ' = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\Dokumain.log"
         Dim puAusgabe As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "dokumente" & ".csv"
         '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".log"
 
@@ -2332,15 +2332,15 @@ Public Class Form1
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
         Dim untergrenze = 0
-        If maxobj - 50000 < 0 Then
+        If maxobj - 10000 < 0 Then
             untergrenze = 0
         Else
             'untergrenze = maxobj - 10000
-            untergrenze = maxobj - 50
+            untergrenze = maxobj - 10000
         End If
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
-        puFehler = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\" & "dokumente_ab_" & maxobj & ".log"
-        swfehlt = New IO.StreamWriter(puFehler)
+        puFehlt = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\" & "dokumente_ab_" & maxobj & ".log"
+        swfehlt = New IO.StreamWriter(puFehlt)
         swfehlt.AutoFlush = True
         'puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_ab_" & maxobj & ".csv"
         puAusgabe = "E:\proumwelt\xls\" & "dokumentMain_ab_" & maxobj & ".xlsx"
@@ -2390,7 +2390,7 @@ Public Class Form1
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         'MsgBox("max. objekte für test: " & maxobj)
-        writeDokumentePU(puFehler, puAusgabe, Sql, maxobj)
+        writeDokumentePU(puFehlt, puAusgabe, Sql, maxobj)
         'puAusgabeStream.Close()
         'puAusgabeStream.Dispose()
         'Process.Start(puAusgabe)
@@ -2400,12 +2400,12 @@ Public Class Form1
         'puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_referenz" & ".csv"
         puAusgabe = "e:\proumwelt\xls\" & "dokumente_referenz" & ".xlsx"
         'puAusgabeStream = New IO.StreamWriter(puAusgabe)
-        Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_referenz]  order by ort desc "
+        Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_referenz]  order by vid desc "
         TextBox1.Text = TextBox1.Text & Environment.NewLine & puAusgabe
         TextBox2.Text = TextBox2.Text & Environment.NewLine & Sql
-        writeDokumentePU(puFehler, puAusgabe, Sql, maxobj)
+        writeDokumentePU(puFehlt, puAusgabe, Sql, maxobj)
         swfehlt.Close()
-        l("fertig  " & puFehler)
+        l("fertig  " & puFehlt)
 
         'Process.Start(puAusgabe)
         End
@@ -2439,9 +2439,9 @@ Public Class Form1
         If vid = "fehler" Then End
         DT = alleDokumentDatenHolen(sql)
         l("vor csvverarbeiten")
-        Dim ic As Integer = 0
+
         Dim igesamt As Integer = 0
-        Dim relativpfad, dateinameext, typ, dokumentid, inputfile, outfile, bearbeiterid As String
+        Dim relativpfad, dateinameext, typ, dokumentid, bearbeiterid As String
         Dim newsavemode As Boolean
         Dim istRevisionssicher As Boolean
         Dim dbdatum As Date
@@ -2458,7 +2458,6 @@ Public Class Form1
         'Dim iblock As Int16 = 0
         Dim fullfilename As String
         Dim t As String = ";"
-        l("PDFumwandeln 2 ")
         l("PDFumwandeln 2 ")
         '  Using sw As New IO.StreamWriter(logfile)
         bearbeiterid = 0
@@ -2507,15 +2506,7 @@ Public Class Form1
                     DbMetaDatenDokumentHolen(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, istRevisionssicher,
                                          initial, eid,
                                  beschreibung, eingang, fullfilename)
-                    'l(vid & " " & CStr(dokumentid) & " " & ic & " (" & DT.Rows.Count & ")")
 
-                    'If newsavemode Then
-                    '    Vorhabensmerkmal = GetInputfilename(inndir, sachgebiet, CInt(ort))
-                    'Else
-                    '    Vorhabensmerkmal = GetInputfile1Name(inndir, sachgebiet, Verfahrensart)
-                    'End If
-                    'End If
-                    'If vid = "44400" Then
                     If vid = String.Empty Then
                         Continue For
                     End If
@@ -2542,8 +2533,6 @@ Public Class Form1
                     If Not fo.Exists Then
                         IO.File.Copy(fullfilename, newdir)
                     End If
-                    'End If
-
 
                     TextBox3.Text = vid & ", " & igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
                     Application.DoEvents()
@@ -2559,41 +2548,13 @@ Public Class Form1
                     ws.Cells("i" & row).Value = ""
                     ws.Cells("j" & row).Value = CInt(istRevisionssicher)
 
-                    '    zeile.Append(vid & t) 'Az
-                    'zeile.Append(eingang.ToString("yyyy") & t) ' 
-                    'zeile.Append("" & t) 'obergruppe leer 
-                    '' zeile.Append(eingang.ToString("yyyy") & t) 'jahr
-                    'zeile.Append(dbdatum.ToString("dd.MM.yyyy") & t) 'datum
-                    'zeile.Append(clsString.removeSemikolon(typ) & t) 'oberbegriff Protokolle
-                    'zeile.Append(clsString.removeSemikolon(cleanString(beschreibung)) & t) 'bezeichnung beschreibung
-                    'zeile.Append((clsString.removeSemikolon(fullfilename)) & t) 'pfad
-                    ''zeile.Append("Paradigma" & t) 'ordner leer 
-                    'zeile.Append(dbdatum.ToString("yyyyMMdd") & "_" & cleanString(dateinameext).Trim & t) 'ordner im mediencenter
-                    'zeile.Append(CInt(dokumentid) & t) 'ordner im mediencenter
-                    'zeile.Append(CInt(istRevisionssicher) & t) 'ordner im mediencenter
-
-                    'If iblock < blockMAX Then
-                    '    block.AppendLine(ws.ToString)
-                    '    ws.Clear()
-                    '    iblock += 1
-                    'Else
-                    'If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
-                    ''iblock = 0
-                    ''block.Clear()
-                    'zeile.Clear()
-                    '    Else
-                    '    Debug.Print("oooo")
-                    'End If
-
-
-                    'ws.Clear()
                     idok += 1
                     row += 1
                     'If idok > maxobj Then Exit For
                 Catch ex As Exception
                     l("fehler2: " & ex.ToString)
-                    TextBox2.Text = ic.ToString & Environment.NewLine & " " &
-                       inputfile & Environment.NewLine &
+                    TextBox2.Text = idok.ToString & Environment.NewLine & " " &
+                       fullfilename & Environment.NewLine &
                        vid & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
                     Application.DoEvents()
@@ -2601,17 +2562,12 @@ Public Class Form1
                 GC.Collect()
                 GC.WaitForFullGCComplete()
             Next
-            'csvzeileSpeichern(zeile.ToString, puAusgabeStream)
-            'zeile.Clear()
             Dim fi As New FileInfo(puAusgabe)
             package.SaveAs(fi)
         End Using
         swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
 
-        '####
-        'swfehlt.Close()
         l("fertig  " & puFehler)
-        ' Process.Start(puFehler)
     End Sub
 
     Private Function cleanString(Text As String) As String
@@ -2667,7 +2623,7 @@ Public Class Form1
             " order by eingang  "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        'writeDokumentePU(puFehler, ausgabeAntragsteller, Sql, maxobj)
+        'writeDokumentePU(puFehlt, ausgabeAntragsteller, Sql, maxobj)
 
 
         writeStammdatenPU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln)
@@ -2983,7 +2939,7 @@ Public Class Form1
             package.SaveAs(fi)
         End Using
         l("fertig  " & puFehler)
-        ' Process.Start(puFehler)
+        ' Process.Start(puFehlt)
     End Sub
 
     Private Function makeVerwandteString(vid As String, alleVIDmitVerwandten As DataTable, alleFremdvorgaengeMitSGNR As DataTable, ByRef jump As Integer) As String
@@ -3362,7 +3318,7 @@ Public Class Form1
         '####
         'swfehlt.Close()
         l("fertig  " & puFehler)
-        ' Process.Start(puFehler)
+        ' Process.Start(puFehlt)
     End Sub
 
     Private Sub Button26_Click(sender As Object, e As EventArgs) Handles Button26.Click
@@ -3379,7 +3335,7 @@ Public Class Form1
         Sql = "select * from PF_mitRH as a, raumbezug as r  where a.id=r.sekid and typ=2      order by vid desc  "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        'writeAdresseausgabePU(puFehler, ausgabeAntragsteller, Sql, maxobj)
+        'writeAdresseausgabePU(puFehlt, ausgabeAntragsteller, Sql, maxobj)
         writeKatasterausgabePU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln)
         'puAusgabeStream.Close()
         'puAusgabeStream.Dispose()
@@ -3540,7 +3496,7 @@ Public Class Form1
         '####
         'swfehlt.Close()
         l("fertig  " & puFehler)
-        ' Process.Start(puFehler)
+        ' Process.Start(puFehlt)
 
     End Sub
 
@@ -3558,7 +3514,7 @@ Public Class Form1
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
-        'writeKatasterausgabePU(puFehler, puAusgabe, Sql, maxobj)
+        'writeKatasterausgabePU(puFehlt, puAusgabe, Sql, maxobj)
         'writeAntragstellerausgabePU()
         writeStakeholderAusgabePU(puFehler, puAusgabeStream, Sql, maxobj)
         puAusgabeStream.Close()
@@ -3584,7 +3540,7 @@ Public Class Form1
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
-        'writeStakeholderAusgabePU(puFehler, puAusgabe, Sql, maxobj)
+        'writeStakeholderAusgabePU(puFehlt, puAusgabe, Sql, maxobj)
         writeWiedervorlageAusgabePU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln)
         'puAusgabeStream.Close()
         'puAusgabeStream.Dispose()
@@ -3734,7 +3690,7 @@ Public Class Form1
         '####
         'swfehlt.Close()
         l("fertig  " & puFehler)
-        ' Process.Start(puFehler)
+        ' Process.Start(puFehlt)
     End Sub
 
     Private Sub writeStakeholderAusgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
@@ -4011,7 +3967,7 @@ Public Class Form1
         '####
         'swfehlt.Close()
         l("fertig  " & puFehler)
-        ' Process.Start(puFehler)
+        ' Process.Start(puFehlt)
     End Sub
 
     Private Sub bildeKopfZeileAntragsteller(ws As ExcelWorksheet, t As String)
@@ -4489,7 +4445,7 @@ Public Class Form1
         '####
         'swfehlt.Close()
         l("fertig  " & puFehler)
-        ' Process.Start(puFehler)
+        ' Process.Start(puFehlt)
     End Sub
 
 
