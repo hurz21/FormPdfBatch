@@ -2335,8 +2335,13 @@ Public Class Form1
         If maxobj - 10000 < 0 Then
             untergrenze = 0
         Else
+            If maxobj > 200000 Then
+                untergrenze = 0
+            Else
+
+                untergrenze = maxobj - 10000
+            End If
             'untergrenze = maxobj - 10000
-            untergrenze = maxobj - 10000
         End If
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         puFehlt = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\" & "dokumente_ab_" & maxobj & ".log"
@@ -2403,7 +2408,7 @@ Public Class Form1
         Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_referenz]  order by vid desc "
         TextBox1.Text = TextBox1.Text & Environment.NewLine & puAusgabe
         TextBox2.Text = TextBox2.Text & Environment.NewLine & Sql
-        writeDokumentePU(puFehlt, puAusgabe, Sql, maxobj)
+        '  writeDokumentePU(puFehlt, puAusgabe, Sql, maxobj)
         swfehlt.Close()
         l("fertig  " & puFehlt)
 
@@ -2428,6 +2433,7 @@ Public Class Form1
         Dim DT As DataTable
         Dim idok As Integer = 0
         Dim row As Integer = 2
+        Dim schreib = 0
         ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
         'puAusgabeStream.AutoFlush = True
         'ausgabeAntragsteller.WriteLine(Now)
@@ -2532,9 +2538,10 @@ Public Class Form1
                     Dim fo As New IO.FileInfo(newdir)
                     If Not fo.Exists Then
                         IO.File.Copy(fullfilename, newdir)
+                        schreib += 1
                     End If
 
-                    TextBox3.Text = vid & ", " & igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
+                    TextBox3.Text = vid & ", " & igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ] schreib=" & schreib
                     Application.DoEvents()
                     'zeilebilden
                     ws.Cells("A" & row).Value = vid
@@ -2553,7 +2560,7 @@ Public Class Form1
                     'If idok > maxobj Then Exit For
                 Catch ex As Exception
                     l("fehler2: " & ex.ToString)
-                    TextBox2.Text = idok.ToString & Environment.NewLine & " " &
+                    TextBox2.Text = idok.ToString & " " & ex.ToString & Environment.NewLine & " " &
                        fullfilename & Environment.NewLine &
                        vid & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
@@ -2565,7 +2572,7 @@ Public Class Form1
             Dim fi As New FileInfo(puAusgabe)
             package.SaveAs(fi)
         End Using
-        swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
+        swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt & ", neu ausgeschrieben: " & schreib)
 
         l("fertig  " & puFehler)
     End Sub
