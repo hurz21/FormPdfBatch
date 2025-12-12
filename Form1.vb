@@ -2344,7 +2344,8 @@ Public Class Form1
             'untergrenze = maxobj - 10000
         End If
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
-        puFehlt = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\" & "dokumente_ab_" & maxobj & ".log"
+        'puFehlt = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\" & "dokumente_ab_" & maxobj & ".log"
+        puFehlt = "e:\proumwelt\log\" & "dokumente_ab_" & maxobj & ".log"
         swfehlt = New IO.StreamWriter(puFehlt)
         swfehlt.AutoFlush = True
         'puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_ab_" & maxobj & ".csv"
@@ -2381,7 +2382,7 @@ Public Class Form1
               "union all  " &
               "SELECT  vid,dokumentid,eid,relativpfad,dateinameext,newsavemode," &
               "checkindatum,initial_,revisionssicher,Beschreibung,tooltip,typ,eingang from [Paradigma].[dbo].DokusMitEingang) as a " &
-              "where vid <" & maxobj & " and vid>" & untergrenze & " order by vid,checkindatum desc;"
+              "where vid <=" & maxobj & " and vid>" & untergrenze & " order by vid,checkindatum desc;"
 
 
         'Sql = "SELECT  *   FROM " &
@@ -2408,7 +2409,7 @@ Public Class Form1
         Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_referenz]  order by vid desc "
         TextBox1.Text = TextBox1.Text & Environment.NewLine & puAusgabe
         TextBox2.Text = TextBox2.Text & Environment.NewLine & Sql
-        '  writeDokumentePU(puFehlt, puAusgabe, Sql, maxobj)
+        'writeDokumentePU(puFehlt, puAusgabe, Sql, maxobj)
         swfehlt.Close()
         l("fertig  " & puFehlt)
 
@@ -2618,6 +2619,7 @@ Public Class Form1
 
         Dim puAusgabe As String = "e:\proumwelt\xls\" & "grunddaten" & ".xlsx"
         puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\grunddaten.xlsx"
+        puAusgabe = "e:\proumwelt\xls\grunddaten.xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -2633,11 +2635,11 @@ Public Class Form1
         'writeDokumentePU(puFehlt, ausgabeAntragsteller, Sql, maxobj)
 
 
-        writeStammdatenPU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln)
+        writeStammdatenPU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln, swfehlt)
         'puAusgabeStream.Close()
         'puAusgabeStream.Dispose()
         'System.Diagnostics.Process.Start("explorer", "e:\proumwelt\xls\")
-        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\")
+        System.Diagnostics.Process.Start("explorer", "e:\proumwelt\xls\grunddaten.xlsx")
         End
     End Sub
 
@@ -2659,13 +2661,13 @@ Public Class Form1
     End Sub
 
     Private Sub writeStammdatenPU(puFehler As String, puAusgabe As String, sql As String,
-                                  maxobj As Integer, umlautwandeln As Boolean)
+                                  maxobj As Integer, umlautwandeln As Boolean, swfehlt As IO.StreamWriter)
         Dim DT, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR As DataTable
         Dim idok As Integer = 0
         'puAusgabeStream.AutoFlush = True
         swfehlt.WriteLine("writeStammdatenPU---")
         Dim sgdict As New Dictionary(Of String, String)
-        Dim sgfile = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\sachgebiete\SG_alleTiefenKorrekturNeuUmlaut.csv"
+        Dim sgfile As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\sachgebiete\SG_alleTiefenKorrekturNeuUmlaut.csv"
         sgfile = "E:\proumwelt\s2.txt"
 
         getSGDictionary(sgdict, sgfile)
@@ -2681,7 +2683,9 @@ Public Class Form1
                  " where v.FREMDVORGANGSID=s.VORGANGSID  " &
                  " order by  s.VORGANGSID desc"
         alleFremdvorgaengeMitSGNR = alleDokumentDatenHolen(sql)
+        Dim tcount As Integer = 0
         Dim sgnr As String = ""
+        Dim az2 As String = ""
         Dim ic As Integer = 0
         Dim igesamt As Integer = 0
         Dim sachgebiet, Verfahrensart, Vorhaben, Bezeichnung, Vorhabensmerkmal, Notiz, sachbearbeiter As String
@@ -2701,6 +2705,7 @@ Public Class Form1
         Dim t As String = ";"
         Dim geschlossen As String = "0"
         Dim row As Integer = 1
+        Dim test As Integer
         l("stammdaten")
 
         ' Lizenz kontext (erforderlich ab EPPlus 5)
@@ -2736,45 +2741,22 @@ Public Class Form1
             ws.Cells("u1").Value = "-"
             'skip
             ws.Cells("v1").Value = "notiz"
-            'skip
-
-
-
-            'kopfzeile
-            'zeile.Append("az" & t) '                           (VID)
-            'zeile.Append("jahr" & t) '                       (datum)
-            'zeile.Append("Fachschale" & t) '                  PROUMWELT
-            'zeile.Append("ort" & t) '                 (sgtext + / + paragraf + / + vorgangsgegenstand + ) Überwachung einer Kleinkläranlage
-            'zeile.Append("Eingangsdatum" & t) '              (datum)
-            'zeile.Append("Antragsdatum" & t) '               (aufnahme)
-            'zeile.Append("Datum Vollst gepruft" & t) '(letztebearbeitung)
-            'zeile.Append("Bescheid Datum" & t) '
-            'zeile.Append("Datum Abgeschlossen am " & t) '   (letztebearbeitung falls erledigt=1)
-            'zeile.Append("Kurzel Stando" & t) ' (storaumnr)	3.b.11 oder  mu  des Aktenstandorts
-            'zeile.Append("Sachgebiet" & t) '                (sachgebietnr)
-            'zeile.Append("Verfahrensart" & t) '
-            'zeile.Append("Vorhaben" & t) '
-            'zeile.Append("Vorhabensmerkmal" & t) '
-            'zeile.Append("Zust. SB" & t) '      (bearbeiter) schuSachbearbeiter
-            'zeile.Append("Objektnummer" & t) '
-            'zeile.Append("Hauptaktenzeichen" & t) ' (Hauptaktenzeichen) 
-            'zeile.Append("Hauptaktenjahr" & t) '
-            'zeile.Append("Notiz" & t) '             (az2 +  altaz + internenr + beschreibung)
-
-
+            'skip 
             Dim jump = 0
-            'csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
 
             For Each drr As DataRow In DT.Rows
                 Try
                     igesamt += 1
                     row += 1
                     vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+                    If vid = 3733 Then
+                        Debug.Print("")
+                    End If
                     eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                     Bezeichnung = cleanString(makeStammBezeichnung(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), CStr(clsDBtools.fieldvalue(drr.Item("PARAGRAF"))),
                                                                    CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSGEGENSTAND"))),
                                                                     CStr(clsDBtools.fieldvalue(drr.Item("az2")))))
-
+                    az2 = CStr(clsDBtools.fieldvalue(drr.Item("az2")))
                     eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                     antrag = CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
                     vollstaendig = CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG")))
@@ -2783,6 +2765,10 @@ Public Class Form1
                                                       CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))) 'falls erledigt
                     aktenstandort = CStr(clsDBtools.fieldvalue(drr.Item("STORAUMNR")))
                     sgnr = clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))
+
+
+                    Weber142Minus(tcount, sgnr, swfehlt, az2)
+
                     If sgnr.Length = 3 Then sgnr = sgnr & "0"
                     If sgnr.Length = 2 Then sgnr = sgnr & "00"
                     If sgnr.Length = 1 Then sgnr = sgnr & "000"
@@ -2791,13 +2777,14 @@ Public Class Form1
                     '    Debug.Print("")
                     'End If
 
+                    gisMapping(sgnr, test)
                     sgdict.TryGetValue(sgnr.Substring(0, 1), sachgebiet) : sachgebiet = sgnr.Substring(0, 1) & "-" & sachgebiet
 
                     'sgdict.TryGetValue(sgnr.Substring(0, 2), Verfahrensart)
                     Verfahrensart = sgnr.Substring(0, 2)
 
                     If String.IsNullOrEmpty(Verfahrensart) Then Verfahrensart = ""
-                    Verfahrensart = sgnr.Substring(0, 2) & "-" & Verfahrensart
+                    Verfahrensart = sgnr 'sgnr.Substring(0, 2) & "-" & Verfahrensart
 
                     sgdict.TryGetValue(sgnr.Substring(0, 3), Vorhaben)
                     If String.IsNullOrEmpty(Vorhaben) Then Vorhaben = ""
@@ -2852,7 +2839,7 @@ Public Class Form1
                     ' Datenzeilen
 
                     'zeilebilden
-                    ws.Cells("A" & row).Value = vid
+                    ws.Cells("A" & row).Value = az2 ' vid
                     'zeile.Append(vid & t) 'Az
 
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
@@ -2937,7 +2924,7 @@ Public Class Form1
             'csvzeileSpeichern(ws.ToString, ausgabeAntragsteller)
             'zeile.Clear()
 
-            swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
+            swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt & ", tcount: " & tcount)
 
             '####
             'swfehlt.Close()
@@ -2947,6 +2934,58 @@ Public Class Form1
         End Using
         l("fertig  " & puFehler)
         ' Process.Start(puFehlt)
+    End Sub
+
+    Private Shared Sub Weber142Minus(ByRef tcount As Integer, ByRef sgnr As String, swfehlt As IO.StreamWriter, az2 As String)
+        Try
+            If sgnr.Count < 4 Then
+                Debug.Print("")
+                swfehlt.WriteLine("tcount: " & sgnr)
+                sgnr = "1031"
+                If az2.ToLower.Contains("-plöb") Or
+                       az2.ToLower.Contains("-klib") Or
+                                az2.ToLower.EndsWith("-kl") Or
+                       az2.ToLower.EndsWith("-pl") Then
+                    sgnr = "5031"
+                    Exit Sub
+                End If
+                If az2.ToLower.Contains("-gaig") Or
+              az2.ToLower.Contains("-schu") Or
+              az2.ToLower.Contains("-rotv") Or
+                    az2.ToLower.Contains("-maup") Or
+                       az2.ToLower.EndsWith("-ri") Or
+                       az2.ToLower.EndsWith("-di") Or
+                       az2.ToLower.EndsWith("-ja") Or
+                       az2.ToLower.EndsWith("-ro") Or
+                       az2.ToLower.EndsWith("-gg") Or
+              az2.ToLower.EndsWith("-sm") Then
+                    sgnr = "5031"
+                    Exit Sub
+                End If
+            End If
+            If sgnr.Trim.Substring(3, 1) = "-" Then
+                swfehlt.WriteLine("tcount: " & sgnr)
+                If sgnr.Contains("142-") Then
+                    Debug.Print("")
+                Else
+                    Debug.Print("")
+                End If
+                tcount += 1
+                sgnr = "4310"
+            End If
+
+        Catch ex As Exception
+            Debug.Print(ex.ToString)
+        End Try
+    End Sub
+
+    Private Shared Sub gisMapping(ByRef sgnr As String, ByRef test As Integer)
+        If IsNumeric(sgnr) Then
+            test = CInt(sgnr)
+            If test > 1999 And test < 3000 Then '1030
+                sgnr = "1030"
+            End If
+        End If
     End Sub
 
     Private Function makeVerwandteString(vid As String, alleVIDmitVerwandten As DataTable, alleFremdvorgaengeMitSGNR As DataTable, ByRef jump As Integer) As String
