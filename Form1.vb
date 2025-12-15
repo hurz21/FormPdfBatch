@@ -2419,7 +2419,7 @@ Public Class Form1
 
     Private Function setMaxObj(maxobj As Integer) As Integer
         If (TextBox4.Text) = "0" Or TextBox4.Text = "" Then
-            maxobj = maxobj
+            maxobj = 80000
         Else
             If IsNumeric(TextBox4.Text) Then
                 maxobj = CInt(TextBox4.Text)
@@ -5050,7 +5050,7 @@ Public Class Form1
         ' swfehlt.WriteLine("wechsel")
         ' dokumenteMitFullpathTabelleErstellen(swfehlt)
         Dim Sql As String
-        Dim maxobj As Integer = 80000
+        Dim maxobj As Integer = 0
         Dim endvid As Integer
         Dim startvid = setMaxObj(maxobj)
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
@@ -5058,10 +5058,10 @@ Public Class Form1
         puFehler = "e:\proumwelt\log\chronologie" & startvid & ".log"
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
-        If startvid - 50000 < 1 Then
+        If startvid - 10000 < 1 Then
             endvid = 0
         Else
-            endvid = startvid - 50000
+            endvid = startvid - 10000
         End If
         'puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_verlaufSummary_" & startvid & ".xlsx"
         puAusgabe = "e:\proumwelt\xls\chronologie_" & startvid & ".xlsx"
