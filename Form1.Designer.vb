@@ -353,16 +353,17 @@ Partial Class Form1
         '
         'Button36
         '
+        Me.Button36.Enabled = False
         Me.Button36.Location = New System.Drawing.Point(251, 153)
         Me.Button36.Name = "Button36"
-        Me.Button36.Size = New System.Drawing.Size(188, 23)
+        Me.Button36.Size = New System.Drawing.Size(231, 23)
         Me.Button36.TabIndex = 42
-        Me.Button36.Text = "14. VerlaufSummary"
+        Me.Button36.Text = "VerlaufSummary>besser chronologie"
         Me.Button36.UseVisualStyleBackColor = True
         '
         'Button35
         '
-        Me.Button35.Location = New System.Drawing.Point(520, 111)
+        Me.Button35.Location = New System.Drawing.Point(688, 137)
         Me.Button35.Name = "Button35"
         Me.Button35.Size = New System.Drawing.Size(75, 23)
         Me.Button35.TabIndex = 41
@@ -371,7 +372,7 @@ Partial Class Form1
         '
         'Button34
         '
-        Me.Button34.Location = New System.Drawing.Point(520, 46)
+        Me.Button34.Location = New System.Drawing.Point(688, 72)
         Me.Button34.Name = "Button34"
         Me.Button34.Size = New System.Drawing.Size(75, 23)
         Me.Button34.TabIndex = 40
@@ -380,16 +381,16 @@ Partial Class Form1
         '
         'Button33
         '
-        Me.Button33.Location = New System.Drawing.Point(520, 75)
+        Me.Button33.Location = New System.Drawing.Point(498, 153)
         Me.Button33.Name = "Button33"
-        Me.Button33.Size = New System.Drawing.Size(75, 23)
+        Me.Button33.Size = New System.Drawing.Size(114, 23)
         Me.Button33.TabIndex = 39
-        Me.Button33.Text = "kosten"
+        Me.Button33.Text = "13. Chronologie"
         Me.Button33.UseVisualStyleBackColor = True
         '
         'Button32
         '
-        Me.Button32.Location = New System.Drawing.Point(520, 21)
+        Me.Button32.Location = New System.Drawing.Point(688, 47)
         Me.Button32.Name = "Button32"
         Me.Button32.Size = New System.Drawing.Size(75, 23)
         Me.Button32.TabIndex = 38

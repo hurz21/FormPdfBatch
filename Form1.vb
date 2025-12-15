@@ -2419,7 +2419,7 @@ Public Class Form1
 
     Private Function setMaxObj(maxobj As Integer) As Integer
         If (TextBox4.Text) = "0" Or TextBox4.Text = "" Then
-            maxobj = 10000000
+            maxobj = maxobj
         Else
             If IsNumeric(TextBox4.Text) Then
                 maxobj = CInt(TextBox4.Text)
@@ -2947,6 +2947,13 @@ Public Class Form1
                                 az2.ToLower.EndsWith("-kl") Or
                        az2.ToLower.EndsWith("-pl") Then
                     sgnr = "5031"
+                    Exit Sub
+                End If
+                If az2.ToLower.Contains("-webs") Or
+                       az2.ToLower.Contains("-resl") Or
+                                az2.ToLower.EndsWith("-we") Or
+                       az2.ToLower.EndsWith("-re") Then
+                    sgnr = "4031"
                     Exit Sub
                 End If
                 If az2.ToLower.Contains("-gaig") Or
@@ -5030,6 +5037,232 @@ Public Class Form1
         Catch ex As Exception
             l("fehler in DbMetaDatenDokumentHolen:" & vid & ex.ToString)
         End Try
+    End Sub
+
+    Private Sub Button33_Click(sender As Object, e As EventArgs) Handles Button33.Click
+        Dim puFehler As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_verlauf" & Environment.UserName & ".log"
+        Dim puAusgabe As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_verlaufSummary" & ".xlsx"
+        'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
+        '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".log"
+
+        '  swfehlt.WriteLine(Now)
+        ' S1020dokumenteMitFullpathTabelleErstellen("DOKUFULLNAME", swfehlt) 'referenzfälleNeuZuweisen
+        ' swfehlt.WriteLine("wechsel")
+        ' dokumenteMitFullpathTabelleErstellen(swfehlt)
+        Dim Sql As String
+        Dim maxobj As Integer = 80000
+        Dim endvid As Integer
+        Dim startvid = setMaxObj(maxobj)
+        Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
+        'puFehler = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_verlauf_" & startvid & ".log"
+        puFehler = "e:\proumwelt\log\chronologie" & startvid & ".log"
+        swfehlt = New IO.StreamWriter(puFehler)
+        swfehlt.AutoFlush = True
+        If startvid - 50000 < 1 Then
+            endvid = 0
+        Else
+            endvid = startvid - 50000
+        End If
+        'puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_verlaufSummary_" & startvid & ".xlsx"
+        puAusgabe = "e:\proumwelt\xls\chronologie_" & startvid & ".xlsx"
+        'puAusgabeStream = New IO.StreamWriter(puAusgabe)
+
+        'Sql = "SELECT *  FROM [Paradigma].[dbo].[EREIGNIS_T16]  where not( art like '%email%' or art like '%wiederv%')  order by id desc "
+        Sql = "    Select   * FROM [Paradigma].[dbo].[EREIGNIS_T16]    e, " &
+                "  [Paradigma].[dbo].[stammdaten_tutti] s " &
+                " where Not (art Like '%email%' or art like '%wiederv%') " &
+                " And e.VORGANGSID = s.VORGANGSID " &
+                " order by e.id desc "
+        ' top 100
+
+        Sql = "  Select   " &
+            "  e.VORGANGSID,EINGANG,e.beschreibung,datum,art,richtung, notiz,quelle, " &
+            "  DATEINAMEEXT,d_beschreibung, " &
+            "  FILEDATUM, typ, CHECKINDATUM, REVISIONSSICHER " &
+            "  FROM [Paradigma].[dbo].[EREIGNIS_und_dok]    e,   " &
+            "   [Paradigma].[dbo].[stammdaten_tutti] s  " &
+            "   where         e.VORGANGSID = s.VORGANGSID    " &
+            "  and e.VORGANGSID<" & startvid & " " &
+            "  and e.VORGANGSID>" & endvid & " " &
+            "   order by    e.VORGANGSID desc,  e.DATUM desc"
+
+        TextBox3.Text = puAusgabe
+
+        Dim relativpfad As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\ereignisse\"
+        relativpfad = "e:\proumwelt\summary\"
+
+
+        TextBox1.Text = puAusgabe
+        TextBox2.Text = Sql
+        'MsgBox("max. objekte für test: " & maxobj)
+        'writeVerlaufPU(puFehler, puAusgabe, Sql, maxobj, relativpfad, startvid)
+        writechronologie(puFehler, puAusgabe, Sql, maxobj, relativpfad, startvid)
+        'puAusgabeStream.Close()
+        'puAusgabeStream.Dispose()
+
+        swfehlt.Close()
+        l("fertig  " & puFehler)
+        System.Diagnostics.Process.Start("explorer", puAusgabe)
+        End
+    End Sub
+
+    Private Sub writechronologie(puFehler As String, puAusgabe As String, sql As String, maxobj As Integer, relativpfad As String, startvid As Integer)
+        Dim DT As DataTable
+        Dim idok As Integer = 0
+        'puAusgabe.AutoFlush = True
+        inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
+        If Form1.vid = "fehler" Then End
+        Dim row As Integer = 1
+        ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
+
+        DT = alleDokumentDatenHolen(sql)
+        l("vor csvverarbeiten")
+        Dim ic As Integer = 0
+        Dim igesamt As Integer = 0
+        Dim dateinameext, art, richtung, inputfile, summaryOutfile, typnr, outstring, summary As String
+        Dim newsavemode As Boolean
+        Dim istRevisionssicher As Boolean
+        Dim dbdatum, FILEDATUM, CHECKINDATUM As Date
+        Dim notiz As String
+        Dim beschreibung As String
+        Dim eingang As Date
+        Dim eid, vid As String
+        Dim myoracle As SqlClient.SqlConnection
+        myoracle = getMSSQLCon()
+        myoracle.Open()
+        Dim zeile As New Text.StringBuilder
+        Dim excelkopf As New Text.StringBuilder
+        Dim fullfilename, quelle, d_beschreibung, typ, REVISIONSSICHER As String
+        Dim t As String = ";"
+        excelkopf.Append("Ereignis" & t) 'Az
+        excelkopf.Append("datum" & t) 'jahr
+        excelkopf.Append("richtung" & t) 'datum
+        excelkopf.Append("quelle" & t) 'oberbegriff Protokolle
+        excelkopf.Append((cleanString("beschreibung")) & t) 'bezeichnung beschreibung
+        excelkopf.Append(("dateiname") & t) 'pfad
+        excelkopf.Append("dateibeschreibung" & t) 'ordner im mediencenter
+        excelkopf.Append("dateityp" & t) ' 
+        excelkopf.Append("revisionssicher" & t) ' 
+        excelkopf.Append("filedatum" & t) ' 
+        excelkopf.Append("checkindatum" & Environment.NewLine) '  
+        'ExcelPackage.LicenseContext = LicenseContext.NonCommercial
+        'ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
+
+        ' Neues Excel-Dokument
+
+
+        Using package As New ExcelPackage()
+            Dim ws = package.Workbook.Worksheets.Add("Daten")
+            ws.Cells("A1").Value = "az"
+            ws.Cells("B1").Value = "jahr"
+            ws.Cells("c1").Value = "og"
+            ws.Cells("d1").Value = "datum"
+            ws.Cells("e1").Value = "fd"
+            ws.Cells("f1").Value = "zd"
+            ws.Cells("g1").Value = "typ"
+            ws.Cells("h1").Value = "emp"
+            ws.Cells("i1").Value = "sb"
+            ws.Cells("j1").Value = "textzeile"
+            ws.Cells("k1").Value = "vermerk"
+
+            Dim aktvorgangsid As String = "0"
+            Dim alter_eingang As Date
+            'Dim summe As New Text.StringBuilder
+            'summaryOutfile = makeAktOutfile(dbdatum, aktvorgangsid, relativpfad)
+            For Each drr As DataRow In DT.Rows
+                Try
+                    igesamt += 1
+                    DbMetaDatenVerlaufDokumentHolen(art, richtung, notiz, typnr, dbdatum, eingang, vid,
+                                               eid, beschreibung, quelle, dateinameext, d_beschreibung,
+                                               FILEDATUM, typ, CHECKINDATUM, REVISIONSSICHER, drr)
+                    'If vid = aktvorgangsid Then
+                    outstring = erzeugeverlaufZeile(beschreibung, richtung, art, dbdatum, dateinameext, quelle, d_beschreibung, typ, REVISIONSSICHER, FILEDATUM, CHECKINDATUM)
+                    '    'summe.Append(outstring)
+                    'Else
+                    'alte summary schliessen
+                    'schreibeEreignisdatei(summaryOutfile, summe.ToString)
+                    'summe.Clear()
+                    row += 1
+                    ws.Cells("A" & row).Value = vid
+                    ws.Cells("b" & row).Value = eingang.ToString("yyyy")
+                    ws.Cells("c" & row).Value = "-"
+                        ws.Cells("d" & row).Value = dbdatum.ToString("dd.MM.yyyy")
+                        'If clsDBtools.fieldvalueDate(FILEDATUM) < "1/1/1990" Then
+                        '    pu.Append("" & t)
+                        'Else
+                        '    pu.Append(cleanString(clsDBtools.fieldvalueDate(FILEDATUM).ToString("yyyyMMdd_hhmmss")) & t)
+                        'End If
+                        'If clsDBtools.fieldvalueDate(CHECKINDATUM) < "1/1/1990" Then
+                        '    pu.Append("" & t & Environment.NewLine)
+                        'Else
+                        '    pu.Append(cleanString(clsDBtools.fieldvalueDate(CHECKINDATUM).ToString("yyyyMMdd_hhmmss")) & Environment.NewLine)
+                        'End If
+
+                        ws.Cells("e" & row).Value = "-"
+                        ws.Cells("f" & row).Value = "-"
+                        ws.Cells("g" & row).Value = art ' & " " & (cleanString(beschreibung))
+                        ws.Cells("h" & row).Value = "-"
+                        ws.Cells("i" & row).Value = quelle
+                        ws.Cells("j" & row).Value = (cleanString(beschreibung))
+                        d_beschreibung = (CStr(clsDBtools.fieldvalue(drr.Item("d_beschreibung"))))
+                    'ws.Cells("k" & row).Value = d_beschreibung & ", " & dateinameext
+                    ws.Cells("k" & row).Value = dateinameext
+
+                    'zeile.Append(aktvorgangsid & t) 'Az
+                    'zeile.Append(alter_eingang.ToString("yyyy") & t) 'jahr
+                    'zeile.Append(t) 'datum
+                    'zeile.Append(t) 'oberbegriff Protokolle
+                    'zeile.Append(t) 'bezeichnung beschreibung
+                    'zeile.Append((summaryOutfile) & t) 'pfad
+                    'zeile.Append("" & t) 'ordner im mediencenter
+                    'zeile.Append("" & t) 'ordner im mediencenter
+                    'zeile.Append("" & t) 'ordner im mediencenter
+
+                    'If csvzeileSpeichern(zeile.ToString, puAusgabe) Then
+                    '    zeile.Clear()
+                    'Else
+                    '    Debug.Print("oooo")
+                    'End If
+                    'neue aufmachen
+                    'summaryOutfile = makeAktOutfile(dbdatum, vid, relativpfad)
+                    alter_eingang = eingang
+                        'summe = New Text.StringBuilder
+                        'summe.Append(excelkopf.ToString)
+                        aktvorgangsid = vid
+                    'outstring = erzeugeverlaufZeile(beschreibung, richtung, art, dbdatum, dateinameext, quelle, d_beschreibung, typ, REVISIONSSICHER, FILEDATUM, CHECKINDATUM)
+                    'summe.Append(outstring)
+                    'End If
+                    l(eid & " " & CStr(art) & " " & ic)
+                    TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" & " vid: " & aktvorgangsid
+                    If igesamt Mod 100 = 0 Then
+                        Application.DoEvents()
+                    End If
+
+
+                    idok += 1
+                    'If idok > maxobj Then
+                    '    Exit For
+                    'End If
+                Catch ex As Exception
+                    l("fehler2: " & ex.ToString)
+                    TextBox2.Text = ic.ToString & Environment.NewLine & " " &
+                           inputfile & Environment.NewLine &
+                           vid & "/" & eid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
+                           TextBox2.Text
+                    'Application.DoEvents()
+                End Try
+                GC.Collect()
+                GC.WaitForFullGCComplete()
+            Next
+            'csvzeileSpeichern(zeile.ToString, puAusgabe)
+            'zeile.Clear()
+
+            swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
+
+            Dim fi As New FileInfo(puAusgabe)
+            package.SaveAs(fi)
+        End Using
+        l("fertig  " & puFehler)
     End Sub
 
 
