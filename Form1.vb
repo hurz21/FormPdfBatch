@@ -29,6 +29,7 @@ Public Class Form1
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.WindowState = FormWindowState.Minimized
         protokoll()
+        stammdaten()
         ' fullpathdokumenteErzeugen()
         'PDFumwandeln()
         'DOCXumwandeln(2113, False)
@@ -2459,7 +2460,7 @@ Public Class Form1
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
         myoracle.Open()
-        'Dim zeile As New Text.StringBuilder
+        'Dim row As New Text.StringBuilder
         'Dim block As New Text.StringBuilder 
         'Dim blockMAX As Int16 = 50
         'Dim iblock As Int16 = 0
@@ -2471,15 +2472,15 @@ Public Class Form1
         Using package As New ExcelPackage()
             Dim ws = package.Workbook.Worksheets.Add("Daten")
             'kopfzeile
-            'zeile.Append("az" & t) 'Az
-            'zeile.Append("jahr" & t) 'jahr
-            'zeile.Append("datum" & t) 'datum
-            'zeile.Append("oberbegriff" & t) 'oberbegriff Protokolle
-            'zeile.Append((cleanString("bezeichnung")) & t) 'bezeichnung beschreibung
-            'zeile.Append(("pfad") & t) 'pfad
-            'zeile.Append("ordner" & t) 'ordner im mediencenter
-            'zeile.Append("revisionssicher" & t) ' 
-            'zeile.Append("bearbeiterid" & t) ' 
+            'row.Append("az" & t) 'Az
+            'row.Append("jahr" & t) 'jahr
+            'row.Append("datum" & t) 'datum
+            'row.Append("oberbegriff" & t) 'oberbegriff Protokolle
+            'row.Append((cleanString("bezeichnung")) & t) 'bezeichnung beschreibung
+            'row.Append(("pfad") & t) 'pfad
+            'row.Append("ordner" & t) 'ordner im mediencenter
+            'row.Append("revisionssicher" & t) ' 
+            'row.Append("bearbeiterid" & t) ' 
             ws.Cells("A1").Value = "az"
             ws.Cells("B1").Value = "jahr"
             ws.Cells("c1").Value = "obergruppe"
@@ -2491,19 +2492,19 @@ Public Class Form1
             ws.Cells("i1").Value = "dokumentid"
             ws.Cells("j1").Value = "revisionssicher"
 
-            'zeile.Append("az" & t) 'Az
-            'zeile.Append("jahr" & t) 'jahr
-            'zeile.Append("obergruppe" & t) 'jahr
-            'zeile.Append("datum" & t) 'datum
-            'zeile.Append("oberbegriff" & t) 'oberbegriff Protokolle leer
-            'zeile.Append((cleanString("bezeichnung")) & t) 'bezeichnung beschreibung
-            'zeile.Append(("pfad") & t) 'pfad
-            'zeile.Append("ordner" & t) 'ordner im mediencenter
-            'zeile.Append("docid" & t) 'ordner im mediencenter
-            'zeile.Append("_revisionssicher" & t) ' 
-            'zeile.Append("_bearbeiterid" & t) ' 
+            'row.Append("az" & t) 'Az
+            'row.Append("jahr" & t) 'jahr
+            'row.Append("obergruppe" & t) 'jahr
+            'row.Append("datum" & t) 'datum
+            'row.Append("oberbegriff" & t) 'oberbegriff Protokolle leer
+            'row.Append((cleanString("bezeichnung")) & t) 'bezeichnung beschreibung
+            'row.Append(("pfad") & t) 'pfad
+            'row.Append("ordner" & t) 'ordner im mediencenter
+            'row.Append("docid" & t) 'ordner im mediencenter
+            'row.Append("_revisionssicher" & t) ' 
+            'row.Append("_bearbeiterid" & t) ' 
 
-            'csvzeileSpeichern(zeile.ToString, puAusgabeStream) 
+            'csvzeileSpeichern(row.ToString, puAusgabeStream) 
             Dim newdir As String
             Dim erfolg As Boolean
             For Each drr As DataRow In DT.Rows
@@ -2614,6 +2615,10 @@ Public Class Form1
     End Function
 
     Private Sub Button21_Click(sender As Object, e As EventArgs) Handles Button21.Click
+        stammdaten()
+    End Sub
+
+    Private Sub stammdaten()
         'probaugstammdaten
         Dim puFehler As String = "e:\proumwelt\log\grunddaten.log"
 
@@ -2639,25 +2644,66 @@ Public Class Form1
         'puAusgabeStream.Close()
         'puAusgabeStream.Dispose()
         'System.Diagnostics.Process.Start("explorer", "e:\proumwelt\xls\")
+        System.Diagnostics.Process.Start("explorer", puFehler)
         System.Diagnostics.Process.Start("explorer", "e:\proumwelt\xls\grunddaten.xlsx")
         End
     End Sub
-
-    Private Sub getSGDictionary(dictionary As Dictionary(Of String, String), sgfile As String)
+    Public Class zeile
+        Public pAlt As String
+        Public pNeu As String
+        Public Verfahrensart As String
+        Public vorhaben As String
+        Public Bezeichnung As String
+        Public notiz As String
+    End Class
+    Private Sub getSGDictionary(sgfile As String, swfehlt As IO.StreamWriter, coll As List(Of zeile))
         Dim tmpstream As StreamReader = File.OpenText(sgfile)
         Dim strlines() As String
-        Dim strline() As String
+        Dim p() As String
+        'Dim coll As New List(Of row)
+        Dim row As New zeile
+        Dim num_rows
+        Dim icnt As Integer
+        Try
+            strlines = tmpstream.ReadToEnd().Split(Environment.NewLine)
+            num_rows = UBound(strlines)
+            For x = 1 To num_rows - 1
+                row = New zeile
+                strlines(x) = strlines(x).Replace(vbCrLf, "").Replace(vbLf, "")
+                p = (strlines(x)).Split(";")
+                row.pAlt = p(0).Trim
+                row.pNeu = p(1).Trim
+                row.Verfahrensart = p(2).Trim
+                row.vorhaben = p(3).Trim
+                row.Bezeichnung = p(4).Trim
+                row.notiz = p(5).Trim
+                If row.pAlt.Count < 4 Then Continue For
+                If row.pNeu.ToLower.Contains("x") Then Continue For
+                If row.pNeu.Count < 4 Then
+                    row.pNeu = row.pAlt 'es gilt dann nur die neue nummer
+                End If
+                If row.pAlt.Count < 4 Then
+                    row.pAlt = row.pNeu 'es gilt dann nur die neue nummer
+                End If
+                If row.Verfahrensart.Trim.Count < 3 Then
+                    swfehlt.WriteLine(row.pAlt & "  Verfahrensart fehlt . => ignore")
+                    Continue For
+                End If
+                If row.vorhaben.Trim.Count < 3 Then
+                    swfehlt.WriteLine(row.pAlt & "  vorhaben fehlt . => ignore")
+                    Continue For
+                End If
+                icnt += 1
+                coll.Add(row)
+                'dictionary.Add(cleanString(p(0)), cleanString(p(1)))
+                Debug.Print("")
 
-        strlines = tmpstream.ReadToEnd().Split(Environment.NewLine)
-        Dim num_rows = UBound(strlines)
+            Next
+            Debug.Print("")
+        Catch ex As Exception
+            l("error " & ex.ToString)
+        End Try
 
-        For x = 0 To num_rows - 1
-            strline = (strlines(x)).Split(";")
-
-            'sgdict(x, y) = strline(y)
-            dictionary.Add(cleanString(strline(0)), cleanString(strline(1)))
-
-        Next
     End Sub
 
     Private Sub writeStammdatenPU(puFehler As String, puAusgabe As String, sql As String,
@@ -2666,12 +2712,19 @@ Public Class Form1
         Dim idok As Integer = 0
         'puAusgabeStream.AutoFlush = True
         swfehlt.WriteLine("writeStammdatenPU---")
-        Dim sgdict As New Dictionary(Of String, String)
+        'Dim sgdict As New Dictionary(Of String, String)
         Dim sgfile As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\sachgebiete\SG_alleTiefenKorrekturNeuUmlaut.csv"
         sgfile = "E:\proumwelt\s2.txt"
-
-        getSGDictionary(sgdict, sgfile)
-
+        sgfile = "E:\Sachgebiete FD.csv"
+        Dim kontrollfile As New IO.StreamWriter("e:\kontroll.txt")
+        Dim geloeschteVorgaenge As New IO.StreamWriter("e:\geloeschteVorgaenge.txt")
+        Dim coll As New List(Of zeile)
+        getSGDictionary(sgfile, swfehlt, coll)
+        For Each str As zeile In coll
+            kontrollfile.WriteLine(str.pAlt & ";" & str.Verfahrensart & ";" & str.vorhaben & ";" & str.Bezeichnung) ' & ";" & str.pAlt & ";" &)
+        Next
+        kontrollfile.Close()
+        Process.Start("e:\kontroll.txt")
         DT = alleDokumentDatenHolen(sql)
         sql = "SELECT s.[VORGANGSID] ,[FREMDVORGANGSID] " &
                      "From [Paradigma].[dbo].[stammdaten_tutti]  s, [Paradigma].[dbo].[verwandte_t44] v " &
@@ -2777,27 +2830,35 @@ Public Class Form1
                     '    Debug.Print("")
                     'End If
 
-                    gisMapping(sgnr, test)
-                    sgdict.TryGetValue(sgnr.Substring(0, 1), sachgebiet) : sachgebiet = sgnr.Substring(0, 1) & "-" & sachgebiet
+                    'gisMapping(sgnr, test)
+                    'sgdict.TryGetValue(sgnr.Substring(0, 1), sachgebiet)
+                    'sachgebiet = sgnr.Substring(0, 1) & "-" & sachgebiet
 
-                    'sgdict.TryGetValue(sgnr.Substring(0, 2), Verfahrensart)
-                    Verfahrensart = sgnr.Substring(0, 2)
-
-                    If String.IsNullOrEmpty(Verfahrensart) Then Verfahrensart = ""
-                    Verfahrensart = sgnr 'sgnr.Substring(0, 2) & "-" & Verfahrensart
-
-                    sgdict.TryGetValue(sgnr.Substring(0, 3), Vorhaben)
                     If String.IsNullOrEmpty(Vorhaben) Then Vorhaben = ""
-                    Vorhaben = sgnr.Substring(0, 3) & "-" & Vorhaben
+                    getVerfahrensartUndVorhaben(sgnr, Verfahrensart, Vorhaben, Vorhabensmerkmal, coll)
+
+                    If Verfahrensart = "????" Or Vorhaben = "????" Then
+                        geloeschteVorgaenge.WriteLine(vid & ";" & sgnr & ";" & az2) ' & ";" & str.pAlt & ";" &)
+                        Continue For
+                    End If
+                    sachgebiet = "67" & sgnr.Substring(0, 1) '& "-" & sachgebiet
+                    'Verfahrensart =get sgnr.Substring(0, 2)
+
+                    'If String.IsNullOrEmpty(Verfahrensart) Then Verfahrensart = ""
+
+
+                    'sgdict.TryGetValue(sgnr.Substring(0, 3), Vorhaben)
+                    'If String.IsNullOrEmpty(Vorhaben) Then Vorhaben = ""
+                    'Vorhaben = sgnr.Substring(0, 3) & "-" & Vorhaben
 
                     'If sgnr = "82" Or sgnr = "03" Or sgnr = "BA" Then
                     '    Debug.Print("")
                     'End If
 
 
-                    sgdict.TryGetValue(sgnr.Substring(0, 4), Vorhabensmerkmal)
-                    If String.IsNullOrEmpty(Vorhabensmerkmal) Then Vorhabensmerkmal = ""
-                    Vorhabensmerkmal = sgnr.Substring(0, 4) & "-" & Vorhabensmerkmal
+                    'sgdict.TryGetValue(sgnr.Substring(0, 4), Vorhabensmerkmal)
+                    'If String.IsNullOrEmpty(Vorhabensmerkmal) Then Vorhabensmerkmal = ""
+                    'Vorhabensmerkmal = sgnr.Substring(0, 4) & "-" & Vorhabensmerkmal
 
 
                     'sachgebiet = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 1))
@@ -2840,71 +2901,71 @@ Public Class Form1
 
                     'zeilebilden
                     ws.Cells("A" & row).Value = az2 ' vid
-                    'zeile.Append(vid & t) 'Az
+                    'row.Append(vid & t) 'Az
 
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
-                    'zeile.Append(eingang.ToString("yyyy") & t) 'jahr
+                    'row.Append(eingang.ToString("yyyy") & t) 'jahr
 
                     ws.Cells("c" & row).Value = "Bilder"
-                    'zeile.Append("PROUMWELT" & t) '
+                    'row.Append("PROUMWELT" & t) '
 
                     ws.Cells("d" & row).Value = "proumwelt"
-                    'zeile.Append(Bezeichnung & t) ' 
+                    'row.Append(Bezeichnung & t) ' 
 
                     ws.Cells("e" & row).Value = Bezeichnung
-                    'zeile.Append(Bezeichnung & t) ' 
+                    'row.Append(Bezeichnung & t) ' 
 
 
-                    'zeile.Append(eingang.ToString("yyyyMMdd") & t) 'datum
-                    'zeile.Append(antrag.ToString("yyyyMMdd") & t) 'datum
-                    'zeile.Append(vollstaendig.ToString("yyyyMMdd") & t) 'datum
-                    'zeile.Append(bescheid.ToString("yyyyMMdd") & t) 'datum
-                    'zeile.Append(abgeschlossen.ToString("yyyyMMdd") & t) 'datum
+                    'row.Append(eingang.ToString("yyyyMMdd") & t) 'datum
+                    'row.Append(antrag.ToString("yyyyMMdd") & t) 'datum
+                    'row.Append(vollstaendig.ToString("yyyyMMdd") & t) 'datum
+                    'row.Append(bescheid.ToString("yyyyMMdd") & t) 'datum
+                    'row.Append(abgeschlossen.ToString("yyyyMMdd") & t) 'datum
 
                     ws.Cells("f" & row).Value = eingang.ToString("dd.MM.yyyy")
-                    'zeile.Append(eingang.ToString("dd.MM.yyyy") & t) 'datum
+                    'row.Append(eingang.ToString("dd.MM.yyyy") & t) 'datum
 
                     ws.Cells("g" & row).Value = antrag.ToString("dd.MM.yyyy")
-                    'zeile.Append(antrag.ToString("dd.MM.yyyy") & t) 'datum
+                    'row.Append(antrag.ToString("dd.MM.yyyy") & t) 'datum
 
 
                     ws.Cells("h" & row).Value = vollstaendig.ToString("dd.MM.yyyy")
-                    'zeile.Append(vollstaendig.ToString("dd.MM.yyyy") & t) 'datum
+                    'row.Append(vollstaendig.ToString("dd.MM.yyyy") & t) 'datum
 
                     ws.Cells("i" & row).Value = bescheid.ToString("dd.MM.yyyy")
-                    'zeile.Append(bescheid.ToString("dd.MM.yyyy") & t) 'datum
+                    'row.Append(bescheid.ToString("dd.MM.yyyy") & t) 'datum
 
                     ws.Cells("j" & row).Value = abgeschlossen.ToString("dd.MM.yyyy")
-                    'zeile.Append(abgeschlossen.ToString("dd.MM.yyyy") & t) 'datum
+                    'row.Append(abgeschlossen.ToString("dd.MM.yyyy") & t) 'datum
 
                     ws.Cells("k" & row).Value = aktenstandort
-                    'zeile.Append(aktenstandort & t) ' 
+                    'row.Append(aktenstandort & t) ' 
 
                     ws.Cells("m" & row).Value = sachgebiet
-                    'zeile.Append(sachgebiet & t) ' 
+                    'row.Append(sachgebiet & t) ' 
 
                     ws.Cells("n" & row).Value = Verfahrensart.TrimEnd("-")
-                    'zeile.Append(Verfahrensart & t) ' 
+                    'row.Append(Verfahrensart & t) ' 
 
                     ws.Cells("o" & row).Value = Vorhaben.TrimEnd("-")
-                    'zeile.Append(Vorhaben & t) ' 
+                    'row.Append(Vorhaben & t) ' 
 
                     ws.Cells("p" & row).Value = Vorhabensmerkmal.TrimEnd("-").TrimEnd(";").TrimEnd(",")
-                    'zeile.Append(Vorhabensmerkmal & t) ' 
+                    'row.Append(Vorhabensmerkmal & t) ' 
 
 
                     ws.Cells("q" & row).Value = sachbearbeiter.TrimEnd("-").TrimEnd(";").TrimEnd(",")
-                    'zeile.Append(Vorhabensmerkmal & t) ' 
-                    'zeile.Append(sachbearbeiter & t) ' 
+                    'row.Append(Vorhabensmerkmal & t) ' 
+                    'row.Append(sachbearbeiter & t) ' 
 
 
-                    'zeile.Append("" & t) ' objektnummer
+                    'row.Append("" & t) ' objektnummer
 
                     ws.Cells("s" & row).Value = Hauptaktenzeichen
-                    'zeile.Append((cleanString(Hauptaktenzeichen)) & t) '   
+                    'row.Append((cleanString(Hauptaktenzeichen)) & t) '   
 
                     ws.Cells("t" & row).Value = hauptaktenjahr
-                    'zeile.Append(hauptaktenjahr.ToString("yyyy") & t) 'datum 
+                    'row.Append(hauptaktenjahr.ToString("yyyy") & t) 'datum 
                     ws.Cells("v" & row).Value = cleanString(Notiz)
 
                     idok += 1
@@ -2922,8 +2983,9 @@ Public Class Form1
                 GC.WaitForFullGCComplete()
             Next
             'csvzeileSpeichern(ws.ToString, ausgabeAntragsteller)
-            'zeile.Clear()
-
+            'row.Clear()
+            geloeschteVorgaenge.Close()
+            Process.Start("e:\geloeschtevorgaenge.txt")
             swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt & ", tcount: " & tcount)
 
             '####
@@ -2936,37 +2998,55 @@ Public Class Form1
         ' Process.Start(puFehlt)
     End Sub
 
+    Private Sub getVerfahrensartUndVorhaben(sgnr As String, ByRef verfahrensart As String, ByRef vorhaben As String, ByRef vorhabensmerkmal As String, coll As List(Of zeile))
+        Try
+            For Each item As zeile In coll
+                If item.pAlt.Trim = sgnr Then
+                    verfahrensart = item.Verfahrensart
+                    vorhaben = item.vorhaben
+                    vorhabensmerkmal = "01 - ~"
+                    Exit Sub
+                End If
+            Next
+            Debug.Print("nicht gefunden")
+            verfahrensart = "????"
+            vorhaben = "????"
+        Catch ex As Exception
+            l("getVerfahrensartUndVorhaben  " & ex.ToString)
+        End Try
+    End Sub
+
     Private Shared Sub Weber142Minus(ByRef tcount As Integer, ByRef sgnr As String, swfehlt As IO.StreamWriter, az2 As String)
         Try
             If sgnr.Count < 4 Then
                 Debug.Print("")
                 swfehlt.WriteLine("tcount: " & sgnr)
-                sgnr = "1031"
+                sgnr = "1101"
                 If az2.ToLower.Contains("-plöb") Or
                        az2.ToLower.Contains("-klib") Or
-                                az2.ToLower.EndsWith("-kl") Or
+                       az2.ToLower.EndsWith("-kl") Or
                        az2.ToLower.EndsWith("-pl") Then
                     sgnr = "5031"
                     Exit Sub
                 End If
                 If az2.ToLower.Contains("-webs") Or
                        az2.ToLower.Contains("-resl") Or
-                                az2.ToLower.EndsWith("-we") Or
+                       az2.ToLower.EndsWith("-we") Or
                        az2.ToLower.EndsWith("-re") Then
                     sgnr = "4031"
                     Exit Sub
                 End If
                 If az2.ToLower.Contains("-gaig") Or
-              az2.ToLower.Contains("-schu") Or
-              az2.ToLower.Contains("-rotv") Or
+                    az2.ToLower.Contains("-schu") Or
+                    az2.ToLower.Contains("-rotv") Or
                     az2.ToLower.Contains("-maup") Or
-                       az2.ToLower.EndsWith("-ri") Or
-                       az2.ToLower.EndsWith("-di") Or
-                       az2.ToLower.EndsWith("-ja") Or
-                       az2.ToLower.EndsWith("-ro") Or
-                       az2.ToLower.EndsWith("-gg") Or
-              az2.ToLower.EndsWith("-sm") Then
-                    sgnr = "5031"
+                    az2.ToLower.EndsWith("-ri") Or
+                    az2.ToLower.EndsWith("-di") Or
+                    az2.ToLower.EndsWith("-ja") Or
+                    az2.ToLower.EndsWith("-ro") Or
+                    az2.ToLower.EndsWith("-gg") Or
+                    az2.ToLower.EndsWith("-sm") Then
+                    sgnr = "3017"
                     Exit Sub
                 End If
             End If
@@ -2978,7 +3058,7 @@ Public Class Form1
                     Debug.Print("")
                 End If
                 tcount += 1
-                sgnr = "4310"
+                sgnr = "4031"
             End If
 
         Catch ex As Exception
@@ -3219,7 +3299,7 @@ Public Class Form1
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
         myoracle.Open()
-        'Dim zeile As New Text.StringBuilder
+        'Dim row As New Text.StringBuilder
         Dim fullfilename As String
         Dim t As String = ";"
         Dim row As Integer = 1
@@ -3249,22 +3329,22 @@ Public Class Form1
             ws.Cells("n1").Value = "freitext".Trim("-")
             ws.Cells("o1").Value = "abstract".Trim("-")
             ws.Cells("p1").Value = "fs".Trim("-")
-            'zeile.Append("az" & t) '       
-            'zeile.Append("jahr" & t) '     
-            'zeile.Append("Ort" & t) '      
-            'zeile.Append("Ortsteil" & t) ' 
-            'zeile.Append("Strasse" & t) '  
-            'zeile.Append("nr" & t) '       
-            'zeile.Append("veraltet" & t) '
-            'zeile.Append("spalte1" & t) '
-            'zeile.Append("gemeindenr" & t)
-            'zeile.Append("strassencode" & t) ' 
-            'zeile.Append("rechtswert" & t)
-            'zeile.Append("hochwert" & t) '
-            'zeile.Append("initial_1" & t) '
-            'zeile.Append("abteilung" & t) '
-            'zeile.Append("abstract" & t) 'telefon
-            'zeile.Append("initial_2" & t) 'fs 
+            'row.Append("az" & t) '       
+            'row.Append("jahr" & t) '     
+            'row.Append("Ort" & t) '      
+            'row.Append("Ortsteil" & t) ' 
+            'row.Append("Strasse" & t) '  
+            'row.Append("nr" & t) '       
+            'row.Append("veraltet" & t) '
+            'row.Append("spalte1" & t) '
+            'row.Append("gemeindenr" & t)
+            'row.Append("strassencode" & t) ' 
+            'row.Append("rechtswert" & t)
+            'row.Append("hochwert" & t) '
+            'row.Append("initial_1" & t) '
+            'row.Append("abteilung" & t) '
+            'row.Append("abstract" & t) 'telefon
+            'row.Append("initial_2" & t) 'fs 
 
             For Each drr As DataRow In DT.Rows
                 Try
@@ -3304,47 +3384,47 @@ Public Class Form1
                     Application.DoEvents()
                     'zeilebilden
                     ws.Cells("A" & row).Value = vid
-                    'zeile.Append(vid & t) 'Az
+                    'row.Append(vid & t) 'Az
 
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
-                    'zeile.Append(eingang.ToString("yyyy") & t) 'jahr
+                    'row.Append(eingang.ToString("yyyy") & t) 'jahr
 
                     ws.Cells("c" & row).Value = "???" 'obergruppe 
 
                     ws.Cells("d" & row).Value = ort
-                    'zeile.Append(ort & t) ' 
+                    'row.Append(ort & t) ' 
 
                     ws.Cells("e" & row).Value = ortsteil
-                    'zeile.Append(ortsteil & t) ' 
+                    'row.Append(ortsteil & t) ' 
 
                     ws.Cells("f" & row).Value = strasse
-                    'zeile.Append(strasse & t) '
+                    'row.Append(strasse & t) '
 
                     ws.Cells("g" & row).Value = nummer
-                    'zeile.Append(nummer & t) ' 
+                    'row.Append(nummer & t) ' 
                     ws.Cells("h" & row).Value = veraltet
-                    'zeile.Append(veraltet & t) ' 
+                    'row.Append(veraltet & t) ' 
 
                     ws.Cells("i" & row).Value = gemeindenr
-                    'zeile.Append(gemeindenr & t) '    
+                    'row.Append(gemeindenr & t) '    
                     ws.Cells("j" & row).Value = strcode
-                    'zeile.Append(strcode & t) '
+                    'row.Append(strcode & t) '
                     ws.Cells("k" & row).Value = ost
-                    'zeile.Append(ost & t) ' 
+                    'row.Append(ost & t) ' 
                     ws.Cells("l" & row).Value = nord
-                    'zeile.Append(nord & t) '  
+                    'row.Append(nord & t) '  
                     ws.Cells("m" & row).Value = funktion
-                    'zeile.Append(funktion & t) ' 
+                    'row.Append(funktion & t) ' 
                     ws.Cells("n" & row).Value = freitext
-                    'zeile.Append(freitext & t) ' 
+                    'row.Append(freitext & t) ' 
                     ws.Cells("o" & row).Value = abstrakt
-                    'zeile.Append(abstrakt & t) '     
+                    'row.Append(abstrakt & t) '     
                     ws.Cells("p" & row).Value = fs
-                    'zeile.Append(fs & t) ' 
+                    'row.Append(fs & t) ' 
 
-                    'If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
+                    'If csvzeileSpeichern(row.ToString, puAusgabeStream) Then
 
-                    '    zeile.Clear()
+                    '    row.Clear()
                     'Else
                     '    Debug.Print("oooo")
                     'End If
@@ -3362,7 +3442,7 @@ Public Class Form1
                 GC.WaitForFullGCComplete()
             Next
             'csvzeileSpeichern(ws.ToString, ausgabeAntragsteller)
-            'zeile.Clear()
+            'row.Clear()
 
             swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
             Dim fi As New FileInfo(puAusgabe)
@@ -3446,25 +3526,25 @@ Public Class Form1
             ws.Cells("n1").Value = "fs"
             ws.Cells("o1").Value = "flaeche"
             'kopfzeile
-            'zeile.Append("az" & t) '     vid   
-            'zeile.Append("jahr" & t) '     datum
-            'zeile.Append("Gemarkung" & t) '  gemarkungstext    
-            'zeile.Append("nachname" & t) '  nachname
-            'zeile.Append("vorname" & t) '  znkombi
-            'zeile.Append("ostwert" & t) '   rechts    
-            'zeile.Append("nordwert" & t) ' hoch
-            'zeile.Append("veraltet" & t) '
-            'zeile.Append("spalte1" & t)
-            'zeile.Append("spalte2" & t) ' 
-            'zeile.Append("initial_1" & t) 'titel
-            'zeile.Append("abteilung" & t) 'abteilung
-            'zeile.Append("abstract" & t) 'telefon
-            'zeile.Append("gemarkungscode" & t) 'fax
-            'zeile.Append("initial_2" & t) 'fs
-            'zeile.Append("flaeche" & t) 'flaecheqm
+            'row.Append("az" & t) '     vid   
+            'row.Append("jahr" & t) '     datum
+            'row.Append("Gemarkung" & t) '  gemarkungstext    
+            'row.Append("nachname" & t) '  nachname
+            'row.Append("vorname" & t) '  znkombi
+            'row.Append("ostwert" & t) '   rechts    
+            'row.Append("nordwert" & t) ' hoch
+            'row.Append("veraltet" & t) '
+            'row.Append("spalte1" & t)
+            'row.Append("spalte2" & t) ' 
+            'row.Append("initial_1" & t) 'titel
+            'row.Append("abteilung" & t) 'abteilung
+            'row.Append("abstract" & t) 'telefon
+            'row.Append("gemarkungscode" & t) 'fax
+            'row.Append("initial_2" & t) 'fs
+            'row.Append("flaeche" & t) 'flaecheqm
             'ws.Append("Funktion" & t) ' 
             'ws.Append("Freitext" & t) ' 
-            'csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
+            'csvzeileSpeichern(row.ToString, puAusgabeStream) : row.Clear()
 
             For Each drr As DataRow In DT.Rows
                 Try
@@ -3501,30 +3581,30 @@ Public Class Form1
                     ws.Cells("c" & row).Value = "???"
 
 
-                    'zeile.Append(vid & t) 'Az
-                    'zeile.Append(eingang.ToString("yyyy") & t) 'jahr 
+                    'row.Append(vid & t) 'Az
+                    'row.Append(eingang.ToString("yyyy") & t) 'jahr 
                     ws.Cells("d" & row).Value = gemarkung
-                    'zeile.Append(gemarkung & t) ' 
+                    'row.Append(gemarkung & t) ' 
                     ws.Cells("e" & row).Value = flur
-                    'zeile.Append(flur & t)
+                    'row.Append(flur & t)
                     ws.Cells("f" & row).Value = flurstueck ' 
-                    'zeile.Append(flurstueck & t)
+                    'row.Append(flurstueck & t)
                     ws.Cells("g" & row).Value = ost ' 
-                    'zeile.Append(ost & t)
+                    'row.Append(ost & t)
                     ws.Cells("h" & row).Value = nord ' 
-                    'zeile.Append(nord & t)
+                    'row.Append(nord & t)
                     ws.Cells("i" & row).Value = "" ' veraltet
-                    'zeile.Append(spalte1 & t) 
+                    'row.Append(spalte1 & t) 
                     ws.Cells("j" & row).Value = funktion ' 
-                    'zeile.Append(funktion & t)
+                    'row.Append(funktion & t)
                     ws.Cells("k" & row).Value = freitext ' 
-                    'zeile.Append(freitext & t)
+                    'row.Append(freitext & t)
                     ws.Cells("l" & row).Value = abstrakt ' 
-                    'zeile.Append(abstrakt & t)
+                    'row.Append(abstrakt & t)
                     ws.Cells("m" & row).Value = gemcode '    
-                    'zeile.Append(gemcode & t)
+                    'row.Append(gemcode & t)
                     ws.Cells("n" & row).Value = FS '    
-                    'zeile.Append(FS & t) '    
+                    'row.Append(FS & t) '    
                     ws.Cells("o" & row).Value = flaecheqm
                     idok += 1
                     If idok > maxobj Then Exit For
@@ -3621,7 +3701,7 @@ Public Class Form1
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
         myoracle.Open()
-        'Dim zeile As New Text.StringBuilder
+        'Dim row As New Text.StringBuilder
         Dim erledigtam As Date
         Dim erledigt As Boolean
         Dim t As String = ";"
@@ -3649,19 +3729,19 @@ Public Class Form1
             ws.Cells("j1").Value = "erledigt"
 
 
-            'zeile.Append("az" & t) '     vid   
-            'zeile.Append("jahr" & t) '     datum
-            'zeile.Append("vid" & t) '  gemarkungstext    
-            'zeile.Append("datum" & t) '  nachname
-            'zeile.Append("sachbearbeiter" & t) '  znkombi
-            'zeile.Append("Betreff" & t) '   rechts    
-            'zeile.Append("info" & t) ' hoch
+            'row.Append("az" & t) '     vid   
+            'row.Append("jahr" & t) '     datum
+            'row.Append("vid" & t) '  gemarkungstext    
+            'row.Append("datum" & t) '  nachname
+            'row.Append("sachbearbeiter" & t) '  znkombi
+            'row.Append("Betreff" & t) '   rechts    
+            'row.Append("info" & t) ' hoch
 
-            'zeile.Append("bearbeiterid" & t) '  
-            'zeile.Append("erledigtam" & t) '  
-            'zeile.Append("erledigt" & t) '  
-            'zeile.Append("angelegtam" & t) '  
-            'csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
+            'row.Append("bearbeiterid" & t) '  
+            'row.Append("erledigtam" & t) '  
+            'row.Append("erledigt" & t) '  
+            'row.Append("angelegtam" & t) '  
+            'csvzeileSpeichern(row.ToString, puAusgabeStream) : row.Clear()
             For Each drr As DataRow In DT.Rows
                 Try
                     igesamt += 1
@@ -3699,23 +3779,23 @@ Public Class Form1
                     ws.Cells("i" & row).Value = erledigtam.ToString("dd.MM.yyyy")
                     ws.Cells("j" & row).Value = erledigt
 
-                    'zeile.Append(vid & t) 'Az
-                    'zeile.Append(eingang.ToString("yyyy") & t) 'jahr .ToString("dd.MM.yyyy") 
-                    'zeile.Append(todo & t) 'Az 
-                    'zeile.Append(datum.ToString("dd.MM.yyyy") & t) ' 
-                    'zeile.Append(sachbearbeiter & t) ' 
-                    'zeile.Append(Betreff & t) ' 
-                    'zeile.Append(info & t) ' 
+                    'row.Append(vid & t) 'Az
+                    'row.Append(eingang.ToString("yyyy") & t) 'jahr .ToString("dd.MM.yyyy") 
+                    'row.Append(todo & t) 'Az 
+                    'row.Append(datum.ToString("dd.MM.yyyy") & t) ' 
+                    'row.Append(sachbearbeiter & t) ' 
+                    'row.Append(Betreff & t) ' 
+                    'row.Append(info & t) ' 
 
 
-                    'zeile.Append(bearbeiterid & t) ' 
-                    'zeile.Append(erledigtam.ToString("yyyy") & t) 'jahr 
-                    'zeile.Append(erledigt & t) ' 
-                    'zeile.Append(angelegtam & t) ' veraltet
+                    'row.Append(bearbeiterid & t) ' 
+                    'row.Append(erledigtam.ToString("yyyy") & t) 'jahr 
+                    'row.Append(erledigt & t) ' 
+                    'row.Append(angelegtam & t) ' veraltet
 
 
-                    'If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
-                    '    zeile.Clear()
+                    'If csvzeileSpeichern(row.ToString, puAusgabeStream) Then
+                    '    row.Clear()
                     'Else
                     '    Debug.Print("oooo")
                     'End If
@@ -3733,7 +3813,7 @@ Public Class Form1
                 GC.WaitForFullGCComplete()
             Next
             'csvzeileSpeichern(ws.ToString, ausgabeAntragsteller)
-            'zeile.Clear()
+            'row.Clear()
 
             swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
             ' Datei speichern
@@ -3972,7 +4052,7 @@ Public Class Form1
                         If antragsteller Is Nothing Then Exit For
                         rowAntrag += 1
                         erfolg = bildeZeileantragsteller(eingang, wsAntragst, antragsteller, rowAntrag)
-                        'zeile Nach antragsteller ausschreiben
+                        'row Nach antragsteller ausschreiben
                         'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
                         'zeileAntragsteller.Clear()
                     Else
@@ -3986,7 +4066,7 @@ Public Class Form1
                         End If
                         rowAntrag += 1
                         erfolg = bildeZeileantragsteller(eingang, wsAntragst, antragsteller, rowAntrag)
-                        'zeile Nach antragsteller ausschreiben
+                        'row Nach antragsteller ausschreiben
                         'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
                         'zeileAntragsteller.Clear()
                     End If
@@ -4584,7 +4664,7 @@ Public Class Form1
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
         myoracle.Open()
-        'Dim zeile As New Text.StringBuilder
+        'Dim row As New Text.StringBuilder
         'Dim block As New Text.StringBuilder 
         'Dim blockMAX As Int16 = 50
         'Dim iblock As Int16 = 0
@@ -4611,17 +4691,17 @@ Public Class Form1
             ws.Cells("j1").Value = "revisionssicher"
 
 
-            'zeile.Append("az" & t) 'Az
-            'zeile.Append("jahr" & t) 'jahr
-            'zeile.Append("datum" & t) 'datum
-            'zeile.Append("oberbegriff" & t) 'oberbegriff Protokolle
-            'zeile.Append((cleanString("bezeichnung")) & t) 'bezeichnung beschreibung
-            'zeile.Append(("pfad") & t) 'pfad
-            'zeile.Append("ordner" & t) 'ordner im mediencenter
-            'zeile.Append("revisionssicher" & t) ' 
-            'zeile.Append("bearbeiterid" & t) ' 
-            'csvzeileSpeichern(zeile.ToString, puAusgabeStream)
-            'zeile.Clear()
+            'row.Append("az" & t) 'Az
+            'row.Append("jahr" & t) 'jahr
+            'row.Append("datum" & t) 'datum
+            'row.Append("oberbegriff" & t) 'oberbegriff Protokolle
+            'row.Append((cleanString("bezeichnung")) & t) 'bezeichnung beschreibung
+            'row.Append(("pfad") & t) 'pfad
+            'row.Append("ordner" & t) 'ordner im mediencenter
+            'row.Append("revisionssicher" & t) ' 
+            'row.Append("bearbeiterid" & t) ' 
+            'csvzeileSpeichern(row.ToString, puAusgabeStream)
+            'row.Clear()
 
             For Each drr As DataRow In DT.Rows
                 Try
@@ -4660,25 +4740,25 @@ Public Class Form1
                     ws.Cells("i" & row).Value = ""
                     ws.Cells("j" & row).Value = "false"
 
-                    'zeile.Append(vid & t) 'Az
-                    'zeile.Append(eingang.ToString("yyyy") & t) 'jahr
-                    'zeile.Append(dbdatum.ToString("dd.MM.yyyy") & t) 'datum
-                    'zeile.Append(art & t) 'oberbegriff Protokolle
-                    'zeile.Append((cleanString(beschreibung)) & t) 'bezeichnung beschreibung
-                    'zeile.Append((outfile) & t) 'pfad
-                    'zeile.Append("" & t) 'ordner im mediencenter
-                    'zeile.Append("" & t) 'ordner im mediencenter
-                    'zeile.Append("" & t) 'ordner im mediencenter
+                    'row.Append(vid & t) 'Az
+                    'row.Append(eingang.ToString("yyyy") & t) 'jahr
+                    'row.Append(dbdatum.ToString("dd.MM.yyyy") & t) 'datum
+                    'row.Append(art & t) 'oberbegriff Protokolle
+                    'row.Append((cleanString(beschreibung)) & t) 'bezeichnung beschreibung
+                    'row.Append((outfile) & t) 'pfad
+                    'row.Append("" & t) 'ordner im mediencenter
+                    'row.Append("" & t) 'ordner im mediencenter
+                    'row.Append("" & t) 'ordner im mediencenter
 
                     ''If iblock < blockMAX Then
                     ''    block.AppendLine(ws.ToString)
                     ''    ws.Clear()
                     ''    iblock += 1
                     ''Else
-                    'If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
+                    'If csvzeileSpeichern(row.ToString, puAusgabeStream) Then
                     '    'iblock = 0
                     '    'block.Clear()
-                    '    zeile.Clear()
+                    '    row.Clear()
                     'Else
                     '    Debug.Print("oooo")
                     'End If
@@ -4698,8 +4778,8 @@ Public Class Form1
                 'GC.Collect()
                 'GC.WaitForFullGCComplete()
             Next
-            'csvzeileSpeichern(zeile.ToString, puAusgabeStream)
-            'zeile.Clear()
+            'csvzeileSpeichern(row.ToString, puAusgabeStream)
+            'row.Clear()
 
             swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
 
@@ -4855,17 +4935,17 @@ Public Class Form1
             ws.Cells("h1").Value = "ordner im mediencenter"
             ws.Cells("i1").Value = "dokumentid"
             ws.Cells("j1").Value = "revisionssicher"
-            'zeile.Append("az" & t) 'Az
-            'zeile.Append("jahr" & t) 'jahr
-            'zeile.Append("datum" & t) 'datum
-            'zeile.Append("oberbegriff" & t) 'oberbegriff Protokolle
-            'zeile.Append((cleanString("bezeichnung")) & t) 'bezeichnung beschreibung
-            'zeile.Append(("pfad") & t) 'pfad
-            'zeile.Append("ordner" & t) 'ordner im mediencenter
-            'zeile.Append("revisionssicher" & t) ' 
-            'zeile.Append("bearbeiterid" & t) ' 
-            'csvzeileSpeichern(zeile.ToString, puAusgabe)
-            'zeile.Clear()
+            'row.Append("az" & t) 'Az
+            'row.Append("jahr" & t) 'jahr
+            'row.Append("datum" & t) 'datum
+            'row.Append("oberbegriff" & t) 'oberbegriff Protokolle
+            'row.Append((cleanString("bezeichnung")) & t) 'bezeichnung beschreibung
+            'row.Append(("pfad") & t) 'pfad
+            'row.Append("ordner" & t) 'ordner im mediencenter
+            'row.Append("revisionssicher" & t) ' 
+            'row.Append("bearbeiterid" & t) ' 
+            'csvzeileSpeichern(row.ToString, puAusgabe)
+            'row.Clear()
             Dim aktvorgangsid As String = "0"
             Dim alter_eingang As Date
             Dim summe As New Text.StringBuilder
@@ -4903,18 +4983,18 @@ Public Class Form1
                         ws.Cells("i" & row).Value = ""
                         ws.Cells("j" & row).Value = "false"
 
-                        'zeile.Append(aktvorgangsid & t) 'Az
-                        'zeile.Append(alter_eingang.ToString("yyyy") & t) 'jahr
-                        'zeile.Append(t) 'datum
-                        'zeile.Append(t) 'oberbegriff Protokolle
-                        'zeile.Append(t) 'bezeichnung beschreibung
-                        'zeile.Append((summaryOutfile) & t) 'pfad
-                        'zeile.Append("" & t) 'ordner im mediencenter
-                        'zeile.Append("" & t) 'ordner im mediencenter
-                        'zeile.Append("" & t) 'ordner im mediencenter
+                        'row.Append(aktvorgangsid & t) 'Az
+                        'row.Append(alter_eingang.ToString("yyyy") & t) 'jahr
+                        'row.Append(t) 'datum
+                        'row.Append(t) 'oberbegriff Protokolle
+                        'row.Append(t) 'bezeichnung beschreibung
+                        'row.Append((summaryOutfile) & t) 'pfad
+                        'row.Append("" & t) 'ordner im mediencenter
+                        'row.Append("" & t) 'ordner im mediencenter
+                        'row.Append("" & t) 'ordner im mediencenter
 
-                        'If csvzeileSpeichern(zeile.ToString, puAusgabe) Then
-                        '    zeile.Clear()
+                        'If csvzeileSpeichern(row.ToString, puAusgabe) Then
+                        '    row.Clear()
                         'Else
                         '    Debug.Print("oooo")
                         'End If
@@ -4949,8 +5029,8 @@ Public Class Form1
                 GC.Collect()
                 GC.WaitForFullGCComplete()
             Next
-            'csvzeileSpeichern(zeile.ToString, puAusgabe)
-            'zeile.Clear()
+            'csvzeileSpeichern(row.ToString, puAusgabe)
+            'row.Clear()
 
             swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
 
@@ -5049,6 +5129,7 @@ Public Class Form1
         ' S1020dokumenteMitFullpathTabelleErstellen("DOKUFULLNAME", swfehlt) 'referenzfälleNeuZuweisen
         ' swfehlt.WriteLine("wechsel")
         ' dokumenteMitFullpathTabelleErstellen(swfehlt)
+        Dim starttime As Date = Now
         Dim Sql As String
         Dim maxobj As Integer = 0
         Dim endvid As Integer
@@ -5058,6 +5139,7 @@ Public Class Form1
         puFehler = "e:\proumwelt\log\chronologie" & startvid & ".log"
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
+        swfehlt.WriteLine(Now.ToString("yyyyMMdd_hhmmss"))
         If startvid - 10000 < 1 Then
             endvid = 0
         Else
@@ -5099,10 +5181,14 @@ Public Class Form1
         writechronologie(puFehler, puAusgabe, Sql, maxobj, relativpfad, startvid)
         'puAusgabeStream.Close()
         'puAusgabeStream.Dispose()
-
+        swfehlt.WriteLine(Now.ToString("yyyyMMdd_hhmmss"))
         swfehlt.Close()
+        Dim intervall As Long
+        intervall = DateDiff(DateInterval.Minute, Now, starttime)
+        l("dauer min " & intervall)
         l("fertig  " & puFehler)
         System.Diagnostics.Process.Start("explorer", puAusgabe)
+        System.Diagnostics.Process.Start("explorer", puFehler)
         End
     End Sub
 
@@ -5123,6 +5209,7 @@ Public Class Form1
         Dim newsavemode As Boolean
         Dim istRevisionssicher As Boolean
         Dim dbdatum, FILEDATUM, CHECKINDATUM As Date
+        Dim aFILEDATUM, aCHECKINDATUM As String
         Dim notiz As String
         Dim beschreibung As String
         Dim eingang As Date
@@ -5176,7 +5263,7 @@ Public Class Form1
                                                eid, beschreibung, quelle, dateinameext, d_beschreibung,
                                                FILEDATUM, typ, CHECKINDATUM, REVISIONSSICHER, drr)
                     'If vid = aktvorgangsid Then
-                    outstring = erzeugeverlaufZeile(beschreibung, richtung, art, dbdatum, dateinameext, quelle, d_beschreibung, typ, REVISIONSSICHER, FILEDATUM, CHECKINDATUM)
+                    'outstring = erzeugeverlaufZeile(beschreibung, richtung, art, dbdatum, dateinameext, quelle, d_beschreibung, typ, REVISIONSSICHER, FILEDATUM, CHECKINDATUM)
                     '    'summe.Append(outstring)
                     'Else
                     'alte summary schliessen
@@ -5186,49 +5273,53 @@ Public Class Form1
                     ws.Cells("A" & row).Value = vid
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
                     ws.Cells("c" & row).Value = "-"
-                        ws.Cells("d" & row).Value = dbdatum.ToString("dd.MM.yyyy")
-                        'If clsDBtools.fieldvalueDate(FILEDATUM) < "1/1/1990" Then
-                        '    pu.Append("" & t)
-                        'Else
-                        '    pu.Append(cleanString(clsDBtools.fieldvalueDate(FILEDATUM).ToString("yyyyMMdd_hhmmss")) & t)
-                        'End If
-                        'If clsDBtools.fieldvalueDate(CHECKINDATUM) < "1/1/1990" Then
-                        '    pu.Append("" & t & Environment.NewLine)
-                        'Else
-                        '    pu.Append(cleanString(clsDBtools.fieldvalueDate(CHECKINDATUM).ToString("yyyyMMdd_hhmmss")) & Environment.NewLine)
-                        'End If
+                    ws.Cells("d" & row).Value = dbdatum.ToString("dd.MM.yyyy")
 
-                        ws.Cells("e" & row).Value = "-"
-                        ws.Cells("f" & row).Value = "-"
-                        ws.Cells("g" & row).Value = art ' & " " & (cleanString(beschreibung))
-                        ws.Cells("h" & row).Value = "-"
-                        ws.Cells("i" & row).Value = quelle
-                        ws.Cells("j" & row).Value = (cleanString(beschreibung))
-                        d_beschreibung = (CStr(clsDBtools.fieldvalue(drr.Item("d_beschreibung"))))
+
+                    If clsDBtools.fieldvalueDate(FILEDATUM) < "1/1/1990" Then
+                        'pu.Append("" & t)
+                        aFILEDATUM = ""
+                    Else
+                        aFILEDATUM = cleanString(clsDBtools.fieldvalueDate(FILEDATUM).ToString("yyyyMMdd_hhmmss"))
+                    End If
+                    If clsDBtools.fieldvalueDate(CHECKINDATUM) < "1/1/1990" Then
+                        aCHECKINDATUM = ""
+                    Else
+                        aCHECKINDATUM = cleanString(clsDBtools.fieldvalueDate(CHECKINDATUM).ToString("yyyyMMdd_hhmmss"))
+                    End If
+                    d_beschreibung = (CStr(clsDBtools.fieldvalue(drr.Item("d_beschreibung"))))
+
+
+                    ws.Cells("e" & row).Value = aFILEDATUM
+                    ws.Cells("f" & row).Value = aCHECKINDATUM
+                    ws.Cells("g" & row).Value = art ' & " " & (cleanString(beschreibung))
+                    ws.Cells("h" & row).Value = "-"
+                    ws.Cells("i" & row).Value = quelle
+                    ws.Cells("j" & row).Value = (cleanString(beschreibung))
                     'ws.Cells("k" & row).Value = d_beschreibung & ", " & dateinameext
                     ws.Cells("k" & row).Value = dateinameext
 
-                    'zeile.Append(aktvorgangsid & t) 'Az
-                    'zeile.Append(alter_eingang.ToString("yyyy") & t) 'jahr
-                    'zeile.Append(t) 'datum
-                    'zeile.Append(t) 'oberbegriff Protokolle
-                    'zeile.Append(t) 'bezeichnung beschreibung
-                    'zeile.Append((summaryOutfile) & t) 'pfad
-                    'zeile.Append("" & t) 'ordner im mediencenter
-                    'zeile.Append("" & t) 'ordner im mediencenter
-                    'zeile.Append("" & t) 'ordner im mediencenter
+                    'row.Append(aktvorgangsid & t) 'Az
+                    'row.Append(alter_eingang.ToString("yyyy") & t) 'jahr
+                    'row.Append(t) 'datum
+                    'row.Append(t) 'oberbegriff Protokolle
+                    'row.Append(t) 'bezeichnung beschreibung
+                    'row.Append((summaryOutfile) & t) 'pfad
+                    'row.Append("" & t) 'ordner im mediencenter
+                    'row.Append("" & t) 'ordner im mediencenter
+                    'row.Append("" & t) 'ordner im mediencenter
 
-                    'If csvzeileSpeichern(zeile.ToString, puAusgabe) Then
-                    '    zeile.Clear()
+                    'If csvzeileSpeichern(row.ToString, puAusgabe) Then
+                    '    row.Clear()
                     'Else
                     '    Debug.Print("oooo")
                     'End If
                     'neue aufmachen
                     'summaryOutfile = makeAktOutfile(dbdatum, vid, relativpfad)
                     alter_eingang = eingang
-                        'summe = New Text.StringBuilder
-                        'summe.Append(excelkopf.ToString)
-                        aktvorgangsid = vid
+                    'summe = New Text.StringBuilder
+                    'summe.Append(excelkopf.ToString)
+                    aktvorgangsid = vid
                     'outstring = erzeugeverlaufZeile(beschreibung, richtung, art, dbdatum, dateinameext, quelle, d_beschreibung, typ, REVISIONSSICHER, FILEDATUM, CHECKINDATUM)
                     'summe.Append(outstring)
                     'End If
@@ -5254,8 +5345,8 @@ Public Class Form1
                 GC.Collect()
                 GC.WaitForFullGCComplete()
             Next
-            'csvzeileSpeichern(zeile.ToString, puAusgabe)
-            'zeile.Clear()
+            'csvzeileSpeichern(row.ToString, puAusgabe)
+            'row.Clear()
 
             swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt)
 

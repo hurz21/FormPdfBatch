@@ -354,7 +354,7 @@ Partial Class Form1
         'Button36
         '
         Me.Button36.Enabled = False
-        Me.Button36.Location = New System.Drawing.Point(251, 153)
+        Me.Button36.Location = New System.Drawing.Point(561, 215)
         Me.Button36.Name = "Button36"
         Me.Button36.Size = New System.Drawing.Size(231, 23)
         Me.Button36.TabIndex = 42
@@ -381,9 +381,9 @@ Partial Class Form1
         '
         'Button33
         '
-        Me.Button33.Location = New System.Drawing.Point(498, 153)
+        Me.Button33.Location = New System.Drawing.Point(251, 157)
         Me.Button33.Name = "Button33"
-        Me.Button33.Size = New System.Drawing.Size(114, 23)
+        Me.Button33.Size = New System.Drawing.Size(179, 23)
         Me.Button33.TabIndex = 39
         Me.Button33.Text = "13. Chronologie"
         Me.Button33.UseVisualStyleBackColor = True
