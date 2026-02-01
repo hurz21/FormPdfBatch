@@ -29,7 +29,7 @@ Public Class Form1
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.WindowState = FormWindowState.Minimized
         protokoll()
-        stammdaten()
+        'stammdaten()
         ' fullpathdokumenteErzeugen()
         'PDFumwandeln()
         'DOCXumwandeln(2113, False)
@@ -2617,11 +2617,9 @@ Public Class Form1
     Private Sub Button21_Click(sender As Object, e As EventArgs) Handles Button21.Click
         stammdaten()
     End Sub
-
     Private Sub stammdaten()
         'probaugstammdaten
         Dim puFehler As String = "e:\proumwelt\log\grunddaten.log"
-
         Dim puAusgabe As String = "e:\proumwelt\xls\" & "grunddaten" & ".xlsx"
         puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\grunddaten.xlsx"
         puAusgabe = "e:\proumwelt\xls\grunddaten.xlsx"
@@ -2637,13 +2635,7 @@ Public Class Form1
             " order by eingang  "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        'writeDokumentePU(puFehlt, ausgabeAntragsteller, Sql, maxobj)
-
-
         writeStammdatenPU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln, swfehlt)
-        'puAusgabeStream.Close()
-        'puAusgabeStream.Dispose()
-        'System.Diagnostics.Process.Start("explorer", "e:\proumwelt\xls\")
         System.Diagnostics.Process.Start("explorer", puFehler)
         System.Diagnostics.Process.Start("explorer", "e:\proumwelt\xls\grunddaten.xlsx")
         End
@@ -2656,7 +2648,7 @@ Public Class Form1
         Public Bezeichnung As String
         Public notiz As String
     End Class
-    Private Sub getSGDictionary(sgfile As String, swfehlt As IO.StreamWriter, coll As List(Of zeile))
+    Private Sub getCollection(sgfile As String, swfehlt As IO.StreamWriter, coll As List(Of zeile))
         Dim tmpstream As StreamReader = File.OpenText(sgfile)
         Dim strlines() As String
         Dim p() As String
@@ -2710,21 +2702,24 @@ Public Class Form1
                                   maxobj As Integer, umlautwandeln As Boolean, swfehlt As IO.StreamWriter)
         Dim DT, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR As DataTable
         Dim idok As Integer = 0
-        'puAusgabeStream.AutoFlush = True
         swfehlt.WriteLine("writeStammdatenPU---")
-        'Dim sgdict As New Dictionary(Of String, String)
-        Dim sgfile As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\sachgebiete\SG_alleTiefenKorrekturNeuUmlaut.csv"
-        sgfile = "E:\proumwelt\s2.txt"
+        Dim sgfile As String
+        'sgfile = "E:\proumwelt\s2.txt"
         sgfile = "E:\Sachgebiete FD.csv"
-        Dim kontrollfile As New IO.StreamWriter("e:\kontroll.txt")
-        Dim geloeschteVorgaenge As New IO.StreamWriter("e:\geloeschteVorgaenge.txt")
+        Dim kontrolldatei = "E:\proumwelt\log\Grundaten_gueltigeSGnummern.txt"
+        Dim abgewiesendat = "E:\proumwelt\log\Grundaten_abgewieseneVorgaenge.txt"
+        Dim gueltigeVorgaenge = "E:\proumwelt\log\Grundaten_gueltigeVorgaenge.txt"
+        Dim kontrollstream As New IO.StreamWriter(kontrolldatei)
+        Dim geloeschteVorgaengeStream As New IO.StreamWriter(abgewiesendat)
+        Dim gueltigeVorgaengeStream As New IO.StreamWriter(gueltigeVorgaenge)
+        gueltigeVorgaengeStream.AutoFlush = True
+        geloeschteVorgaengeStream.AutoFlush = True
+        kontrollstream.AutoFlush = True
         Dim coll As New List(Of zeile)
-        getSGDictionary(sgfile, swfehlt, coll)
-        For Each str As zeile In coll
-            kontrollfile.WriteLine(str.pAlt & ";" & str.Verfahrensart & ";" & str.vorhaben & ";" & str.Bezeichnung) ' & ";" & str.pAlt & ";" &)
-        Next
-        kontrollfile.Close()
-        Process.Start("e:\kontroll.txt")
+        getCollection(sgfile, swfehlt, coll)
+        writeCollectionKontrollfile(kontrollstream, coll)
+        kontrollstream.Close()
+
         DT = alleDokumentDatenHolen(sql)
         sql = "SELECT s.[VORGANGSID] ,[FREMDVORGANGSID] " &
                      "From [Paradigma].[dbo].[stammdaten_tutti]  s, [Paradigma].[dbo].[verwandte_t44] v " &
@@ -2759,6 +2754,7 @@ Public Class Form1
         Dim geschlossen As String = "0"
         Dim row As Integer = 1
         Dim test As Integer
+        Dim zusatz1, zusatz2, zusatz3 As String
         l("stammdaten")
 
         ' Lizenz kontext (erforderlich ab EPPlus 5)
@@ -2773,34 +2769,35 @@ Public Class Form1
             ws.Cells("A1").Value = "az"
             ws.Cells("B1").Value = "jahr"
             ws.Cells("c1").Value = "obergruppe"
-            ws.Cells("d1").Value = "flachschale"
+            ws.Cells("d1").Value = "fachschale"
             ws.Cells("e1").Value = "bezeichnung"
-            ws.Cells("f1").Value = "eingang"
+            ws.Cells("f1").Value = "datum eingang"
             ws.Cells("g1").Value = "datum antrag"
-            ws.Cells("h1").Value = "datumvollständig"
-            ws.Cells("i1").Value = "bescheid datum"
+            ws.Cells("h1").Value = "datum vollständig"
+            ws.Cells("i1").Value = "datum bescheid"
             ws.Cells("j1").Value = "datum abgeschlossen"
             ws.Cells("k1").Value = "aktenstandort"
-            ws.Cells("l1").Value = "-"
+            ws.Cells("l1").Value = "aktenstandortSachbearb"
 
             ws.Cells("m1").Value = "sachgebiet".Trim("-")
             ws.Cells("n1").Value = "verfahrensart".Trim("-")
             ws.Cells("o1").Value = "vorhaben".Trim("-")
             ws.Cells("p1").Value = "vorhmerkmal".Trim("-")
-            ws.Cells("q1").Value = "sachbearbeiter"
-            ws.Cells("r1").Value = "-"
+            ws.Cells("q1").Value = "ZusSachbearbeiter"
+            ws.Cells("r1").Value = "Objektnummer"
             ws.Cells("s1").Value = "hauptaz"
-            ws.Cells("t1").Value = "hazjahr"
-            ws.Cells("u1").Value = "-"
-            'skip
+            ws.Cells("t1").Value = "hauptazjahr"
+            ws.Cells("u1").Value = "hauptaktObergr"
             ws.Cells("v1").Value = "notiz"
-            'skip 
+            ws.Cells("w1").Value = "ZusatzZ1"
+            ws.Cells("x1").Value = "ZusatzZ2"
+            ws.Cells("y1").Value = "ZusatzZ3"
             Dim jump = 0
 
             For Each drr As DataRow In DT.Rows
                 Try
                     igesamt += 1
-                    row += 1
+
                     vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
                     If vid = 3733 Then
                         Debug.Print("")
@@ -2818,68 +2815,43 @@ Public Class Form1
                                                       CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))) 'falls erledigt
                     aktenstandort = CStr(clsDBtools.fieldvalue(drr.Item("STORAUMNR")))
                     sgnr = clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))
-
-
                     Weber142Minus(tcount, sgnr, swfehlt, az2)
 
                     If sgnr.Length = 3 Then sgnr = sgnr & "0"
                     If sgnr.Length = 2 Then sgnr = sgnr & "00"
                     If sgnr.Length = 1 Then sgnr = sgnr & "000"
-                    'If vid = 79415 Then
-
+                    'If vid = 79415 Then 
                     '    Debug.Print("")
-                    'End If
-
-                    'gisMapping(sgnr, test)
-                    'sgdict.TryGetValue(sgnr.Substring(0, 1), sachgebiet)
-                    'sachgebiet = sgnr.Substring(0, 1) & "-" & sachgebiet
-
-                    If String.IsNullOrEmpty(Vorhaben) Then Vorhaben = ""
+                    'End If 
+                    'gisMapping(sgnr, test)  
                     getVerfahrensartUndVorhaben(sgnr, Verfahrensart, Vorhaben, Vorhabensmerkmal, coll)
 
                     If Verfahrensart = "????" Or Vorhaben = "????" Then
-                        geloeschteVorgaenge.WriteLine(vid & ";" & sgnr & ";" & az2) ' & ";" & str.pAlt & ";" &)
+                        geloeschteVorgaengeStream.WriteLine(vid & ";" & sgnr & ";" & az2) ' & ";" & str.pAlt & ";" &)
                         Continue For
                     End If
+                    '#########################################################################
+                    gueltigeVorgaengeStream.WriteLine(vid & ";" & az2 & ";" & eingang.ToString("yyyy"))
+                    row += 1
                     sachgebiet = "67" & sgnr.Substring(0, 1) '& "-" & sachgebiet
-                    'Verfahrensart =get sgnr.Substring(0, 2)
-
-                    'If String.IsNullOrEmpty(Verfahrensart) Then Verfahrensart = ""
-
-
-                    'sgdict.TryGetValue(sgnr.Substring(0, 3), Vorhaben)
-                    'If String.IsNullOrEmpty(Vorhaben) Then Vorhaben = ""
-                    'Vorhaben = sgnr.Substring(0, 3) & "-" & Vorhaben
-
-                    'If sgnr = "82" Or sgnr = "03" Or sgnr = "BA" Then
-                    '    Debug.Print("")
-                    'End If
-
-
-                    'sgdict.TryGetValue(sgnr.Substring(0, 4), Vorhabensmerkmal)
-                    'If String.IsNullOrEmpty(Vorhabensmerkmal) Then Vorhabensmerkmal = ""
-                    'Vorhabensmerkmal = sgnr.Substring(0, 4) & "-" & Vorhabensmerkmal
-
-
-                    'sachgebiet = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 1))
-                    'Verfahrensart = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 2))
-                    'Vorhaben = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 3))
-                    'Vorhabensmerkmal = cleanString(makeSachgebiet(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))), CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), 4))
-
-
-
 
                     sachbearbeiter = CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter"))) & "," & CStr(clsDBtools.fieldvalue(drr.Item("weiterebearb")))
                     Hauptaktenzeichen = CStr(clsDBtools.fieldvalue(drr.Item("probaugaz")))
-                    hauptaktenjahr = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+                    'hauptaktenjahr = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                     geschlossen = CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))
 
-                    verwandteString = makeVerwandteString(vid, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR, jump)
+                    verwandteString = makeVerwandteString(vid, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR, jump).Trim
+                    If verwandteString.Count > 2 Then
+                        Debug.Print("")
+                    End If
                     Notiz = cleanString(makeStammNotiz(CStr(clsDBtools.fieldvalue(drr.Item("az2"))),
                                                        CStr(clsDBtools.fieldvalue(drr.Item("altaz"))),
                                                        CStr(clsDBtools.fieldvalue(drr.Item("internenr"))),
                                                        CStr(clsDBtools.fieldvalue(drr.Item("beschreibung"))),
                                                         verwandteString, vid))
+                    zusatz1 = verwandteString
+                    zusatz2 = vid
+                    zusatz3 = ""
                     If umlautwandeln Then
                         sgnr = clsString.removeSemikolon(sgnr)
                         Hauptaktenzeichen = clsString.removeSemikolon(Hauptaktenzeichen)
@@ -2897,76 +2869,29 @@ Public Class Form1
 
                     TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
                     Application.DoEvents()
-                    ' Datenzeilen
-
-                    'zeilebilden
-                    ws.Cells("A" & row).Value = az2 ' vid
-                    'row.Append(vid & t) 'Az
-
+                    ' Datenzeilen 
+                    ws.Cells("A" & row).Value = az2
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
-                    'row.Append(eingang.ToString("yyyy") & t) 'jahr
-
                     ws.Cells("c" & row).Value = "Bilder"
-                    'row.Append("PROUMWELT" & t) '
-
                     ws.Cells("d" & row).Value = "proumwelt"
-                    'row.Append(Bezeichnung & t) ' 
-
                     ws.Cells("e" & row).Value = Bezeichnung
-                    'row.Append(Bezeichnung & t) ' 
-
-
-                    'row.Append(eingang.ToString("yyyyMMdd") & t) 'datum
-                    'row.Append(antrag.ToString("yyyyMMdd") & t) 'datum
-                    'row.Append(vollstaendig.ToString("yyyyMMdd") & t) 'datum
-                    'row.Append(bescheid.ToString("yyyyMMdd") & t) 'datum
-                    'row.Append(abgeschlossen.ToString("yyyyMMdd") & t) 'datum
-
                     ws.Cells("f" & row).Value = eingang.ToString("dd.MM.yyyy")
-                    'row.Append(eingang.ToString("dd.MM.yyyy") & t) 'datum
-
                     ws.Cells("g" & row).Value = antrag.ToString("dd.MM.yyyy")
-                    'row.Append(antrag.ToString("dd.MM.yyyy") & t) 'datum
-
-
                     ws.Cells("h" & row).Value = vollstaendig.ToString("dd.MM.yyyy")
-                    'row.Append(vollstaendig.ToString("dd.MM.yyyy") & t) 'datum
-
                     ws.Cells("i" & row).Value = bescheid.ToString("dd.MM.yyyy")
-                    'row.Append(bescheid.ToString("dd.MM.yyyy") & t) 'datum
-
                     ws.Cells("j" & row).Value = abgeschlossen.ToString("dd.MM.yyyy")
-                    'row.Append(abgeschlossen.ToString("dd.MM.yyyy") & t) 'datum
-
                     ws.Cells("k" & row).Value = aktenstandort
-                    'row.Append(aktenstandort & t) ' 
-
                     ws.Cells("m" & row).Value = sachgebiet
-                    'row.Append(sachgebiet & t) ' 
-
                     ws.Cells("n" & row).Value = Verfahrensart.TrimEnd("-")
-                    'row.Append(Verfahrensart & t) ' 
-
                     ws.Cells("o" & row).Value = Vorhaben.TrimEnd("-")
-                    'row.Append(Vorhaben & t) ' 
-
                     ws.Cells("p" & row).Value = Vorhabensmerkmal.TrimEnd("-").TrimEnd(";").TrimEnd(",")
-                    'row.Append(Vorhabensmerkmal & t) ' 
-
-
                     ws.Cells("q" & row).Value = sachbearbeiter.TrimEnd("-").TrimEnd(";").TrimEnd(",")
-                    'row.Append(Vorhabensmerkmal & t) ' 
-                    'row.Append(sachbearbeiter & t) ' 
-
-
-                    'row.Append("" & t) ' objektnummer
-
                     ws.Cells("s" & row).Value = Hauptaktenzeichen
-                    'row.Append((cleanString(Hauptaktenzeichen)) & t) '   
-
-                    ws.Cells("t" & row).Value = hauptaktenjahr
-                    'row.Append(hauptaktenjahr.ToString("yyyy") & t) 'datum 
+                    ws.Cells("t" & row).Value = "" 'hauptaktenjahr.ToString("dd.MM.yyyy")
                     ws.Cells("v" & row).Value = cleanString(Notiz)
+                    ws.Cells("w" & row).Value = cleanString(zusatz1)
+                    ws.Cells("x" & row).Value = cleanString(zusatz2)
+                    ws.Cells("y" & row).Value = cleanString(zusatz3)
 
                     idok += 1
                     If idok > maxobj Then Exit For
@@ -2982,20 +2907,23 @@ Public Class Form1
                 GC.Collect()
                 GC.WaitForFullGCComplete()
             Next
-            'csvzeileSpeichern(ws.ToString, ausgabeAntragsteller)
-            'row.Clear()
-            geloeschteVorgaenge.Close()
-            Process.Start("e:\geloeschtevorgaenge.txt")
+            geloeschteVorgaengeStream.Close()
+            Process.Start(abgewiesendat)
+            Process.Start(kontrolldatei)
+            Process.Start(gueltigeVorgaenge)
             swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt & ", tcount: " & tcount)
 
-            '####
-            'swfehlt.Close()
             ' Datei speichern
             Dim fi As New FileInfo(puAusgabe)
             package.SaveAs(fi)
         End Using
         l("fertig  " & puFehler)
-        ' Process.Start(puFehlt)
+    End Sub
+
+    Private Shared Sub writeCollectionKontrollfile(kontrollfile As StreamWriter, coll As List(Of zeile))
+        For Each str As zeile In coll
+            kontrollfile.WriteLine(str.pAlt & ";" & str.Verfahrensart & ";" & str.vorhaben & ";" & str.Bezeichnung) ' & ";" & str.pAlt & ";" &)
+        Next
     End Sub
 
     Private Sub getVerfahrensartUndVorhaben(sgnr As String, ByRef verfahrensart As String, ByRef vorhaben As String, ByRef vorhabensmerkmal As String, coll As List(Of zeile))
