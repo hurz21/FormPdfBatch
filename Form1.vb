@@ -10,6 +10,7 @@ Imports Microsoft.Office.Interop.Word
 'Imports Microsoft.Office.Interop
 'Imports Microsoft.Office.Interop.Word
 
+
 Public Class Form1
 
     'Public wordVorlagen As New Microsoft.Office.Interop.Word.Application 'habe hier new ergänzt ????
@@ -2632,7 +2633,7 @@ Public Class Form1
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         Sql = "SELECT * FROM [Paradigma].[dbo].[stammdaten_tutti] " &
             " where vorgangsid< " & maxobj &
-            " order by eingang  "
+            " order by vorgangsid desc  "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         writeStammdatenPU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln, swfehlt)
@@ -5282,6 +5283,57 @@ Public Class Form1
             package.SaveAs(fi)
         End Using
         l("fertig  " & puFehler)
+    End Sub
+
+    Private Sub Button35_Click(sender As Object, e As EventArgs) Handles Button35.Click
+        'probaugstammdaten
+        Dim puFehler As String = "e:\proumwelt\log\illegal.log"
+        Dim puAusgabe As String = "e:\proumwelt\xls\" & "illegal" & ".xlsx"
+        puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\illegal.xlsx"
+        puAusgabe = "e:\proumwelt\xls\illegal.csv"
+        'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
+        swfehlt = New IO.StreamWriter(puFehler)
+        swfehlt.AutoFlush = True
+        Dim Sql As String
+        Dim maxobj As Integer = 0
+        maxobj = setMaxObj(maxobj)
+        Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
+        Sql = "SELECT * FROM [Paradigma].[dbo].[t17] " &
+            " order by vorgangsid desc  "
+        TextBox1.Text = puAusgabe
+        TextBox2.Text = Sql
+        'writeStammdatenPU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln, swfehlt)
+        'writeIllegalePU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln, swfehlt)
+
+        Dim meineDT As DataTable
+        meineDT = alleDokumentDatenHolen(Sql)
+
+        Dim dt As DataTable = meineDT
+        Dim filePath As String = puAusgabe '"e:\illegal.csv"
+
+        Using writer As New StreamWriter(filePath, False, System.Text.Encoding.UTF8)
+
+            ' Spaltennamen schreiben
+            Dim columnNames = dt.Columns.Cast(Of DataColumn)().
+                      Select(Function(c) c.ColumnName)
+            writer.WriteLine(String.Join(";", columnNames))
+
+            ' Zeilen schreiben
+            For Each row As DataRow In dt.Rows
+                Dim fields = row.ItemArray.Select(Function(f) f.ToString().Replace(";", " ").Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " "))
+                writer.WriteLine(String.Join(";", fields))
+            Next
+
+        End Using
+
+
+
+
+
+
+        'System.Diagnostics.Process.Start("explorer", puFehler)
+        System.Diagnostics.Process.Start("explorer", puAusgabe)
+        End
     End Sub
 
 
