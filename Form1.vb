@@ -2628,10 +2628,15 @@ Public Class Form1
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
-        Dim maxobj As Integer = 0
+        Dim maxobj As Integer = 1000
         maxobj = setMaxObj(maxobj)
+
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         Sql = "SELECT * FROM [Paradigma].[dbo].[stammdaten_tutti] " &
+            " where vorgangsid< " & maxobj &
+            " order by vorgangsid desc  "
+
+        Sql = "SELECT top 1000 * FROM [Paradigma].[dbo].[stammdaten_tutti] " &
             " where vorgangsid< " & maxobj &
             " order by vorgangsid desc  "
         TextBox1.Text = puAusgabe
@@ -2744,7 +2749,8 @@ Public Class Form1
         Dim dbdatum, hauptaktenjahr As Date
         Dim Hauptaktenzeichen As String
         Dim beschreibung As String
-        Dim eingang, antrag, vollstaendig, bescheid, abgeschlossen As Date
+        Dim eingang, antrag, vollstaendig As Date ', bescheid,abgeschlossen As Date
+        Dim eingangS, antragS, vollstaendigS, bescheidS, abgeschlossenS As String
         Dim aktenstandort As String
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
@@ -2810,9 +2816,9 @@ Public Class Form1
                     az2 = CStr(clsDBtools.fieldvalue(drr.Item("az2")))
                     eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                     antrag = CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
-                    vollstaendig = CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG")))
-                    bescheid = CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
-                    abgeschlossen = makeAbgeschlossen(CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG"))),
+                    vollstaendigS = "" '"CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG")))
+                    bescheidS = "" '"CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
+                    abgeschlossenS = makeAbgeschlossen(CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG"))),
                                                       CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))) 'falls erledigt
                     aktenstandort = CStr(clsDBtools.fieldvalue(drr.Item("STORAUMNR")))
                     sgnr = clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))
@@ -2873,14 +2879,14 @@ Public Class Form1
                     ' Datenzeilen 
                     ws.Cells("A" & row).Value = az2
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
-                    ws.Cells("c" & row).Value = "Bilder"
+                    ws.Cells("c" & row).Value = ""
                     ws.Cells("d" & row).Value = "proumwelt"
                     ws.Cells("e" & row).Value = Bezeichnung
                     ws.Cells("f" & row).Value = eingang.ToString("dd.MM.yyyy")
                     ws.Cells("g" & row).Value = antrag.ToString("dd.MM.yyyy")
-                    ws.Cells("h" & row).Value = vollstaendig.ToString("dd.MM.yyyy")
-                    ws.Cells("i" & row).Value = bescheid.ToString("dd.MM.yyyy")
-                    ws.Cells("j" & row).Value = abgeschlossen.ToString("dd.MM.yyyy")
+                    ws.Cells("h" & row).Value = vollstaendigS '.ToString("dd.MM.yyyy")
+                    ws.Cells("i" & row).Value = bescheidS '.ToString("dd.MM.yyyy")
+                    ws.Cells("j" & row).Value = abgeschlossenS '.ToString("dd.MM.yyyy")
                     ws.Cells("k" & row).Value = aktenstandort
                     ws.Cells("m" & row).Value = sachgebiet
                     ws.Cells("n" & row).Value = Verfahrensart.TrimEnd("-")
@@ -2933,7 +2939,7 @@ Public Class Form1
                 If item.pAlt.Trim = sgnr Then
                     verfahrensart = item.Verfahrensart
                     vorhaben = item.vorhaben
-                    vorhabensmerkmal = "01 - ~"
+                    vorhabensmerkmal = "999"
                     Exit Sub
                 End If
             Next
@@ -3059,12 +3065,12 @@ Public Class Form1
         End Try
     End Function
 
-    Private Function makeAbgeschlossen([date] As Date, erledigt As String) As Date
+    Private Function makeAbgeschlossen([date] As Date, erledigt As String) As String
         Try
             If erledigt = 1 Then
-                Return [date]
+                Return [date].ToString("dd.MM.yyyy")
             Else
-                Return CDate("1970/01/01")
+                Return "" '"CDate("")
             End If
         Catch ex As Exception
             l("fehler  " & ex.ToString)
@@ -5300,6 +5306,9 @@ Public Class Form1
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         Sql = "SELECT * FROM [Paradigma].[dbo].[t17] " &
             " order by vorgangsid desc  "
+        'Sql = "SELECT initial_,kuerzel1,aktiv FROM [Paradigma].[dbo].[BEARBEITER_T5] " &
+        '    " order by aktiv desc  "
+        '[BEARBEITER_T5]
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         'writeStammdatenPU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln, swfehlt)
@@ -5325,11 +5334,6 @@ Public Class Form1
             Next
 
         End Using
-
-
-
-
-
 
         'System.Diagnostics.Process.Start("explorer", puFehler)
         System.Diagnostics.Process.Start("explorer", puAusgabe)
