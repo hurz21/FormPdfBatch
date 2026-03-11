@@ -30,7 +30,7 @@ Public Class Form1
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.WindowState = FormWindowState.Minimized
         protokoll()
-        'stammdaten()
+        stammdaten()
         ' fullpathdokumenteErzeugen()
         'PDFumwandeln()
         'DOCXumwandeln(2113, False)
@@ -2747,7 +2747,7 @@ Public Class Form1
         Dim verwandteString As String
         Dim istRevisionssicher As Boolean
         Dim dbdatum, hauptaktenjahr As Date
-        Dim Hauptaktenzeichen As String
+        Dim Hauptaktenzeichen, stotitel As String
         Dim beschreibung As String
         Dim eingang, antrag, vollstaendig As Date ', bescheid,abgeschlossen As Date
         Dim eingangS, antragS, vollstaendigS, bescheidS, abgeschlossenS As String
@@ -2821,6 +2821,8 @@ Public Class Form1
                     abgeschlossenS = makeAbgeschlossen(CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG"))),
                                                       CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))) 'falls erledigt
                     aktenstandort = CStr(clsDBtools.fieldvalue(drr.Item("STORAUMNR")))
+                    stotitel = CStr(clsDBtools.fieldvalue(drr.Item("STOTITEL"))).Trim
+
                     sgnr = clsDBtools.fieldvalue(drr.Item("SACHGEBIETNR"))
                     Weber142Minus(tcount, sgnr, swfehlt, az2)
 
@@ -2843,7 +2845,7 @@ Public Class Form1
                     sachgebiet = "67" & sgnr.Substring(0, 1) '& "-" & sachgebiet
 
                     sachbearbeiter = CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter"))) & "," & CStr(clsDBtools.fieldvalue(drr.Item("weiterebearb")))
-                    Hauptaktenzeichen = CStr(clsDBtools.fieldvalue(drr.Item("probaugaz")))
+                    Hauptaktenzeichen = ""
                     'hauptaktenjahr = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                     geschlossen = CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))
 
@@ -2851,14 +2853,19 @@ Public Class Form1
                     If verwandteString.Count > 2 Then
                         Debug.Print("")
                     End If
+                    'Notiz = cleanString(makeStammNotiz(CStr(clsDBtools.fieldvalue(drr.Item("az2"))),
+                    '                                   CStr(clsDBtools.fieldvalue(drr.Item("altaz"))),
+                    '                                   CStr(clsDBtools.fieldvalue(drr.Item("internenr"))),
+                    '                                   CStr(clsDBtools.fieldvalue(drr.Item("beschreibung"))),
+                    '                                    verwandteString, vid))
                     Notiz = cleanString(makeStammNotiz(CStr(clsDBtools.fieldvalue(drr.Item("az2"))),
                                                        CStr(clsDBtools.fieldvalue(drr.Item("altaz"))),
                                                        CStr(clsDBtools.fieldvalue(drr.Item("internenr"))),
                                                        CStr(clsDBtools.fieldvalue(drr.Item("beschreibung"))),
-                                                        verwandteString, vid))
-                    zusatz1 = verwandteString
-                    zusatz2 = vid
-                    zusatz3 = ""
+                                                        verwandteString, vid, stotitel))
+                    zusatz1 = CStr(clsDBtools.fieldvalue(drr.Item("az2")))
+                    zusatz2 = verwandteString
+                    zusatz3 = CStr(clsDBtools.fieldvalue(drr.Item("probaugaz")))
                     If umlautwandeln Then
                         sgnr = clsString.removeSemikolon(sgnr)
                         Hauptaktenzeichen = clsString.removeSemikolon(Hauptaktenzeichen)
@@ -3138,7 +3145,7 @@ Public Class Form1
         End Try
     End Function
 
-    Private Function makeStammNotiz(az As String, altaz As String, interne As String, beschreibung As String, verw As String, vid As String) As String
+    Private Function makeStammNotiz(az As String, altaz As String, interne As String, beschreibung As String, verw As String, vid As String, stotitel As String) As String
         Dim t As Char = ","
         Dim ret As String = ""
         Try
@@ -3149,14 +3156,15 @@ Public Class Form1
             If altaz.Length < 1 Then
                 altaz = ""
             Else
-                altaz = ", AltAz: " & altaz
+                altaz = " AltAz: " & altaz
             End If
             If interne.Length < 1 Then
                 interne = ""
             Else
-                interne = ", IntNr: " & interne
+                interne = " IntNr: " & interne
             End If
-            Return az & altaz & interne & t & " " & beschreibung & " " & verw & "#" & vid & "#"
+            'Return az & altaz & interne & t & " " & beschreibung & " " & verw & "#" & vid & "#"
+            Return altaz & interne & t & " " & beschreibung & " " & stotitel
 
         Catch ex As Exception
             l("fehler  " & ex.ToString)
@@ -3176,7 +3184,7 @@ Public Class Form1
             Else
                 paragraf = t & " $: " & paragraf
             End If
-            ret = sgtext & paragraf & t & " " & vgGegenstand & " (" & az & ")"
+            ret = sgtext & paragraf & t & " " & vgGegenstand '& " (" & az & ")"
             Return ret
         Catch ex As Exception
             l("fehler  " & ex.ToString)
@@ -5309,6 +5317,8 @@ Public Class Form1
         'Sql = "SELECT initial_,kuerzel1,aktiv FROM [Paradigma].[dbo].[BEARBEITER_T5] " &
         '    " order by aktiv desc  "
         '[BEARBEITER_T5]
+        'Sql = "SELECT        distinct [STORAUMNR] as raum,count(  [STORAUMNR]) as anz  FROM [Paradigma].[dbo].[STAMMDATEN_T41]  group by [STORAUMNR]  order by anz desc"
+
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         'writeStammdatenPU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln, swfehlt)
