@@ -30,7 +30,7 @@ Public Class Form1
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.WindowState = FormWindowState.Minimized
         protokoll()
-        stammdaten()
+        ' stammdaten()
         ' fullpathdokumenteErzeugen()
         'PDFumwandeln()
         'DOCXumwandeln(2113, False)
@@ -2053,8 +2053,8 @@ Public Class Form1
     End Sub
 
     Private Sub fullpathdokumenteErzeugen()
-        Dim dateifehlt As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\auffueller" & Environment.UserName & ".log"
-        dateifehlt = "e:\proumwelt\log\auffueller.log"
+        Dim dateifehlt As String = "O:\UMWELT\B\Proumwelt_Migration\doku\auffueller" & Environment.UserName & ".log"
+        dateifehlt = "O:\UMWELT\B\Proumwelt_Migration\doku\auffueller_undfehlendeDokus.log.log"
         swfehlt = New IO.StreamWriter(dateifehlt)
         swfehlt.AutoFlush = True
         swfehlt.WriteLine(Now)
@@ -2307,7 +2307,7 @@ Public Class Form1
     Private Sub Button19_Click(sender As Object, e As EventArgs) Handles Button19.Click
 
         Dim dateifehlt As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\referenzdokus" & Environment.UserName & ".log"
-        dateifehlt = "e:\proumwelt\log\referenzdokus" & ".log"
+        dateifehlt = "O:\UMWELT\B\Proumwelt_Migration\doku\referenz\referenzdokus.log"
         swfehlt = New IO.StreamWriter(dateifehlt)
         swfehlt.AutoFlush = True
         swfehlt.WriteLine(Now)
@@ -2347,11 +2347,11 @@ Public Class Form1
         End If
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         'puFehlt = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\" & "dokumente_ab_" & maxobj & ".log"
-        puFehlt = "e:\proumwelt\log\" & "dokumente_ab_" & maxobj & ".log"
+        puFehlt = "O:\UMWELT\B\Proumwelt_Migration\doku\main\dokumente_ab_" & maxobj & ".log"
         swfehlt = New IO.StreamWriter(puFehlt)
         swfehlt.AutoFlush = True
         'puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_ab_" & maxobj & ".csv"
-        puAusgabe = "E:\proumwelt\xls\" & "dokumentMain_ab_" & maxobj & ".xlsx"
+        puAusgabe = "O:\UMWELT\B\Proumwelt_Migration\doku\main\dokumentMain_ab_" & maxobj & ".xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
 
         Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_vorgang]  order by dokumentid desc "
@@ -2397,8 +2397,9 @@ Public Class Form1
 
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
+        Dim altunderledigtDokumente = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\erledigtUndAlt.txt"
         'MsgBox("max. objekte für test: " & maxobj)
-        writeDokumentePU(puFehlt, puAusgabe, Sql, maxobj)
+        writeDokumentePU(puFehlt, puAusgabe, Sql, maxobj, "O:\UMWELT\B\Proumwelt_Migration\doku\files", altunderledigtDokumente) ' "E:\proumwelt\dokmain"
         'puAusgabeStream.Close()
         'puAusgabeStream.Dispose()
         'Process.Start(puAusgabe)
@@ -2406,7 +2407,7 @@ Public Class Form1
 
 
         'puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_referenz" & ".csv"
-        puAusgabe = "e:\proumwelt\xls\" & "dokumente_referenz" & ".xlsx"
+        puAusgabe = "O:\UMWELT\B\Proumwelt_Migration\doku\main\dokumente_referenz.xlsx"
         'puAusgabeStream = New IO.StreamWriter(puAusgabe)
         Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_referenz]  order by vid desc "
         TextBox1.Text = TextBox1.Text & Environment.NewLine & puAusgabe
@@ -2421,7 +2422,7 @@ Public Class Form1
 
     Private Function setMaxObj(maxobj As Integer) As Integer
         If (TextBox4.Text) = "0" Or TextBox4.Text = "" Then
-            maxobj = 80000
+            maxobj = 90000
         Else
             If IsNumeric(TextBox4.Text) Then
                 maxobj = CInt(TextBox4.Text)
@@ -2431,7 +2432,7 @@ Public Class Form1
         Return maxobj
     End Function
 
-    Private Sub writeDokumentePU(puFehler As String, puAusgabe As String, sql As String, maxobj As Integer)
+    Private Sub writeDokumentePU(puFehler As String, puAusgabe As String, sql As String, maxobj As Integer, outdirroot As String, altunderledigtDokumente As String)
         '####
         Dim DT As DataTable
         Dim idok As Integer = 0
@@ -2444,7 +2445,7 @@ Public Class Form1
         swfehlt.WriteLine("Teil2 normale Dokumente ausschreiben ---------------------")
 
         'inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
-        Dim outdirROOT = "E:\proumwelt\dokmain"
+        ' Dim outdirROOT = "E:\proumwelt\dokmain"
         If vid = "fehler" Then End
         DT = alleDokumentDatenHolen(sql)
         l("vor csvverarbeiten")
@@ -2461,6 +2462,8 @@ Public Class Form1
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
         myoracle.Open()
+        Dim alt As New List(Of String)
+        alt = altunderledigtDokumenteEinlesen(altunderledigtDokumente)
         'Dim row As New Text.StringBuilder
         'Dim block As New Text.StringBuilder 
         'Dim blockMAX As Int16 = 50
@@ -2492,7 +2495,7 @@ Public Class Form1
             ws.Cells("h1").Value = "ordner im mediencenter"
             ws.Cells("i1").Value = "dokumentid"
             ws.Cells("j1").Value = "revisionssicher"
-
+            Dim vorhanden As Boolean
             'row.Append("az" & t) 'Az
             'row.Append("jahr" & t) 'jahr
             'row.Append("obergruppe" & t) 'jahr
@@ -2524,7 +2527,7 @@ Public Class Form1
                     End If
 
                     'dateiUmkopieren
-                    newdir = IO.Path.Combine(outdirROOT, eingang.ToString("yyyy"))
+                    newdir = IO.Path.Combine(outdirroot, eingang.ToString("yyyy"))
                     If Not IO.Directory.Exists(newdir) Then
                         IO.Directory.CreateDirectory(newdir)
                     End If
@@ -2540,7 +2543,13 @@ Public Class Form1
 
                     Dim fo As New IO.FileInfo(newdir)
                     If Not fo.Exists Then
-                        IO.File.Copy(fullfilename, newdir)
+                        If alt.Contains(vid) Then
+                            'nicht kopiert
+                            Debug.Print("")
+                        Else
+                            IO.File.Copy(fullfilename, newdir)
+                        End If
+
                         schreib += 1
                     End If
 
@@ -2579,6 +2588,16 @@ Public Class Form1
 
         l("fertig  " & puFehler)
     End Sub
+
+    Private Function altunderledigtDokumenteEinlesen(altunderledigtDokumente As String) As List(Of String)
+        Try
+            Dim liste As List(Of String) = IO.File.ReadAllLines(altunderledigtDokumente).ToList()
+            Return liste
+        Catch ex As Exception
+            l("fehler in altunderledigtDokumenteEinlesen   " & ex.ToString)
+            Return Nothing
+        End Try
+    End Function
 
     Private Function cleanString(Text As String) As String
         Try
@@ -2620,10 +2639,11 @@ Public Class Form1
     End Sub
     Private Sub stammdaten()
         'probaugstammdaten
-        Dim puFehler As String = "e:\proumwelt\log\grunddaten.log"
+        Dim puFehler As String = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\grunddaten.log"
         Dim puAusgabe As String = "e:\proumwelt\xls\" & "grunddaten" & ".xlsx"
         puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\grunddaten.xlsx"
         puAusgabe = "e:\proumwelt\xls\grunddaten.xlsx"
+        puAusgabe = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\grunddaten.xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -2636,14 +2656,14 @@ Public Class Form1
             " where vorgangsid< " & maxobj &
             " order by vorgangsid desc  "
 
-        Sql = "SELECT top 1000 * FROM [Paradigma].[dbo].[stammdaten_tutti] " &
-            " where vorgangsid< " & maxobj &
-            " order by vorgangsid desc  "
+        'Sql = "SELECT top 1000 * FROM [Paradigma].[dbo].[stammdaten_tutti] " &
+        '    " where vorgangsid< " & maxobj &
+        '    " order by vorgangsid desc  "
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        writeStammdatenPU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln, swfehlt)
+        writeStammdatenPU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln, swfehlt, rohausgabe:=True)
         System.Diagnostics.Process.Start("explorer", puFehler)
-        System.Diagnostics.Process.Start("explorer", "e:\proumwelt\xls\grunddaten.xlsx")
+        System.Diagnostics.Process.Start("explorer", puAusgabe) '"e:\proumwelt\xls\grunddaten.xlsx")
         End
     End Sub
     Public Class zeile
@@ -2705,26 +2725,32 @@ Public Class Form1
     End Sub
 
     Private Sub writeStammdatenPU(puFehler As String, puAusgabe As String, sql As String,
-                                  maxobj As Integer, umlautwandeln As Boolean, swfehlt As IO.StreamWriter)
+                                  maxobj As Integer, umlautwandeln As Boolean, swfehlt As IO.StreamWriter, rohausgabe As Boolean)
         Dim DT, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR As DataTable
         Dim idok As Integer = 0
         swfehlt.WriteLine("writeStammdatenPU---")
         Dim sgfile As String
         'sgfile = "E:\proumwelt\s2.txt"
         sgfile = "E:\Sachgebiete FD.csv"
-        Dim kontrolldatei = "E:\proumwelt\log\Grundaten_gueltigeSGnummern.txt"
-        Dim abgewiesendat = "E:\proumwelt\log\Grundaten_abgewieseneVorgaenge.txt"
-        Dim gueltigeVorgaenge = "E:\proumwelt\log\Grundaten_gueltigeVorgaenge.txt"
+        Dim kontrolldatei = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\Grundaten_gueltigeSGnummern.txt"
+        Dim abgewiesendat = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\Grundaten_abgewieseneVorgaenge.txt"
+        Dim gueltigeVorgaenge = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\Grundaten_gueltigeVorgaenge.txt"
+        Dim erledigtUndAlt = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\erledigtUndAlt.txt"
         Dim kontrollstream As New IO.StreamWriter(kontrolldatei)
         Dim geloeschteVorgaengeStream As New IO.StreamWriter(abgewiesendat)
         Dim gueltigeVorgaengeStream As New IO.StreamWriter(gueltigeVorgaenge)
+        Dim erledigtUndAltStream As New IO.StreamWriter(erledigtUndAlt)
         gueltigeVorgaengeStream.AutoFlush = True
         geloeschteVorgaengeStream.AutoFlush = True
+        erledigtUndAltStream.AutoFlush = True
         kontrollstream.AutoFlush = True
         Dim coll As New List(Of zeile)
-        getCollection(sgfile, swfehlt, coll)
-        writeCollectionKontrollfile(kontrollstream, coll)
-        kontrollstream.Close()
+        If rohausgabe Then
+        Else
+            getCollection(sgfile, swfehlt, coll)
+            writeCollectionKontrollfile(kontrollstream, coll)
+            kontrollstream.Close()
+        End If
 
         DT = alleDokumentDatenHolen(sql)
         sql = "SELECT s.[VORGANGSID] ,[FREMDVORGANGSID] " &
@@ -2750,7 +2776,8 @@ Public Class Form1
         Dim Hauptaktenzeichen, stotitel As String
         Dim beschreibung As String
         Dim eingang, antrag, vollstaendig As Date ', bescheid,abgeschlossen As Date
-        Dim eingangS, antragS, vollstaendigS, bescheidS, abgeschlossenS As String
+        Dim eingangS, antragS, vollstaendigS, bescheidS, abgeschlossenDatumString As String
+        Dim dokuskip As Integer = 0
         Dim aktenstandort As String
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
@@ -2799,6 +2826,7 @@ Public Class Form1
             ws.Cells("w1").Value = "ZusatzZ1"
             ws.Cells("x1").Value = "ZusatzZ2"
             ws.Cells("y1").Value = "ZusatzZ3"
+            ws.Cells("z1").Value = "dokuskip"
             Dim jump = 0
 
             For Each drr As DataRow In DT.Rows
@@ -2806,20 +2834,26 @@ Public Class Form1
                     igesamt += 1
 
                     vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                    If vid = 3733 Then
+                    If vid = 79717 Then
                         Debug.Print("")
                     End If
                     eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
-                    Bezeichnung = cleanString(makeStammBezeichnung(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))), CStr(clsDBtools.fieldvalue(drr.Item("PARAGRAF"))),
+                    Bezeichnung = cleanString(makeStammBezeichnung(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))),
+                                                                   CStr(clsDBtools.fieldvalue(drr.Item("PARAGRAF"))),
                                                                    CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSGEGENSTAND"))),
-                                                                    CStr(clsDBtools.fieldvalue(drr.Item("az2")))))
+                                                                   CStr(clsDBtools.fieldvalue(drr.Item("az2")))))
+
                     az2 = CStr(clsDBtools.fieldvalue(drr.Item("az2")))
                     eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                     antrag = CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
                     vollstaendigS = "" '"CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG")))
                     bescheidS = "" '"CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
-                    abgeschlossenS = makeAbgeschlossen(CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG"))),
+                    abgeschlossenDatumString = makeAbgeschlossen(CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG"))),
                                                       CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))) 'falls erledigt
+                    dokuskip = makeDokuskip(CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG"))),
+                                            CDate(clsDBtools.fieldvalueDate(drr.Item("AUFNAHME"))),
+                                                      CStr(clsDBtools.fieldvalue(drr.Item("erledigt"))))
+
                     aktenstandort = CStr(clsDBtools.fieldvalue(drr.Item("STORAUMNR")))
                     stotitel = CStr(clsDBtools.fieldvalue(drr.Item("STOTITEL"))).Trim
 
@@ -2833,7 +2867,17 @@ Public Class Form1
                     '    Debug.Print("")
                     'End If 
                     'gisMapping(sgnr, test)  
-                    getVerfahrensartUndVorhaben(sgnr, Verfahrensart, Vorhaben, Vorhabensmerkmal, coll)
+                    If dokuskip > 0 Then
+                        erledigtUndAltStream.WriteLine(vid, ";", sgnr)
+                    End If
+
+                    If rohausgabe Then
+                        Verfahrensart = sgnr
+                        Vorhaben = sgnr
+                        Vorhabensmerkmal = sgnr
+                    Else
+                        getVerfahrensartUndVorhaben(sgnr, Verfahrensart, Vorhaben, Vorhabensmerkmal, coll)
+                    End If
 
                     If Verfahrensart = "????" Or Vorhaben = "????" Then
                         geloeschteVorgaengeStream.WriteLine(vid & ";" & sgnr & ";" & az2) ' & ";" & str.pAlt & ";" &)
@@ -2844,7 +2888,7 @@ Public Class Form1
                     row += 1
                     sachgebiet = "67" & sgnr.Substring(0, 1) '& "-" & sachgebiet
 
-                    sachbearbeiter = CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter"))) & "," & CStr(clsDBtools.fieldvalue(drr.Item("weiterebearb")))
+                    sachbearbeiter = CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter"))) ' & "," & CStr(clsDBtools.fieldvalue(drr.Item("weiterebearb")))
                     Hauptaktenzeichen = ""
                     'hauptaktenjahr = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                     geschlossen = CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))
@@ -2863,7 +2907,7 @@ Public Class Form1
                                                        CStr(clsDBtools.fieldvalue(drr.Item("internenr"))),
                                                        CStr(clsDBtools.fieldvalue(drr.Item("beschreibung"))),
                                                         verwandteString, vid, stotitel))
-                    zusatz1 = CStr(clsDBtools.fieldvalue(drr.Item("az2")))
+                    zusatz1 = vid 'CStr(clsDBtools.fieldvalue(drr.Item("az2")))
                     zusatz2 = verwandteString
                     zusatz3 = CStr(clsDBtools.fieldvalue(drr.Item("probaugaz")))
                     If umlautwandeln Then
@@ -2893,7 +2937,7 @@ Public Class Form1
                     ws.Cells("g" & row).Value = antrag.ToString("dd.MM.yyyy")
                     ws.Cells("h" & row).Value = vollstaendigS '.ToString("dd.MM.yyyy")
                     ws.Cells("i" & row).Value = bescheidS '.ToString("dd.MM.yyyy")
-                    ws.Cells("j" & row).Value = abgeschlossenS '.ToString("dd.MM.yyyy")
+                    ws.Cells("j" & row).Value = abgeschlossenDatumString '.ToString("dd.MM.yyyy")
                     ws.Cells("k" & row).Value = aktenstandort
                     ws.Cells("m" & row).Value = sachgebiet
                     ws.Cells("n" & row).Value = Verfahrensart.TrimEnd("-")
@@ -2906,6 +2950,7 @@ Public Class Form1
                     ws.Cells("w" & row).Value = cleanString(zusatz1)
                     ws.Cells("x" & row).Value = cleanString(zusatz2)
                     ws.Cells("y" & row).Value = cleanString(zusatz3)
+                    ws.Cells("z" & row).Value = (dokuskip)
 
                     idok += 1
                     If idok > maxobj Then Exit For
@@ -2933,6 +2978,25 @@ Public Class Form1
         End Using
         l("fertig  " & puFehler)
     End Sub
+
+    Private Function makeDokuskip(datum1 As Date, aufnahme As Date, erledigt As String) As Integer
+        Try
+
+            If datum1 <= Today.AddYears(-10) And aufnahme <= Today.AddYears(-10) Then
+                If erledigt = "1" Then
+                    Return 1 'doku kann übersprungen werden, da erledigt und älter als 10 Jahre
+                Else
+                    Return 0 'doku könnte übersprungen werden, da älter als 10 Jahre, aber nicht erledigt
+                End If
+            Else
+                Return 0 'doku nicht überspringen, da jünger als 10 Jahre
+            End If
+
+        Catch ex As Exception
+            l("fehler inmakeDokuskip  " & ex.ToString)
+            Return 0
+        End Try
+    End Function
 
     Private Shared Sub writeCollectionKontrollfile(kontrollfile As StreamWriter, coll As List(Of zeile))
         For Each str As zeile In coll
@@ -3146,7 +3210,7 @@ Public Class Form1
     End Function
 
     Private Function makeStammNotiz(az As String, altaz As String, interne As String, beschreibung As String, verw As String, vid As String, stotitel As String) As String
-        Dim t As Char = ","
+        Dim t As Char = " "
         Dim ret As String = ""
         Try
             az = az.Trim
@@ -3194,8 +3258,8 @@ Public Class Form1
 
     Private Sub Button22_Click(sender As Object, e As EventArgs) Handles Button22.Click
         'adresse
-        Dim puFehler As String = "e:\proumwelt\log\LageAdresse" & ".log"
-        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "LageAdresse" & ".xlsx"
+        Dim puFehler As String = "O:\UMWELT\B\Proumwelt_Migration\lageadresse\LageAdresse.log"
+        Dim puAusgabe As String = "O:\UMWELT\B\Proumwelt_Migration\lageadresse\LageAdresse.xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -3217,7 +3281,7 @@ Public Class Form1
         'puAusgabeStream.Close()
         'puAusgabeStream.Dispose()
         swfehlt.Dispose()
-        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
+        System.Diagnostics.Process.Start("explorer", puAusgabe)
         End
     End Sub
 
@@ -3399,8 +3463,8 @@ Public Class Form1
 
     Private Sub Button26_Click(sender As Object, e As EventArgs) Handles Button26.Click
         'kataster 
-        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\kataster" & ".log"
-        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "kataster" & ".xlsx"
+        Dim puFehler As String = "O:\UMWELT\B\Proumwelt_Migration\kataster\kataster.log"
+        Dim puAusgabe As String = "O:\UMWELT\B\Proumwelt_Migration\kataster\kataster.xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -3415,7 +3479,7 @@ Public Class Form1
         writeKatasterausgabePU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln)
         'puAusgabeStream.Close()
         'puAusgabeStream.Dispose()
-        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung")
+        System.Diagnostics.Process.Start("explorer", puAusgabe)
         swfehlt.Dispose()
         End
     End Sub
@@ -3601,8 +3665,8 @@ Public Class Form1
     End Sub
     Private Sub Button25_Click(sender As Object, e As EventArgs) Handles Button25.Click
         'wiedervorlagen
-        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\wiedervorlagen" & ".log"
-        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "wiedervorlagen" & ".xlsx"
+        Dim puFehler As String = "O:\UMWELT\B\Proumwelt_Migration\wiedervorlage\wiedervorlagen.log"
+        Dim puAusgabe As String = "O:\UMWELT\B\Proumwelt_Migration\wiedervorlage\wiedervorlagen.xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -3620,7 +3684,7 @@ Public Class Form1
         writeWiedervorlageAusgabePU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln)
         'puAusgabeStream.Close()
         'puAusgabeStream.Dispose()
-        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
+        System.Diagnostics.Process.Start("explorer", puAusgabe)
         swfehlt.Dispose()
         End
     End Sub
@@ -3920,9 +3984,9 @@ Public Class Form1
 
     Private Sub Button30_Click(sender As Object, e As EventArgs) Handles Button30.Click
         'antragsteller
-        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\antragsteller" & ".log"
-        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "antragsteller" & ".xlsx"
-        Dim pubeteiligte As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "beteiligte_1" & ".xlsx"
+        Dim puFehler As String = "O:\UMWELT\B\Proumwelt_Migration\antragsteller\antragsteller.log"
+        Dim puAusgabe As String = "O:\UMWELT\B\Proumwelt_Migration\antragsteller\antragsteller.xlsx"
+        Dim pubeteiligte As String = "O:\UMWELT\B\Proumwelt_Migration\antragsteller\beteiligte_1.xlsx"
         'Dim ausgabeAntragsteller As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         'Dim ausgabeBeteiligte As New IO.StreamWriter(pubeteiligte, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
@@ -3941,7 +4005,7 @@ Public Class Form1
         'ausgabeBeteiligte.Close()
         'ausgabeBeteiligte.Dispose()
         swfehlt.Dispose()
-        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
+        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\Proumwelt_Migration\antragsteller")
         End
     End Sub
 
