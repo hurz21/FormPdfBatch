@@ -2307,7 +2307,7 @@ Public Class Form1
     Private Sub Button19_Click(sender As Object, e As EventArgs) Handles Button19.Click
 
         Dim dateifehlt As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\referenzdokus" & Environment.UserName & ".log"
-        dateifehlt = "O:\UMWELT\B\Proumwelt_Migration\doku\referenz\referenzdokus.log"
+        dateifehlt = "O:\UMWELT\B\Proumwelt_Migration\dokumente\referenz\referenzdokus.log"
         swfehlt = New IO.StreamWriter(dateifehlt)
         swfehlt.AutoFlush = True
         swfehlt.WriteLine(Now)
@@ -2322,6 +2322,7 @@ Public Class Form1
     End Sub
 
     Private Sub Button20_Click(sender As Object, e As EventArgs) Handles Button20.Click
+        Dim batchfile As String
         Dim puFehlt As String ' = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\Dokumain.log"
         Dim puAusgabe As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "dokumente" & ".csv"
         '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".log"
@@ -2347,11 +2348,14 @@ Public Class Form1
         End If
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         'puFehlt = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\" & "dokumente_ab_" & maxobj & ".log"
-        puFehlt = "O:\UMWELT\B\Proumwelt_Migration\doku\main\dokumente_ab_" & maxobj & ".log"
+        batchfile = "O:\UMWELT\B\Proumwelt_Migration\dokumente\main\dokumente_ab_" & maxobj & ".bat"
+        puFehlt = "O:\UMWELT\B\Proumwelt_Migration\dokumente\main\dokumente_ab_" & maxobj & ".log"
+        Dim batchstream = New IO.StreamWriter(batchfile)
+        batchstream.AutoFlush = True
         swfehlt = New IO.StreamWriter(puFehlt)
         swfehlt.AutoFlush = True
         'puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_ab_" & maxobj & ".csv"
-        puAusgabe = "O:\UMWELT\B\Proumwelt_Migration\doku\main\dokumentMain_ab_" & maxobj & ".xlsx"
+        puAusgabe = "O:\UMWELT\B\Proumwelt_Migration\dokumente\main\dokumentMain_ab_" & maxobj & ".xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
 
         Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_vorgang]  order by dokumentid desc "
@@ -2399,7 +2403,7 @@ Public Class Form1
         TextBox2.Text = Sql
         Dim altunderledigtDokumente = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\erledigtUndAlt.txt"
         'MsgBox("max. objekte für test: " & maxobj)
-        writeDokumentePU(puFehlt, puAusgabe, Sql, maxobj, "O:\UMWELT\B\Proumwelt_Migration\doku\files", altunderledigtDokumente) ' "E:\proumwelt\dokmain"
+        writeDokumentePU(batchstream, puFehlt, puAusgabe, Sql, maxobj, "O:\UMWELT\B\Proumwelt_Migration\dokumente\files", altunderledigtDokumente) ' "E:\proumwelt\dokmain"
         'puAusgabeStream.Close()
         'puAusgabeStream.Dispose()
         'Process.Start(puAusgabe)
@@ -2407,7 +2411,7 @@ Public Class Form1
 
 
         'puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_referenz" & ".csv"
-        puAusgabe = "O:\UMWELT\B\Proumwelt_Migration\doku\main\dokumente_referenz.xlsx"
+        puAusgabe = "O:\UMWELT\B\Proumwelt_Migration\dokumente\main\dokumente_referenz.xlsx"
         'puAusgabeStream = New IO.StreamWriter(puAusgabe)
         Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_referenz]  order by vid desc "
         TextBox1.Text = TextBox1.Text & Environment.NewLine & puAusgabe
@@ -2417,7 +2421,7 @@ Public Class Form1
         l("fertig  " & puFehlt)
 
         'Process.Start(puAusgabe)
-        End
+
     End Sub
 
     Private Function setMaxObj(maxobj As Integer) As Integer
@@ -2432,7 +2436,7 @@ Public Class Form1
         Return maxobj
     End Function
 
-    Private Sub writeDokumentePU(puFehler As String, puAusgabe As String, sql As String, maxobj As Integer, outdirroot As String, altunderledigtDokumente As String)
+    Private Sub writeDokumentePU(batchfile As IO.StreamWriter, puFehler As String, puAusgabe As String, sql As String, maxobj As Integer, outdirroot As String, altunderledigtDokumente As String)
         '####
         Dim DT As DataTable
         Dim idok As Integer = 0
@@ -2547,7 +2551,14 @@ Public Class Form1
                             'nicht kopiert
                             Debug.Print("")
                         Else
-                            IO.File.Copy(fullfilename, newdir)
+                            'IO.File.Copy(fullfilename, newdir)
+                            Debug.Print(fullfilename)
+                            Debug.Print(newdir)
+                            'batchfile.WriteLine("copy " & Chr(34) & IO.Path.GetDirectoryName(fullfilename) & Chr(34) & " " &
+                            '                Chr(34) & IO.Path.GetDirectoryName(newdir) & Chr(34) &
+                            '                " " & Chr(34) & IO.Path.GetFileName(fullfilename) & Chr(34) &
+                            '                " /NFL /NDL /NJH /NJS /nc /ns /np")
+                            batchfile.WriteLine("xcopy /C /d " & Chr(34) & fullfilename & Chr(34) & " " & Chr(34) & newdir & Chr(34))
                         End If
 
                         schreib += 1
