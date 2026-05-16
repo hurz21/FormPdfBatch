@@ -29,7 +29,7 @@ Public Class Form1
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.WindowState = FormWindowState.Minimized
-        protokoll()
+        'protokoll()
         ' stammdaten()
         ' fullpathdokumenteErzeugen()
         'PDFumwandeln()
@@ -41,6 +41,7 @@ Public Class Form1
             .CustomLocation = "D:\probaug_Ausgabe\logs\" & ""
 #Else
             .CustomLocation = "D:\probaug_Ausgabe\logs\" & ""
+            .CustomLocation = "O:\UMWELT\B\Proumwelt_Migration\dokumente\test\Release\"
 #End If
 
             .BaseFileName = "form2pdf" & "_" & Environment.UserName & "-" & Now.ToString("yyyy-MM-dd_HH_mm_ss")
@@ -2350,6 +2351,12 @@ Public Class Form1
         'puFehlt = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\" & "dokumente_ab_" & maxobj & ".log"
         batchfile = "O:\UMWELT\B\Proumwelt_Migration\dokumente\main\dokumente_ab_" & maxobj & ".bat"
         puFehlt = "O:\UMWELT\B\Proumwelt_Migration\dokumente\main\dokumente_ab_" & maxobj & ".log"
+
+
+        batchfile = "e:\Proumwelt\dokumente\main\dokumente_ab_" & maxobj & ".bat"
+        puFehlt = "E:\Proumwelt\dokumente\main\dokumente_ab_" & maxobj & ".log"
+
+
         Dim batchstream = New IO.StreamWriter(batchfile)
         batchstream.AutoFlush = True
         swfehlt = New IO.StreamWriter(puFehlt)
@@ -2403,7 +2410,10 @@ Public Class Form1
         TextBox2.Text = Sql
         Dim altunderledigtDokumente = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\erledigtUndAlt.txt"
         'MsgBox("max. objekte für test: " & maxobj)
-        writeDokumentePU(batchstream, puFehlt, puAusgabe, Sql, maxobj, "O:\UMWELT\B\Proumwelt_Migration\dokumente\files", altunderledigtDokumente) ' "E:\proumwelt\dokmain"
+        Dim dateiausgabe = "O:\UMWELT\B\Proumwelt_Migration\dokumente\files"
+        dateiausgabe = "e:\Proumwelt\dokumente\files"
+        puAusgabe = "e:\Proumwelt\dokumente\main\dokumentMain_ab_" & maxobj & ".xlsx"
+        writeDokumentePU(batchstream, puFehlt, puAusgabe, Sql, maxobj, dateiausgabe, altunderledigtDokumente, altpruefung:=False) ' "E:\proumwelt\dokmain"
         'puAusgabeStream.Close()
         'puAusgabeStream.Dispose()
         'Process.Start(puAusgabe)
@@ -2416,7 +2426,8 @@ Public Class Form1
         Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_referenz]  order by vid desc "
         TextBox1.Text = TextBox1.Text & Environment.NewLine & puAusgabe
         TextBox2.Text = TextBox2.Text & Environment.NewLine & Sql
-        'writeDokumentePU(puFehlt, puAusgabe, Sql, maxobj)
+        '   writeDokumentePU(puFehlt, puAusgabe, Sql, maxobj)
+        'writeDokumentePU(batchstream, puFehlt, puAusgabe, Sql, maxobj, "O:\UMWELT\B\Proumwelt_Migration\dokumente\files", altunderledigtDokumente) ' "E:\proumwelt\dokmain"
         swfehlt.Close()
         l("fertig  " & puFehlt)
 
@@ -2436,7 +2447,8 @@ Public Class Form1
         Return maxobj
     End Function
 
-    Private Sub writeDokumentePU(batchfile As IO.StreamWriter, puFehler As String, puAusgabe As String, sql As String, maxobj As Integer, outdirroot As String, altunderledigtDokumente As String)
+    Private Sub writeDokumentePU(batchfile As IO.StreamWriter, puFehler As String, puAusgabe As String, sql As String, maxobj As Integer, outdirroot As String, altunderledigtDokumente As String,
+                                 altpruefung As Boolean)
         '####
         Dim DT As DataTable
         Dim idok As Integer = 0
@@ -2451,7 +2463,9 @@ Public Class Form1
         'inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
         ' Dim outdirROOT = "E:\proumwelt\dokmain"
         If vid = "fehler" Then End
+
         DT = alleDokumentDatenHolen(sql)
+
         l("vor csvverarbeiten")
 
         Dim igesamt As Integer = 0
@@ -2464,10 +2478,13 @@ Public Class Form1
         Dim eingang As Date
         Dim eid As String = 0
         Dim myoracle As SqlClient.SqlConnection
+        Dim existiertschon As Boolean = False
         myoracle = getMSSQLCon()
         myoracle.Open()
         Dim alt As New List(Of String)
-        alt = altunderledigtDokumenteEinlesen(altunderledigtDokumente)
+        If altpruefung Then
+            alt = altunderledigtDokumenteEinlesen(altunderledigtDokumente)
+        End If
         'Dim row As New Text.StringBuilder
         'Dim block As New Text.StringBuilder 
         'Dim blockMAX As Int16 = 50
@@ -2526,6 +2543,15 @@ Public Class Form1
                     If vid = String.Empty Then
                         Continue For
                     End If
+                    If altpruefung Then
+
+                        If alt.Contains(vid) Then
+                            'nicht kopiert
+                            Debug.Print("kein eintrag in xls und kein eintrag in die batch-copierdatei")
+                            Continue For
+                        End If
+                    End If
+
                     If fullfilename = String.Empty Then
                         Continue For
                     End If
@@ -2546,24 +2572,21 @@ Public Class Form1
                     newdir = IO.Path.Combine(newdir, dateinameext)
 
                     Dim fo As New IO.FileInfo(newdir)
-                    If Not fo.Exists Then
-                        If alt.Contains(vid) Then
-                            'nicht kopiert
-                            Debug.Print("")
-                        Else
-                            'IO.File.Copy(fullfilename, newdir)
-                            Debug.Print(fullfilename)
-                            Debug.Print(newdir)
-                            'batchfile.WriteLine("copy " & Chr(34) & IO.Path.GetDirectoryName(fullfilename) & Chr(34) & " " &
-                            '                Chr(34) & IO.Path.GetDirectoryName(newdir) & Chr(34) &
-                            '                " " & Chr(34) & IO.Path.GetFileName(fullfilename) & Chr(34) &
-                            '                " /NFL /NDL /NJH /NJS /nc /ns /np")
-                            batchfile.WriteLine("xcopy /C /d " & Chr(34) & fullfilename & Chr(34) & " " & Chr(34) & newdir & Chr(34))
-                        End If
-
+                    'existiertschon = fo.Exists
+                    existiertschon = False
+                    If existiertschon Then
+                        'mit eintrag  in die xls 
+                        'kein eintrag in die batch-copierdatei
+                    Else
+                        'mit eintrag  in die xls 
+                        'mit eintrag in die batch-copierdatei
+                        'IO.File.Copy(fullfilename, newdir)
+                        Debug.Print(fullfilename)
+                        Debug.Print(newdir)
+                        batchfile.WriteLine("copy " & Chr(34) & fullfilename & Chr(34) & " " & Chr(34) & newdir & Chr(34))
+                        batchfile.WriteLine("rem cnt  " & igesamt & " " & DT.Rows.Count)
                         schreib += 1
                     End If
-
                     TextBox3.Text = vid & ", " & igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ] schreib=" & schreib
                     Application.DoEvents()
                     'zeilebilden
@@ -2592,11 +2615,11 @@ Public Class Form1
                 GC.Collect()
                 GC.WaitForFullGCComplete()
             Next
+            batchfile.WriteLine("pause ")
             Dim fi As New FileInfo(puAusgabe)
             package.SaveAs(fi)
         End Using
         swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt & ", neu ausgeschrieben: " & schreib)
-
         l("fertig  " & puFehler)
     End Sub
 
@@ -2990,10 +3013,10 @@ Public Class Form1
         l("fertig  " & puFehler)
     End Sub
 
-    Private Function makeDokuskip(datum1 As Date, aufnahme As Date, erledigt As String) As Integer
+    Private Function makeDokuskip(letztebearbeitung As Date, aufnahme As Date, erledigt As String) As Integer
         Try
 
-            If datum1 <= Today.AddYears(-10) And aufnahme <= Today.AddYears(-10) Then
+            If letztebearbeitung <= Today.AddYears(-10) And aufnahme <= Today.AddYears(-10) Then
                 If erledigt = "1" Then
                     Return 1 'doku kann übersprungen werden, da erledigt und älter als 10 Jahre
                 Else

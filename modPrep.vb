@@ -178,12 +178,12 @@ ByRef initial As String, ByRef eid As String, ByRef beschreibung As String, ByRe
         Return outfile
     End Function
     Sub l(t As String)
-        nachricht(t)
+        'nachricht(t)
     End Sub
 
     Sub nachricht(t As String)
         '  Form1.sw.WriteLine(t)
         '  Console.WriteLine(t)
-        My.Application.Log.WriteEntry(t)
+        'My.Application.Log.WriteEntry(t)
     End Sub
 End Module
