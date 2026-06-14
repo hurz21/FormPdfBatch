@@ -2349,12 +2349,15 @@ Public Class Form1
         End If
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         'puFehlt = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\" & "dokumente_ab_" & maxobj & ".log"
-        batchfile = "O:\UMWELT\B\Proumwelt_Migration\dokumente\main\dokumente_ab_" & maxobj & ".bat"
-        puFehlt = "O:\UMWELT\B\Proumwelt_Migration\dokumente\main\dokumente_ab_" & maxobj & ".log"
+        'batchfile = "O:\UMWELT\B\Proumwelt_Migration\dokumente\main\dokumente_ab_" & maxobj & ".bat"
+        'puFehlt = "O:\UMWELT\B\Proumwelt_Migration\dokumente\main\dokumente_ab_" & maxobj & ".log"
+        'puFehlt = "\\kh-w-fs02\M\Proumwelt_Migration\dokumente\main\dokumente_ab_" & maxobj & ".log"
 
 
-        batchfile = "e:\Proumwelt\dokumente\main\dokumente_ab_" & maxobj & ".bat"
-        puFehlt = "E:\Proumwelt\dokumente\main\dokumente_ab_" & maxobj & ".log"
+        'batchfile = "e:\Proumwelt\dokumente\main\dokumente_ab_" & maxobj & ".bat"
+        '\\KH-W-FS02\Proumwelt_Migration
+        batchfile = "\\kh-w-fs02\Proumwelt_Migration\dokumente\main\dokumente_ab_" & maxobj & ".bat"
+        puFehlt = "\\kh-w-fs02\Proumwelt_Migration\dokumente\main\dokumente_ab_" & maxobj & ".log"
 
 
         Dim batchstream = New IO.StreamWriter(batchfile)
@@ -2362,7 +2365,8 @@ Public Class Form1
         swfehlt = New IO.StreamWriter(puFehlt)
         swfehlt.AutoFlush = True
         'puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_ab_" & maxobj & ".csv"
-        puAusgabe = "O:\UMWELT\B\Proumwelt_Migration\dokumente\main\dokumentMain_ab_" & maxobj & ".xlsx"
+        'puAusgabe = "O:\UMWELT\B\Proumwelt_Migration\dokumente\main\dokumentMain_ab_" & maxobj & ".xlsx"
+        puAusgabe = "\\kh-w-fs02\Proumwelt_Migration\dokumente\main\dokumentMain_ab_" & maxobj & ".xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
 
         Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_vorgang]  order by dokumentid desc "
@@ -2411,8 +2415,9 @@ Public Class Form1
         Dim altunderledigtDokumente = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\erledigtUndAlt.txt"
         'MsgBox("max. objekte für test: " & maxobj)
         Dim dateiausgabe = "O:\UMWELT\B\Proumwelt_Migration\dokumente\files"
-        dateiausgabe = "e:\Proumwelt\dokumente\files"
-        puAusgabe = "e:\Proumwelt\dokumente\main\dokumentMain_ab_" & maxobj & ".xlsx"
+        'dateiausgabe = "e:\Proumwelt\dokumente\files"
+        dateiausgabe = "\\kh-w-fs02\Proumwelt_Migration\dokumente\files"
+        puAusgabe = "\\kh-w-fs02\Proumwelt_Migration\dokumente\main\dokumentMain_ab_" & maxobj & ".xlsx"
         writeDokumentePU(batchstream, puFehlt, puAusgabe, Sql, maxobj, dateiausgabe, altunderledigtDokumente, altpruefung:=False) ' "E:\proumwelt\dokmain"
         'puAusgabeStream.Close()
         'puAusgabeStream.Dispose()
@@ -4629,9 +4634,9 @@ Public Class Form1
     End Sub
 
     Private Sub Button28_Click(sender As Object, e As EventArgs) Handles Button28.Click
-        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\ausgabeEreignisse" & ".log"
+        Dim puFehler As String = "\\KH-W-FS02\Proumwelt_Migration\dokumente\ereignisse\ausgabeEreignisse" & ".log"
         'Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_ereignisse" & ".xlsx"
-        Dim puAusgabe As String = "e:\proumwelt\ereignisse\dokumente_ereignisse.xlsx"
+        Dim puAusgabe As String = "\\KH-W-FS02\Proumwelt_Migration\dokumente\ereignisse\dokumente_ereignisse.xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".log"
         swfehlt = New IO.StreamWriter(puFehler)
@@ -4667,7 +4672,7 @@ Public Class Form1
 
 
         Dim relativpfad As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\ereignisse\"
-        relativpfad = "e:\proumwelt\ereignisse\"
+        relativpfad = "\\KH-W-FS02\Proumwelt_Migration\dokumente\ereignisse\"
 
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
@@ -5177,7 +5182,7 @@ Public Class Form1
         Dim startvid = setMaxObj(maxobj)
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         'puFehler = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_verlauf_" & startvid & ".log"
-        puFehler = "e:\proumwelt\log\chronologie" & startvid & ".log"
+        puFehler = "\\KH-W-FS02\Proumwelt_Migration\chronologie\chronologie" & startvid & ".log"
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         swfehlt.WriteLine(Now.ToString("yyyyMMdd_hhmmss"))
@@ -5187,7 +5192,7 @@ Public Class Form1
             endvid = startvid - 10000
         End If
         'puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_verlaufSummary_" & startvid & ".xlsx"
-        puAusgabe = "e:\proumwelt\xls\chronologie_" & startvid & ".xlsx"
+        puAusgabe = "\\KH-W-FS02\Proumwelt_Migration\chronologie\chronologie_" & startvid & ".xlsx"
         'puAusgabeStream = New IO.StreamWriter(puAusgabe)
 
         'Sql = "SELECT *  FROM [Paradigma].[dbo].[EREIGNIS_T16]  where not( art like '%email%' or art like '%wiederv%')  order by id desc "
@@ -5212,7 +5217,7 @@ Public Class Form1
         TextBox3.Text = puAusgabe
 
         Dim relativpfad As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\ereignisse\"
-        relativpfad = "e:\proumwelt\summary\"
+        relativpfad = "\\KH-W-FS02\Proumwelt_Migration\chronologie\"
 
 
         TextBox1.Text = puAusgabe
