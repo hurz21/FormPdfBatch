@@ -2056,6 +2056,7 @@ Public Class Form1
     Private Sub fullpathdokumenteErzeugen()
         Dim dateifehlt As String = "O:\UMWELT\B\Proumwelt_Migration\doku\auffueller" & Environment.UserName & ".log"
         dateifehlt = "O:\UMWELT\B\Proumwelt_Migration\doku\auffueller_undfehlendeDokus.log.log"
+        dateifehlt = "T:\dokumente\auffueller_undfehlendeDokus.log.log"
         swfehlt = New IO.StreamWriter(dateifehlt)
         swfehlt.AutoFlush = True
         swfehlt.WriteLine(Now)
@@ -2309,6 +2310,7 @@ Public Class Form1
 
         Dim dateifehlt As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\referenzdokus" & Environment.UserName & ".log"
         dateifehlt = "O:\UMWELT\B\Proumwelt_Migration\dokumente\referenz\referenzdokus.log"
+        dateifehlt = "t:\dokumente\referenz\referenzdokus.log"
         swfehlt = New IO.StreamWriter(dateifehlt)
         swfehlt.AutoFlush = True
         swfehlt.WriteLine(Now)
@@ -2323,7 +2325,7 @@ Public Class Form1
     End Sub
 
     Private Sub Button20_Click(sender As Object, e As EventArgs) Handles Button20.Click
-        Dim batchfile As String
+        'Dim batchfile As String
         Dim puFehlt As String ' = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\Dokumain.log"
         Dim puAusgabe As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\" & "dokumente" & ".csv"
         '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".log"
@@ -2356,17 +2358,17 @@ Public Class Form1
 
         'batchfile = "e:\Proumwelt\dokumente\main\dokumente_ab_" & maxobj & ".bat"
         '\\KH-W-FS02\Proumwelt_Migration
-        batchfile = "\\kh-w-fs02\Proumwelt_Migration\dokumente\main\dokumente_ab_" & maxobj & ".bat"
-        puFehlt = "\\kh-w-fs02\Proumwelt_Migration\dokumente\main\dokumente_ab_" & maxobj & ".log"
+        'batchfile = "\\kh-w-fs02\Proumwelt_Migration\dokumente\main\dokumente_ab_" & maxobj & ".bat"
+        puFehlt = "t:\dokumente\main\dokumente_ab_" & maxobj & ".log"
 
 
-        Dim batchstream = New IO.StreamWriter(batchfile)
-        batchstream.AutoFlush = True
+        'Dim batchstream = New IO.StreamWriter(batchfile)
+        'batchstream.AutoFlush = True
         swfehlt = New IO.StreamWriter(puFehlt)
         swfehlt.AutoFlush = True
         'puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_ab_" & maxobj & ".csv"
         'puAusgabe = "O:\UMWELT\B\Proumwelt_Migration\dokumente\main\dokumentMain_ab_" & maxobj & ".xlsx"
-        puAusgabe = "\\kh-w-fs02\Proumwelt_Migration\dokumente\main\dokumentMain_ab_" & maxobj & ".xlsx"
+        puAusgabe = "t:\dokumente\main\dokumentMain_ab_" & maxobj & ".xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
 
         Sql = "SELECT * FROM [Paradigma].[dbo].[probaug_dokumente_vorgang]  order by dokumentid desc "
@@ -2414,11 +2416,11 @@ Public Class Form1
         TextBox2.Text = Sql
         Dim altunderledigtDokumente = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\erledigtUndAlt.txt"
         'MsgBox("max. objekte für test: " & maxobj)
-        Dim dateiausgabe = "O:\UMWELT\B\Proumwelt_Migration\dokumente\files"
+        Dim dateiausgabe ' = "O:\UMWELT\B\Proumwelt_Migration\dokumente\files"
         'dateiausgabe = "e:\Proumwelt\dokumente\files"
-        dateiausgabe = "\\kh-w-fs02\Proumwelt_Migration\dokumente\files"
-        puAusgabe = "\\kh-w-fs02\Proumwelt_Migration\dokumente\main\dokumentMain_ab_" & maxobj & ".xlsx"
-        writeDokumentePU(batchstream, puFehlt, puAusgabe, Sql, maxobj, dateiausgabe, altunderledigtDokumente, altpruefung:=False) ' "E:\proumwelt\dokmain"
+        dateiausgabe = "t:\dokumente\files"
+        puAusgabe = "t:\dokumente\main\dokumentMain_ab_" & maxobj & ".xlsx"
+        writeDokumentePU(puFehlt, puAusgabe, Sql, maxobj, dateiausgabe, altunderledigtDokumente, altpruefung:=False) ' "E:\proumwelt\dokmain"
         'puAusgabeStream.Close()
         'puAusgabeStream.Dispose()
         'Process.Start(puAusgabe)
@@ -2442,7 +2444,7 @@ Public Class Form1
 
     Private Function setMaxObj(maxobj As Integer) As Integer
         If (TextBox4.Text) = "0" Or TextBox4.Text = "" Then
-            maxobj = 90000
+            maxobj = 100000
         Else
             If IsNumeric(TextBox4.Text) Then
                 maxobj = CInt(TextBox4.Text)
@@ -2452,7 +2454,8 @@ Public Class Form1
         Return maxobj
     End Function
 
-    Private Sub writeDokumentePU(batchfile As IO.StreamWriter, puFehler As String, puAusgabe As String, sql As String, maxobj As Integer, outdirroot As String, altunderledigtDokumente As String,
+    Private Sub writeDokumentePU(puFehler As String, puAusgabe As String, sql As String,
+                                 maxobj As Integer, outdirroot As String, altunderledigtDokumente As String,
                                  altpruefung As Boolean)
         '####
         Dim DT As DataTable
@@ -2577,19 +2580,25 @@ Public Class Form1
                     newdir = IO.Path.Combine(newdir, dateinameext)
 
                     Dim fo As New IO.FileInfo(newdir)
-                    'existiertschon = fo.Exists
-                    existiertschon = False
+                    existiertschon = fo.Exists
+                    'existiertschon = False
                     If existiertschon Then
                         'mit eintrag  in die xls 
                         'kein eintrag in die batch-copierdatei
                     Else
                         'mit eintrag  in die xls 
                         'mit eintrag in die batch-copierdatei
-                        'IO.File.Copy(fullfilename, newdir)
+                        Try
+                            IO.File.Copy(fullfilename, newdir, False)
+                        Catch ex As Exception
+                            MsgBox("fehler bei copy: " & ex.ToString & Environment.NewLine &
+                                Now.ToLongTimeString & Environment.NewLine &
+                                   "weiter mit leertaste")
+                        End Try
                         Debug.Print(fullfilename)
                         Debug.Print(newdir)
-                        batchfile.WriteLine("copy " & Chr(34) & fullfilename & Chr(34) & " " & Chr(34) & newdir & Chr(34))
-                        batchfile.WriteLine("rem cnt  " & igesamt & " " & DT.Rows.Count)
+                        'batchfile.WriteLine("copy " & Chr(34) & fullfilename & Chr(34) & " " & Chr(34) & newdir & Chr(34))
+                        'batchfile.WriteLine("rem cnt  " & igesamt & " " & DT.Rows.Count)
                         schreib += 1
                     End If
                     TextBox3.Text = vid & ", " & igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ] schreib=" & schreib
@@ -2620,7 +2629,7 @@ Public Class Form1
                 GC.Collect()
                 GC.WaitForFullGCComplete()
             Next
-            batchfile.WriteLine("pause ")
+            'batchfile.WriteLine("pause ")
             Dim fi As New FileInfo(puAusgabe)
             package.SaveAs(fi)
         End Using
@@ -2674,6 +2683,7 @@ Public Class Form1
     End Function
 
     Private Sub Button21_Click(sender As Object, e As EventArgs) Handles Button21.Click
+
         stammdaten()
     End Sub
     Private Sub stammdaten()
@@ -2683,6 +2693,9 @@ Public Class Form1
         puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\grunddaten.xlsx"
         puAusgabe = "e:\proumwelt\xls\grunddaten.xlsx"
         puAusgabe = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\grunddaten.xlsx"
+        puAusgabe = "t:\grunddaten\grunddaten.xlsx"
+
+        puFehler = "t:\grunddaten\grunddaten.log"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -2774,7 +2787,11 @@ Public Class Form1
         Dim kontrolldatei = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\Grundaten_gueltigeSGnummern.txt"
         Dim abgewiesendat = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\Grundaten_abgewieseneVorgaenge.txt"
         Dim gueltigeVorgaenge = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\Grundaten_gueltigeVorgaenge.txt"
-        Dim erledigtUndAlt = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\erledigtUndAlt.txt"
+
+        kontrolldatei = "t:\grunddaten\Grundaten_gueltigeSGnummern.txt"
+        abgewiesendat = "t:\grunddaten\Grundaten_abgewieseneVorgaenge.txt"
+        gueltigeVorgaenge = "t:\grunddaten\Grundaten_gueltigeVorgaenge.txt"
+        Dim erledigtUndAlt = "t:\grunddaten\erledigtUndAlt.txt"
         Dim kontrollstream As New IO.StreamWriter(kontrolldatei)
         Dim geloeschteVorgaengeStream As New IO.StreamWriter(abgewiesendat)
         Dim gueltigeVorgaengeStream As New IO.StreamWriter(gueltigeVorgaenge)
@@ -3297,8 +3314,10 @@ Public Class Form1
 
     Private Sub Button22_Click(sender As Object, e As EventArgs) Handles Button22.Click
         'adresse
-        Dim puFehler As String = "O:\UMWELT\B\Proumwelt_Migration\lageadresse\LageAdresse.log"
-        Dim puAusgabe As String = "O:\UMWELT\B\Proumwelt_Migration\lageadresse\LageAdresse.xlsx"
+        'Dim puFehler As String = "O:\UMWELT\B\Proumwelt_Migration\lageadresse\LageAdresse.log"
+        'Dim puAusgabe As String = "O:\UMWELT\B\Proumwelt_Migration\lageadresse\LageAdresse.xlsx"
+        Dim puFehler As String = "t:\lageadresse\LageAdresse.log"
+        Dim puAusgabe As String = "t:\lageadresse\LageAdresse.xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -3502,8 +3521,10 @@ Public Class Form1
 
     Private Sub Button26_Click(sender As Object, e As EventArgs) Handles Button26.Click
         'kataster 
-        Dim puFehler As String = "O:\UMWELT\B\Proumwelt_Migration\kataster\kataster.log"
-        Dim puAusgabe As String = "O:\UMWELT\B\Proumwelt_Migration\kataster\kataster.xlsx"
+        'Dim puFehler As String = "O:\UMWELT\B\Proumwelt_Migration\kataster\kataster.log"
+        'Dim puAusgabe As String = "O:\UMWELT\B\Proumwelt_Migration\kataster\kataster.xlsx"
+        Dim puFehler As String = "t:\kataster\kataster.log"
+        Dim puAusgabe As String = "t:\kataster\kataster.xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -3681,9 +3702,10 @@ Public Class Form1
 
     Private Sub Button23_Click(sender As Object, e As EventArgs) Handles Button23.Click
         'beteiligte 2_stakeholder 
-        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\stakeholder" & ".log"
-        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "stakeholder" & ".csv"
+        Dim puFehler As String = "t:\stakeholder\stakeholder" & ".log"
+        Dim puAusgabe As String = "t:\stakeholder\stakeholder" & ".csv"
         Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
+        puAusgabeStream.AutoFlush = True
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         Dim Sql As String
@@ -3698,14 +3720,14 @@ Public Class Form1
         writeStakeholderAusgabePU(puFehler, puAusgabeStream, Sql, maxobj)
         puAusgabeStream.Close()
         puAusgabeStream.Dispose()
-        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
+        System.Diagnostics.Process.Start("explorer", "t:\stakeholder\")
         swfehlt.Dispose()
         End
     End Sub
     Private Sub Button25_Click(sender As Object, e As EventArgs) Handles Button25.Click
         'wiedervorlagen
-        Dim puFehler As String = "O:\UMWELT\B\Proumwelt_Migration\wiedervorlage\wiedervorlagen.log"
-        Dim puAusgabe As String = "O:\UMWELT\B\Proumwelt_Migration\wiedervorlage\wiedervorlagen.xlsx"
+        Dim puFehler As String = "t:\wiedervorlage\wiedervorlagen.log"
+        Dim puAusgabe As String = "t:\wiedervorlage\wiedervorlagen.xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -3903,7 +3925,8 @@ Public Class Form1
 
             For Each perso As person In perscoll
                 'zeileBeteiligte = bildeZeilePerson(eingang, t, perso)  
-                If csvzeileSpeichern(zeileBeteiligte.ToString, puAusgabeStream) Then
+                Dim a = bildezeilebeteiligter(perso, t, eingang)
+                If csvzeileSpeichern(a, puAusgabeStream) Then
                     zeileBeteiligte.Clear()
                 End If
                 igesamt += 1
@@ -3914,6 +3937,42 @@ Public Class Form1
         End Try
         'Next
     End Sub
+
+    Private Function bildezeilebeteiligter(perso As person, t As String, eingang As Date) As String
+        Dim a As New Text.StringBuilder
+        Try
+            a.Append("vid" & t)
+            a.Append(eingang.ToString("yyyy") & t)
+            a.Append("???" & t)
+            a.Append("???" & t)
+            a.Append(perso.Anrede & t)
+            a.Append(bildeFirma(perso) & t)
+            a.Append(perso.Namenszusatz & t)
+            a.Append(perso.Vorname & t)
+            a.Append(perso.Name & t)
+            a.Append(perso.Kontakt.Anschrift.Strasse & t)
+            a.Append(perso.Kontakt.Anschrift.Hausnr & t)
+            a.Append(perso.Kontakt.Anschrift.Hausnr & t)
+            a.Append("hessen" & t)
+            a.Append(perso.Kontakt.Anschrift.PLZ & t)
+            a.Append(perso.Kontakt.Anschrift.Gemeindename & t)
+            a.Append(perso.Bemerkung & t)
+            a.Append("pf: " & perso.Kontakt.Anschrift.Postfach & t)
+            a.Append(perso.Kontakt.elektr.Telefon1 & t)
+            a.Append(perso.Kontakt.elektr.Fax1 & t)
+            a.Append(perso.Kontakt.elektr.MobilFon & t)
+            a.Append(perso.Kontakt.elektr.Email & t)
+            a.Append("" & t)
+            a.Append(perso.Kontakt.elektr.Homepage & t)
+            a.Append("" & t)
+            a.Append("" & t)
+            a.Append(perso.Kassenkonto & t)
+            a.Append(perso.Rolle & t)
+            Return a.ToString
+        Catch ex As Exception
+            l(" " & ex.ToString)
+        End Try
+    End Function
 
     Private Function getAllStakeholders(perstemp As person, dt As DataTable) As List(Of person)
         Dim perlist As New List(Of person)
@@ -3993,8 +4052,9 @@ Public Class Form1
         zeileBeteiligte.Append("KASSENKONTO" & t)
     End Sub
     Private Sub bildeKopfZeileStakeholder(zeileBeteiligte As System.Text.StringBuilder, t As String)
-        zeileBeteiligte.Append("az" & t) '     vid   
-        zeileBeteiligte.Append("jahr" & t) '     datum
+        zeileBeteiligte.Append("" & t) '     vid   
+        zeileBeteiligte.Append("" & t) '     datum
+        zeileBeteiligte.Append("" & t) '     datum
         zeileBeteiligte.Append("Obergruppe" & t) '  rolle    
         zeileBeteiligte.Append("Anrede" & t) '   
         zeileBeteiligte.Append("Firma" & t) '  znkombi
@@ -4023,9 +4083,13 @@ Public Class Form1
 
     Private Sub Button30_Click(sender As Object, e As EventArgs) Handles Button30.Click
         'antragsteller
-        Dim puFehler As String = "O:\UMWELT\B\Proumwelt_Migration\antragsteller\antragsteller.log"
-        Dim puAusgabe As String = "O:\UMWELT\B\Proumwelt_Migration\antragsteller\antragsteller.xlsx"
-        Dim pubeteiligte As String = "O:\UMWELT\B\Proumwelt_Migration\antragsteller\beteiligte_1.xlsx"
+        'Dim puFehler As String = "O:\UMWELT\B\Proumwelt_Migration\antragsteller\antragsteller.log"
+        'Dim puAusgabe As String = "O:\UMWELT\B\Proumwelt_Migration\antragsteller\antragsteller.xlsx"
+        'Dim pubeteiligte As String = "O:\UMWELT\B\Proumwelt_Migration\antragsteller\beteiligte_1.xlsx"
+
+        Dim puFehler As String = "t:\antragsteller\antragsteller.log"
+        Dim puAusgabe As String = "t:\antragsteller\antragsteller.xlsx"
+        Dim pubeteiligte As String = "t:\antragsteller\beteiligte_1.xlsx"
         'Dim ausgabeAntragsteller As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         'Dim ausgabeBeteiligte As New IO.StreamWriter(pubeteiligte, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
@@ -5182,7 +5246,7 @@ Public Class Form1
         Dim startvid = setMaxObj(maxobj)
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         'puFehler = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\PU_verlauf_" & startvid & ".log"
-        puFehler = "\\KH-W-FS02\Proumwelt_Migration\chronologie\chronologie" & startvid & ".log"
+        puFehler = "t:\chronologie\chronologie" & startvid & ".log"
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
         swfehlt.WriteLine(Now.ToString("yyyyMMdd_hhmmss"))
@@ -5192,7 +5256,7 @@ Public Class Form1
             endvid = startvid - 10000
         End If
         'puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_verlaufSummary_" & startvid & ".xlsx"
-        puAusgabe = "\\KH-W-FS02\Proumwelt_Migration\chronologie\chronologie_" & startvid & ".xlsx"
+        puAusgabe = "t:\chronologie\chronologie_" & startvid & ".xlsx"
         'puAusgabeStream = New IO.StreamWriter(puAusgabe)
 
         'Sql = "SELECT *  FROM [Paradigma].[dbo].[EREIGNIS_T16]  where not( art like '%email%' or art like '%wiederv%')  order by id desc "
@@ -5404,10 +5468,10 @@ Public Class Form1
 
     Private Sub Button35_Click(sender As Object, e As EventArgs) Handles Button35.Click
         'probaugstammdaten
-        Dim puFehler As String = "e:\proumwelt\log\illegal.log"
+        Dim puFehler As String = "T:\grunddaten\illegal.log"
         Dim puAusgabe As String = "e:\proumwelt\xls\" & "illegal" & ".xlsx"
         puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\illegal.xlsx"
-        puAusgabe = "e:\proumwelt\xls\illegal.csv"
+        puAusgabe = "T:\grunddaten\illegal.csv"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
