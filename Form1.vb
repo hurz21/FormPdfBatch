@@ -2349,6 +2349,9 @@ Public Class Form1
             End If
             'untergrenze = maxobj - 10000
         End If
+#If DEBUG Then
+        '  untergrenze = maxobj - 3
+#End If
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         'puFehlt = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\logs\" & "dokumente_ab_" & maxobj & ".log"
         'batchfile = "O:\UMWELT\B\Proumwelt_Migration\dokumente\main\dokumente_ab_" & maxobj & ".bat"
@@ -2418,7 +2421,11 @@ Public Class Form1
         'MsgBox("max. objekte für test: " & maxobj)
         Dim dateiausgabe ' = "O:\UMWELT\B\Proumwelt_Migration\dokumente\files"
         'dateiausgabe = "e:\Proumwelt\dokumente\files"
+        '
         dateiausgabe = "t:\dokumente\files"
+        'dateiausgabe = "O:\UMWELT\B\Proumwelt_Migration\dokumente\files"
+
+        '
         puAusgabe = "t:\dokumente\main\dokumentMain_ab_" & maxobj & ".xlsx"
         writeDokumentePU(puFehlt, puAusgabe, Sql, maxobj, dateiausgabe, altunderledigtDokumente, altpruefung:=False) ' "E:\proumwelt\dokmain"
         'puAusgabeStream.Close()
@@ -2559,7 +2566,14 @@ Public Class Form1
                             Continue For
                         End If
                     End If
-
+                    'If fullfilename.Contains("?") Then
+                    '    fullfilename = fullfilename.Replace("?", "F")
+                    '    l(vid & " ?????? " & fullfilename)
+                    'End If
+                    If dateinameext.Contains("?") Then
+                        dateinameext = dateinameext.Replace("?", "F")
+                        l(vid & " ?????? " & dateinameext)
+                    End If
                     If fullfilename = String.Empty Then
                         Continue For
                     End If
@@ -4698,13 +4712,12 @@ Public Class Form1
     End Sub
 
     Private Sub Button28_Click(sender As Object, e As EventArgs) Handles Button28.Click
-        Dim puFehler As String = "\\KH-W-FS02\Proumwelt_Migration\dokumente\ereignisse\ausgabeEreignisse" & ".log"
+        Dim puFehler As String = "t:\dokumente\ereignisse\ausgabeEreignisse" & ".log"
         'Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "dokumente_ereignisse" & ".xlsx"
-        Dim puAusgabe As String = "\\KH-W-FS02\Proumwelt_Migration\dokumente\ereignisse\dokumente_ereignisse.xlsx"
+        Dim puAusgabe As String = "t:\dokumente\ereignisse\dokumente_ereignisse.xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         '   dateifehlt = "L:\system\batch\margit\auffueller" & Environment.UserName & ".log"
-        swfehlt = New IO.StreamWriter(puFehler)
-        swfehlt.AutoFlush = True
+
         '  swfehlt.WriteLine(Now)
         ' S1020dokumenteMitFullpathTabelleErstellen("DOKUFULLNAME", swfehlt) 'referenzfälleNeuZuweisen
         ' swfehlt.WriteLine("wechsel")
@@ -4712,6 +4725,13 @@ Public Class Form1
         Dim Sql As String
         Dim maxobj As Integer = 0
         maxobj = setMaxObj(maxobj)
+        Dim untergrenze = maxobj - 10000
+        puFehler = "t:\dokumente\ereignisse\ausgabeEreignisse_" & maxobj & ".log"
+        puAusgabe = "t:\dokumente\ereignisse\dokumente_ereignisse_" & maxobj & ".xlsx"
+
+        swfehlt = New IO.StreamWriter(puFehler)
+        swfehlt.AutoFlush = True
+
         Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
         'Sql = "SELECT *  FROM [Paradigma].[dbo].[EREIGNIS_T16]  where not( art like '%email%' or art like '%wiederv%')  order by id desc "
         Sql = "    Select   * FROM [Paradigma].[dbo].[EREIGNIS_T16]    e, " &
@@ -4726,6 +4746,18 @@ Public Class Form1
                 "  and    not( art like '%email%' or art like '%wiederv%' or  (NOTIZ) is  null  ) " &
                 " order by    e.VORGANGSID desc,  e.DATUM desc"
 
+        Sql = "    Select   * FROM [Paradigma].[dbo].[EREIGNIS_T16]    e, " &
+                "  [Paradigma].[dbo].[stammdaten_tutti] s " &
+                " where  " &
+                "   e.VORGANGSID = s.VORGANGSID " &
+                "  and    not( art like '%email%' or art like '%wiederv%' or  (NOTIZ) is  null  ) " &
+                " and s.VORGANGSID <=" & maxobj & " and s.VORGANGSID>" & untergrenze &
+                " order by    e.VORGANGSID desc,  e.DATUM desc"
+
+
+
+        'vid <=" & maxobj & " and vid>" & untergrenze & "
+
         'Sql = "  SELECT e.id,e.BESCHREIBUNG,datum,art,richtung,notiz,typnr,e.VORGANGSID,s.EINGANG,dateinameext " &
         '        " FROM [Paradigma].[dbo].EREIGNIS_und_DOK e,   " &
         '        "   [Paradigma].[dbo].[stammdaten_tutti] s  " &
@@ -4736,7 +4768,7 @@ Public Class Form1
 
 
         Dim relativpfad As String '= "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\ereignisse\"
-        relativpfad = "\\KH-W-FS02\Proumwelt_Migration\dokumente\ereignisse\"
+        relativpfad = "t:\dokumente\ereignisse\files\"
 
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
@@ -4836,8 +4868,11 @@ Public Class Form1
                         l("fehler beim erzeugeEreignisString ")
                     End If
 
-                    TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
+                    TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" & "  / " & vid
                     Application.DoEvents()
+                    If vid = 66633 Then
+                        Debug.Print("vid=66633")
+                    End If
                     'zeilebilden
                     ws.Cells("A" & row).Value = vid
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
