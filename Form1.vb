@@ -4573,8 +4573,8 @@ Public Class Form1
 
     Private Sub Button27_Click(sender As Object, e As EventArgs) Handles Button27.Click
         'sachbearbeiter 
-        Dim puFehler As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\sachbearbeiter" & ".log"
-        Dim puAusgabe As String = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\" & "sachbearbeiter" & ".csv"
+        Dim puFehler As String = "t:\sachbearbeiter" & ".log"
+        Dim puAusgabe As String = "t:\" & "sachbearbeiter" & ".csv"
         Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -4588,7 +4588,7 @@ Public Class Form1
         writeSachbearbeiterPU(puFehler, puAusgabeStream, Sql, maxobj)
         puAusgabeStream.Close()
         puAusgabeStream.Dispose()
-        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung")
+        System.Diagnostics.Process.Start("explorer", puAusgabe)
         swfehlt.Dispose()
         End
     End Sub
@@ -4639,7 +4639,7 @@ Public Class Form1
         For Each drr As DataRow In DT.Rows
             Try
                 igesamt += 1
-                vid = CStr(clsDBtools.fieldvalue(drr.Item("vid")))
+                'vid = CStr(clsDBtools.fieldvalue(drr.Item("vid")))
                 Username = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Username"))))
                 nachname = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("nachname"))))
                 vorname = cleanString((clsDBtools.fieldvalue(drr.Item("vorname"))))
@@ -4676,7 +4676,6 @@ Public Class Form1
                 zeile.Append(sachgebiet & t) '    
 
                 If csvzeileSpeichern(zeile.ToString, puAusgabeStream) Then
-
                     zeile.Clear()
                 Else
                     Debug.Print("oooo")
