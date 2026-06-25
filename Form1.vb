@@ -1,11 +1,12 @@
-﻿Imports OfficeOpenXml
-Imports System.IO
-Imports System.Drawing.Imaging
-'Imports System.Runtime.InteropServices
+﻿'Imports System.Runtime.InteropServices
 'Imports Microsoft.Office.Interop.Excel
 Imports System.Data
 Imports System.Diagnostics.Eventing.Reader
+Imports System.Drawing.Imaging
+Imports System.IO
+Imports System.Xml
 Imports Microsoft.Office.Interop.Word
+Imports OfficeOpenXml
 'Imports Acrobat
 'Imports Microsoft.Office.Interop
 'Imports Microsoft.Office.Interop.Word
@@ -2722,9 +2723,13 @@ Public Class Form1
             " where vorgangsid< " & maxobj &
             " order by vorgangsid desc  "
 
-        'Sql = "SELECT top 1000 * FROM [Paradigma].[dbo].[stammdaten_tutti] " &
-        '    " where vorgangsid< " & maxobj &
-        '    " order by vorgangsid desc  "
+        Sql = "SELECT  b.*, s.* " &
+            " From [Paradigma].[dbo].[BEARBEITER_T5] b " &
+            " right OUTER Join [Paradigma].[dbo].[stammdaten_tutti] s " &
+            " On b.bearbeiterid = s.bearbeiterid " &
+            " Order By vorgangsid desc  ;"
+
+
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
         writeStammdatenPU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln, swfehlt, rohausgabe:=True)
@@ -2791,7 +2796,8 @@ Public Class Form1
     End Sub
 
     Private Sub writeStammdatenPU(puFehler As String, puAusgabe As String, sql As String,
-                                  maxobj As Integer, umlautwandeln As Boolean, swfehlt As IO.StreamWriter, rohausgabe As Boolean)
+                                  maxobj As Integer, umlautwandeln As Boolean, swfehlt As IO.StreamWriter,
+                                  rohausgabe As Boolean)
         Dim DT, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR As DataTable
         Dim idok As Integer = 0
         swfehlt.WriteLine("writeStammdatenPU---")
@@ -2821,6 +2827,14 @@ Public Class Form1
             writeCollectionKontrollfile(kontrollstream, coll)
             kontrollstream.Close()
         End If
+
+        'illegale #########################################
+        Dim sql_illegale = "SELECT * FROM [Paradigma].[dbo].[t17] " &
+            " order by vorgangsid desc  "
+        Dim illStatus, illText As String
+        Dim illegaleDT As DataTable
+        illegaleDT = alleDokumentDatenHolen(sql_illegale)
+        '#########################################
 
         DT = alleDokumentDatenHolen(sql)
         sql = "SELECT s.[VORGANGSID] ,[FREMDVORGANGSID] " &
@@ -2953,12 +2967,16 @@ Public Class Form1
                         geloeschteVorgaengeStream.WriteLine(vid & ";" & sgnr & ";" & az2) ' & ";" & str.pAlt & ";" &)
                         Continue For
                     End If
+
+
+
                     '#########################################################################
                     gueltigeVorgaengeStream.WriteLine(vid & ";" & az2 & ";" & eingang.ToString("yyyy"))
                     row += 1
                     sachgebiet = "67" & sgnr.Substring(0, 1) '& "-" & sachgebiet
 
-                    sachbearbeiter = CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter"))) ' & "," & CStr(clsDBtools.fieldvalue(drr.Item("weiterebearb")))
+                    'sachbearbeiter = CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter"))) ' & "," & CStr(clsDBtools.fieldvalue(drr.Item("weiterebearb")))
+                    sachbearbeiter = CStr(clsDBtools.fieldvalue(drr.Item("kuerzel1"))) ' & "," & CStr(clsDBtools.fieldvalue(drr.Item("weiterebearb")))
                     Hauptaktenzeichen = ""
                     'hauptaktenjahr = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                     geschlossen = CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))
@@ -2977,6 +2995,18 @@ Public Class Form1
                                                        CStr(clsDBtools.fieldvalue(drr.Item("internenr"))),
                                                        CStr(clsDBtools.fieldvalue(drr.Item("beschreibung"))),
                                                         verwandteString, vid, stotitel))
+
+
+                    'illegale
+                    If Verfahrensart = "3307" Then
+                        Debug.Print("")
+                        If getIllegaleHuette(vid, illegaleDT, illStatus, illText) Then
+                            Notiz = Notiz & " / ill.: " & illText
+                            Vorhabensmerkmal = illStatus
+                            Verfahrensart = "305"
+                        End If
+                    End If
+
                     zusatz1 = vid 'CStr(clsDBtools.fieldvalue(drr.Item("az2")))
                     zusatz2 = verwandteString
                     zusatz3 = CStr(clsDBtools.fieldvalue(drr.Item("probaugaz")))
@@ -3048,6 +3078,75 @@ Public Class Form1
         End Using
         l("fertig  " & puFehler)
     End Sub
+
+    Private Function getIllegaleHuette(vid As String, illegaleDT As DataTable, ByRef illStatus As String, ByRef illText As String) As Boolean
+        l("getIllegaleHuette  " & vid)
+        Dim statustext, gebietstext, raeumungstyptext As String
+        Try
+            For i = 0 To illegaleDT.Rows.Count - 1
+                If illegaleDT.Rows(i).Item("vorgangsid").ToString = vid Then
+                    illStatus = illegaleDT.Rows(i).Item("status").ToString
+                    Select Case illStatus
+                        Case illStatus = ""
+                            statustext = "0"
+                        Case "1"
+                            statustext = "planmäßig"
+                        Case "2"
+                            statustext = "laufend"
+                        Case "3"
+                            statustext = "erledigt"
+                        Case "4"
+                            statustext = "recherche"
+                        Case Else
+                            statustext = "0"
+                    End Select
+                    Select Case illegaleDT.Rows(i).Item("gebiet").ToString
+                        Case "0"
+                            gebietstext = ""
+                        Case "1"
+                            gebietstext = "Außenbereich"
+                        Case "2"
+                            gebietstext = "LSG Kreis Offenbach"
+                        Case "3"
+                            gebietstext = "LSG Hess. Mainauen"
+                        Case "4"
+                            gebietstext = "LSG Zellerbruch"
+                        Case "5"
+                            gebietstext = "NSG"
+                        Case Else
+                            gebietstext = ""
+                    End Select
+                    Select Case illegaleDT.Rows(i).Item("raeumungstyp").ToString
+                        Case "0"
+                            raeumungstyptext = ""
+                        Case "1"
+                            raeumungstyptext = "freiwillig"
+                        Case "2"
+                            raeumungstyptext = "Abräumvertrag"
+                        Case "3"
+                            raeumungstyptext = "Rechtsstreit"
+                        Case Else
+                            raeumungstyptext = ""
+                    End Select
+
+                    illText = "stat:" & statustext & ",geb:" & gebietstext & ",räu:" & raeumungstyptext &
+                       ",aD: " & clsDBtools.fieldvalueDate(illegaleDT.Rows(i).Item("anhoerung")).ToString("yyyy-MM-dd").Replace("1900-01-01", "") &
+                       ",räBis: " & clsDBtools.fieldvalueDate(illegaleDT.Rows(i).Item("raeumungbisdatum")).ToString("yyyy-MM-dd").Replace("1900-01-01", "") &
+                       ",räD: " & clsDBtools.fieldvalueDate(illegaleDT.Rows(i).Item("raeumung")).ToString("yyyy-MM-dd").Replace("1900-01-01", "") &
+                       ",vD: " & clsDBtools.fieldvalueDate(illegaleDT.Rows(i).Item("verfuegung")).ToString("yyyy-MM-dd").Replace("1900-01-01", "") &
+                       ",erl: " & clsDBtools.fieldvalueDate(illegaleDT.Rows(i).Item("fallerledigt")).ToString("yyyy-MM-dd").Replace("1900-01-01", "") &
+                       ",ver: " & illegaleDT.Rows(i).Item("vermerk").ToString &
+                       ",qu: " & illegaleDT.Rows(i).Item("quelle").ToString()
+                    Return True
+                End If
+            Next
+            Return False
+            l("nichts gefunden")
+        Catch ex As Exception
+            l("getIllegaleHuette fehler  " & ex.ToString)
+            Return False
+        End Try
+    End Function
 
     Private Function makeDokuskip(letztebearbeitung As Date, aufnahme As Date, erledigt As String) As Integer
         Try

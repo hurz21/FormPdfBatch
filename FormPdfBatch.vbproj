@@ -447,7 +447,8 @@
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Release ( 
 
-  copy $(targetfilename)  L:\system\batch\margit\formpdfbatch.exe
+  copy $(targetfilename) T:\exe\formpdfbatch.exe
+  copy $(targetfilename) T:\exe2\formpdfbatch.exe
 )</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
