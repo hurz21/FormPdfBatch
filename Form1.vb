@@ -2728,7 +2728,7 @@ Public Class Form1
             " right OUTER Join [Paradigma].[dbo].[stammdaten_tutti] s " &
             " On b.bearbeiterid = s.bearbeiterid " &
             " Order By vorgangsid desc  ;"
-
+        '" where vorgangsid>70000 " &
 
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
@@ -3066,15 +3066,16 @@ Public Class Form1
                 GC.Collect()
                 GC.WaitForFullGCComplete()
             Next
-            geloeschteVorgaengeStream.Close()
-            Process.Start(abgewiesendat)
-            Process.Start(kontrolldatei)
-            Process.Start(gueltigeVorgaenge)
+
             swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt & ", tcount: " & tcount)
 
             ' Datei speichern
             Dim fi As New FileInfo(puAusgabe)
             package.SaveAs(fi)
+            geloeschteVorgaengeStream.Close()
+            Process.Start(abgewiesendat)
+            Process.Start(kontrolldatei)
+            Process.Start(gueltigeVorgaenge)
         End Using
         l("fertig  " & puFehler)
     End Sub
