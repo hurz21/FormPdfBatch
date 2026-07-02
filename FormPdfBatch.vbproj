@@ -228,6 +228,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="kontaktdaten.vb" />
+    <Compile Include="mergeexcel.vb" />
     <Compile Include="modDokExist.vb" />
     <Compile Include="modOracle.vb" />
     <Compile Include="modPrep.vb" />

@@ -2513,15 +2513,7 @@ Public Class Form1
         Using package As New ExcelPackage()
             Dim ws = package.Workbook.Worksheets.Add("Daten")
             'kopfzeile
-            'row.Append("az" & t) 'Az
-            'row.Append("jahr" & t) 'jahr
-            'row.Append("datum" & t) 'datum
-            'row.Append("oberbegriff" & t) 'oberbegriff Protokolle
-            'row.Append((cleanString("bezeichnung")) & t) 'bezeichnung beschreibung
-            'row.Append(("pfad") & t) 'pfad
-            'row.Append("ordner" & t) 'ordner im mediencenter
-            'row.Append("revisionssicher" & t) ' 
-            'row.Append("bearbeiterid" & t) ' 
+
             ws.Cells("A1").Value = "az"
             ws.Cells("B1").Value = "jahr"
             ws.Cells("c1").Value = "obergruppe"
@@ -2529,23 +2521,11 @@ Public Class Form1
             ws.Cells("e1").Value = "oberbegriff"
             ws.Cells("f1").Value = "bezeichnung"
             ws.Cells("g1").Value = "relativer pfad"
-            ws.Cells("h1").Value = "ordner im mediencenter"
+            ws.Cells("h1").Value = "ordner im mc"
             ws.Cells("i1").Value = "dokumentid"
             ws.Cells("j1").Value = "revisionssicher"
             Dim vorhanden As Boolean
-            'row.Append("az" & t) 'Az
-            'row.Append("jahr" & t) 'jahr
-            'row.Append("obergruppe" & t) 'jahr
-            'row.Append("datum" & t) 'datum
-            'row.Append("oberbegriff" & t) 'oberbegriff Protokolle leer
-            'row.Append((cleanString("bezeichnung")) & t) 'bezeichnung beschreibung
-            'row.Append(("pfad") & t) 'pfad
-            'row.Append("ordner" & t) 'ordner im mediencenter
-            'row.Append("docid" & t) 'ordner im mediencenter
-            'row.Append("_revisionssicher" & t) ' 
-            'row.Append("_bearbeiterid" & t) ' 
 
-            'csvzeileSpeichern(row.ToString, puAusgabeStream) 
             Dim newdir As String
             Dim erfolg As Boolean
             For Each drr As DataRow In DT.Rows
@@ -2621,12 +2601,13 @@ Public Class Form1
                     'zeilebilden
                     ws.Cells("A" & row).Value = vid
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
-                    ws.Cells("c" & row).Value = "obagruppe"
+                    ws.Cells("c" & row).Value = ""
                     ws.Cells("d" & row).Value = dbdatum.ToString("dd.MM.yyyy")
                     ws.Cells("e" & row).Value = clsString.removeSemikolon(typ)
                     ws.Cells("f" & row).Value = (cleanString(beschreibung))
                     ws.Cells("g" & row).Value = clsString.removeSemikolon(newdir)
-                    ws.Cells("h" & row).Value = dbdatum.ToString("yyyyMMdd") & "_" & cleanString(dateinameext).Trim
+                    'ws.Cells("h" & row).Value = dbdatum.ToString("yyyyMMdd") & "_" & cleanString(dateinameext).Trim
+                    ws.Cells("h" & row).Value = "SomeOldBullshit" 'dbdatum.ToString("yyyyMMdd") & "_" & cleanString(dateinameext).Trim
                     ws.Cells("i" & row).Value = ""
                     ws.Cells("j" & row).Value = CInt(istRevisionssicher)
 
@@ -3005,9 +2986,11 @@ Public Class Form1
                             Vorhabensmerkmal = illStatus
                             Verfahrensart = "305"
                         End If
+                    Else
+                        Vorhabensmerkmal = ""
                     End If
 
-                    zusatz1 = vid 'CStr(clsDBtools.fieldvalue(drr.Item("az2")))
+                    zusatz1 = az2 '.Substring(0, 16) 'vid 'CStr(clsDBtools.fieldvalue(drr.Item("az2")))
                     zusatz2 = verwandteString
                     zusatz3 = CStr(clsDBtools.fieldvalue(drr.Item("probaugaz")))
                     If umlautwandeln Then
@@ -3028,7 +3011,7 @@ Public Class Form1
                     TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
                     Application.DoEvents()
                     ' Datenzeilen 
-                    ws.Cells("A" & row).Value = az2
+                    ws.Cells("A" & row).Value = vid 'az2
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
                     ws.Cells("c" & row).Value = ""
                     ws.Cells("d" & row).Value = "proumwelt"
@@ -3041,7 +3024,7 @@ Public Class Form1
                     ws.Cells("k" & row).Value = aktenstandort
                     ws.Cells("m" & row).Value = sachgebiet
                     ws.Cells("n" & row).Value = Verfahrensart.TrimEnd("-")
-                    ws.Cells("o" & row).Value = Vorhaben.TrimEnd("-")
+                    ws.Cells("o" & row).Value = Vorhaben 'Vorhaben.TrimEnd("-")
                     ws.Cells("p" & row).Value = Vorhabensmerkmal.TrimEnd("-").TrimEnd(";").TrimEnd(",")
                     ws.Cells("q" & row).Value = sachbearbeiter.TrimEnd("-").TrimEnd(";").TrimEnd(",")
                     ws.Cells("s" & row).Value = Hauptaktenzeichen
@@ -3130,13 +3113,13 @@ Public Class Form1
                             raeumungstyptext = ""
                     End Select
 
-                    illText = "stat:" & statustext & ",geb:" & gebietstext & ",räu:" & raeumungstyptext &
-                       ",aD: " & clsDBtools.fieldvalueDate(illegaleDT.Rows(i).Item("anhoerung")).ToString("yyyy-MM-dd").Replace("1900-01-01", "") &
-                       ",räBis: " & clsDBtools.fieldvalueDate(illegaleDT.Rows(i).Item("raeumungbisdatum")).ToString("yyyy-MM-dd").Replace("1900-01-01", "") &
-                       ",räD: " & clsDBtools.fieldvalueDate(illegaleDT.Rows(i).Item("raeumung")).ToString("yyyy-MM-dd").Replace("1900-01-01", "") &
-                       ",vD: " & clsDBtools.fieldvalueDate(illegaleDT.Rows(i).Item("verfuegung")).ToString("yyyy-MM-dd").Replace("1900-01-01", "") &
-                       ",erl: " & clsDBtools.fieldvalueDate(illegaleDT.Rows(i).Item("fallerledigt")).ToString("yyyy-MM-dd").Replace("1900-01-01", "") &
-                       ",ver: " & illegaleDT.Rows(i).Item("vermerk").ToString &
+                    illText = "stat:" & statustext & ",gebiet:" & gebietstext & ",räumtyp:" & raeumungstyptext &
+                       ",anhöD: " & clsDBtools.fieldvalueDate(illegaleDT.Rows(i).Item("anhoerung")).ToString("yyyy-MM-dd").Replace("1900-01-01", "") &
+                       ",räumBis: " & clsDBtools.fieldvalueDate(illegaleDT.Rows(i).Item("raeumungbisdatum")).ToString("yyyy-MM-dd").Replace("1900-01-01", "") &
+                       ",räumD: " & clsDBtools.fieldvalueDate(illegaleDT.Rows(i).Item("raeumung")).ToString("yyyy-MM-dd").Replace("1900-01-01", "") &
+                       ",verfD: " & clsDBtools.fieldvalueDate(illegaleDT.Rows(i).Item("verfuegung")).ToString("yyyy-MM-dd").Replace("1900-01-01", "") &
+                       ",erledigt: " & clsDBtools.fieldvalueDate(illegaleDT.Rows(i).Item("fallerledigt")).ToString("yyyy-MM-dd").Replace("1900-01-01", "") &
+                       ",verm: " & illegaleDT.Rows(i).Item("vermerk").ToString &
                        ",qu: " & illegaleDT.Rows(i).Item("quelle").ToString()
                     Return True
                 End If
@@ -5651,6 +5634,17 @@ Public Class Form1
         End
     End Sub
 
+    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
+
+    End Sub
+
+    Private Sub Button37_Click(sender As Object, e As EventArgs) Handles Button37.Click
+        'merge excel files
+        'T:\dokumente\main
+        Mergetest("T:\dokumente\main", "MERGEDMainDoks.xlsx")
+        Mergetest("T:\dokumente\ereignisse", "MERGEDEreignisseDoks.xlsx")
+    End Sub
+
 
 
 
@@ -5733,4 +5727,58 @@ Public Class Form1
             Return False
         End Try
     End Function
+    Shared Sub Mergetest(folder As String, folderOUT As String)
+        ' Lizenz kontext (erforderlich ab EPPlus 5)
+        'ExcelPackage.LicenseContext = LicenseContext.NonCommercial
+        ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
+
+        'Dim folder = "T:\dokumente\main"
+        Dim outPath = Path.Combine(folder, folderOUT)
+
+        Dim files = Directory.GetFiles(folder) _
+            .Where(Function(f)
+                       Dim ext = Path.GetExtension(f).ToLowerInvariant()
+                       Return ext = ".xlsx"
+                   End Function) _
+            .OrderBy(Function(f) f) _
+            .ToArray()
+
+        If files.Length = 0 Then
+            Console.WriteLine("Keine .xlsx-Dateien gefunden.")
+            Return
+        End If
+
+        Using outPkg As New ExcelPackage()
+            Dim outWs = outPkg.Workbook.Worksheets.Add("Merged")
+            Dim nextRow As Integer = 1
+
+            For Each file In files
+                Using inPkg As New ExcelPackage(New FileInfo(file))
+                    Dim inWs = inPkg.Workbook.Worksheets.FirstOrDefault()
+                    If inWs Is Nothing Then Continue For
+
+                    Dim endRow As Integer = 0
+                    Dim endCol As Integer = 0
+                    If inWs.Dimension IsNot Nothing Then
+                        endRow = inWs.Dimension.End.Row
+                        endCol = inWs.Dimension.End.Column
+                    End If
+
+                    If endRow = 0 OrElse endCol = 0 Then Continue For
+
+                    For r As Integer = 1 To endRow
+                        For c As Integer = 1 To endCol
+                            outWs.Cells(nextRow, c).Value = inWs.Cells(r, c).Value
+                        Next
+                        nextRow += 1
+                    Next
+                End Using
+            Next
+
+            If File.Exists(outPath) Then File.Delete(outPath)
+            outPkg.SaveAs(New FileInfo(outPath))
+        End Using
+
+        Console.WriteLine("Fertig: " & outPath)
+    End Sub
 End Class

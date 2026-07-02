@@ -66,6 +66,7 @@ Partial Class Form1
         Me.Button24 = New System.Windows.Forms.Button()
         Me.Button23 = New System.Windows.Forms.Button()
         Me.Button22 = New System.Windows.Forms.Button()
+        Me.Button37 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -87,6 +88,7 @@ Partial Class Form1
         Me.TextBox1.Name = "TextBox1"
         Me.TextBox1.Size = New System.Drawing.Size(585, 121)
         Me.TextBox1.TabIndex = 1
+        Me.TextBox1.Text = "delete   FROM [Paradigma].[dbo].[DOKUFULLNAME]"
         '
         'TextBox2
         '
@@ -310,6 +312,7 @@ Partial Class Form1
         'GroupBox1
         '
         Me.GroupBox1.BackColor = System.Drawing.SystemColors.ActiveCaption
+        Me.GroupBox1.Controls.Add(Me.Button37)
         Me.GroupBox1.Controls.Add(Me.CheckBox2)
         Me.GroupBox1.Controls.Add(Me.Button36)
         Me.GroupBox1.Controls.Add(Me.Button35)
@@ -504,6 +507,15 @@ Partial Class Form1
         Me.Button22.Text = "5.Lage-Adresse"
         Me.Button22.UseVisualStyleBackColor = True
         '
+        'Button37
+        '
+        Me.Button37.Location = New System.Drawing.Point(508, 18)
+        Me.Button37.Name = "Button37"
+        Me.Button37.Size = New System.Drawing.Size(75, 23)
+        Me.Button37.TabIndex = 44
+        Me.Button37.Text = "mergeExcels"
+        Me.Button37.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -584,4 +596,5 @@ End Sub
     Friend WithEvents Button35 As Button
     Friend WithEvents Button36 As Button
     Friend WithEvents CheckBox2 As CheckBox
+    Friend WithEvents Button37 As Button
 End Class
