@@ -217,6 +217,7 @@
     <Compile Include="Class1.vb" />
     <Compile Include="clsBankverbindungSEPA.vb" />
     <Compile Include="clsBlob.vb" />
+    <Compile Include="clsDatenbankZugriff.vb" />
     <Compile Include="clsExcel.vb" />
     <Compile Include="clsstring.vb" />
     <Compile Include="clsWordTest.vb" />
@@ -249,6 +250,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="strassenOrtItem.vb" />
     <Compile Include="person.vb" />
     <Compile Include="wordkonv.vb" />
     <Compile Include="w_adresse.vb" />

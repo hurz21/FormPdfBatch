@@ -1,17 +1,20 @@
 ﻿'Imports System.Runtime.InteropServices
 'Imports Microsoft.Office.Interop.Excel
 Imports System.Data
-Imports System.Diagnostics.Eventing.Reader
-Imports System.Drawing.Imaging
-Imports System.IO
-Imports System.Xml
-Imports Microsoft.Office.Interop.Word
-Imports OfficeOpenXml
 'Imports Acrobat
 'Imports Microsoft.Office.Interop
 'Imports Microsoft.Office.Interop.Word
 
-
+Imports System.Data.SqlClient
+Imports System.Diagnostics.Eventing.Reader
+Imports System.Drawing.Imaging
+Imports System.IO
+Imports System.Runtime.Serialization.Formatters
+Imports System.Security.Cryptography.X509Certificates
+Imports System.Xml
+Imports Microsoft.Office.Interop.Word
+Imports Mono.Security.Protocol
+Imports OfficeOpenXml
 Public Class Form1
 
     'Public wordVorlagen As New Microsoft.Office.Interop.Word.Application 'habe hier new ergänzt ????
@@ -34,6 +37,7 @@ Public Class Form1
         ' stammdaten()
         ' fullpathdokumenteErzeugen()
         'PDFumwandeln()
+        strassenabgleichIngradaProsoz()
         'DOCXumwandeln(2113, False)
     End Sub
     Public Sub protokoll()
@@ -2816,15 +2820,22 @@ Public Class Form1
         Dim illegaleDT As DataTable
         illegaleDT = alleDokumentDatenHolen(sql_illegale)
         '#########################################
+        Dim sql_natureg = "SELECT   [VORGANGSID] ,     [NUMMER]      ,[ART]      ,[TYP]      ,[BESCHREIBUNG]      ,[QUELLE]      ,[TS]     ,[NOTIZ]      " &
+                            ",[MASSNAHMENNR]" &
+                            " FROM [Paradigma].[dbo].[NATUREG]  order by ts desc"
+        Dim naturegStatus, naturegText As String
+        Dim naturegDT As DataTable
+        naturegDT = alleDokumentDatenHolen(sql_natureg)
+        '#########################################
 
         DT = alleDokumentDatenHolen(sql)
-        sql = "SELECT s.[VORGANGSID] ,[FREMDVORGANGSID] " &
+        sql = "Select s.[VORGANGSID] ,[FREMDVORGANGSID] " &
                      "From [Paradigma].[dbo].[stammdaten_tutti]  s, [Paradigma].[dbo].[verwandte_t44] v " &
                      " where s.VORGANGSID = v.VORGANGSID  " &
                      " order by s.vorgangsid desc  "
         alleVIDmitVerwandten = alleDokumentDatenHolen(sql)
-        sql = "SELECT distinct  s.[VORGANGSID] ,v.FREMDVORGANGSID     ,  s.[SACHGEBIETNR]" &
-                 " FROM [Paradigma].[dbo].[VORGANG_T43] as s,  [Paradigma].[dbo].[verwandte_t44] v " &
+        sql = "Select distinct  s.[VORGANGSID] ,v.FREMDVORGANGSID     ,  s.[SACHGEBIETNR]" &
+                 " FROM [Paradigma].[dbo].[VORGANG_T43] As s,  [Paradigma].[dbo].[verwandte_t44] v " &
                  " where v.FREMDVORGANGSID=s.VORGANGSID  " &
                  " order by  s.VORGANGSID desc"
         alleFremdvorgaengeMitSGNR = alleDokumentDatenHolen(sql)
@@ -2977,12 +2988,32 @@ Public Class Form1
                                                        CStr(clsDBtools.fieldvalue(drr.Item("beschreibung"))),
                                                         verwandteString, vid, stotitel))
 
+                    'natureg
+                    Dim naturegresult As String = ""
+                    If Verfahrensart.StartsWith("3") Then
+                        ' In der DataTable nach derselben VorgangsID suchen
+                        Dim treffer() As DataRow = naturegDT.Select("VORGANGSID = '" & vid & "'")
 
+                        If treffer.Length > 0 Then
+                            naturegresult = " (Natureg: "
+                            naturegresult = naturegresult & "Art: " & treffer(0)("Art").ToString()
+                            naturegresult = naturegresult & ",Typ: " & treffer(0)("Typ").ToString()
+                            naturegresult = naturegresult & ",Qul: " & treffer(0)("Quelle").ToString()
+                            naturegresult = naturegresult & ",Maßn: " & treffer(0)("MASSNAHMENNR").ToString()
+                            naturegresult = naturegresult & ",Beschr: " & treffer(0)("beschreibung").ToString()
+                            naturegresult = naturegresult & ",Notiz: " & treffer(0)("notiz").ToString()
+                            naturegresult = naturegresult & ")"
+                            Notiz = Notiz & naturegresult
+                        End If
+
+                    Else
+                        naturegresult = ""
+                    End If
                     'illegale
                     If Verfahrensart = "3307" Then
                         Debug.Print("")
                         If getIllegaleHuette(vid, illegaleDT, illStatus, illText) Then
-                            Notiz = Notiz & " / ill.: " & illText
+                            Notiz = Notiz & " (ill.: " & illText & ") "
                             Vorhabensmerkmal = illStatus
                             Verfahrensart = "305"
                         End If
@@ -3014,7 +3045,7 @@ Public Class Form1
                     ws.Cells("A" & row).Value = vid 'az2
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
                     ws.Cells("c" & row).Value = ""
-                    ws.Cells("d" & row).Value = "proumwelt"
+                    ws.Cells("d" & row).Value = ""
                     ws.Cells("e" & row).Value = Bezeichnung
                     ws.Cells("f" & row).Value = eingang.ToString("dd.MM.yyyy")
                     ws.Cells("g" & row).Value = antrag.ToString("dd.MM.yyyy")
@@ -5641,8 +5672,8 @@ Public Class Form1
     Private Sub Button37_Click(sender As Object, e As EventArgs) Handles Button37.Click
         'merge excel files
         'T:\dokumente\main
-        Mergetest("T:\dokumente\main", "MERGEDMainDoks.xlsx")
-        Mergetest("T:\dokumente\ereignisse", "MERGEDEreignisseDoks.xlsx")
+        Mergetest("T:\dokumente\main", "T:\dokumente\MERGEDMainDoks.xlsx")
+        Mergetest("T:\dokumente\ereignisse", "T:\dokumente\MERGEDEreignisseDoks.xlsx")
     End Sub
 
 
@@ -5701,6 +5732,152 @@ Public Class Form1
 
     End Sub
 
+    Private Sub Button38_Click(sender As Object, e As EventArgs) Handles Button38.Click
+        strassenabgleichIngradaProsoz()
+    End Sub
+    Private Sub strassenabgleichIngradaProsoz()
+        l("initdb  ende")
+        Dim Sql As String
+        Dim maxobj As Integer = 0
+        maxobj = setMaxObj(maxobj)
+        Dim umlautwandeln As Boolean = True : umlautwandeln = CBool(CheckBox2.Checked)
+        Sql = "use lkof;SELECT  distinct gemeinde,f.lagebezeichnung  FROM   dbo.tbl_lieg_flurstueck AS f  " &
+                 "LEFT OUTER JOIN       dbo.tbl_reg_gemeinde AS g   " &
+                 "ON f.gemeinde_gemeindeschluessel = g.gemeindeschluessel   " &
+                 "where lagebezeichnung is not null    " &
+                 "order by gemeinde, lagebezeichnung "
+        'TextBox1.Text = puAusgabe
+        TextBox2.Text = Sql
+        Dim meineDT As DataTable
+        meineDT = getDTingrada(Sql)
+
+        Dim ingradaRoh As List(Of strassenOrtItem)
+        ingradaRoh = ingrada2obj(meineDT)
+        ingradaRoh = ingradaKorrekturStrasse(ingradaRoh)
+        Dim IngradaEindeutigeListe = ingradaRoh _
+                    .GroupBy(Function(x) x.ort & "|" & x.strasse) _
+                    .Select(Function(g) g.First()) _
+                    .ToList()
+
+
+
+        Dim probaugstrassendt As DataTable
+        Sql = "SELECT  distinct      o.[Bezeichnung] as ort, s.[Bezeichnung]  as strasse       " &
+                   "FROM [prosozbau].[dbo].[PBPBauort] o, [prosozbau].[dbo].[PBPStrasse] s  " &
+                   "where s.Bauort_Key1=o.id  " &
+                   "order by   o.[Bezeichnung] ,  s.[Bezeichnung] "
+        probaugstrassendt = alleDokumentDatenHolen(Sql)
+        Dim probaugStrassenListe As List(Of strassenOrtItem)
+        probaugStrassenListe = ingrada2obj(probaugstrassendt)
+
+        Dim logfile = IO.Path.Combine(Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments),
+                                           "strassenabgleich" & Format(Now, "yy") & ".log")
+        sw = New IO.StreamWriter(logfile)
+        sw.AutoFlush = True
+        sw.WriteLine(Now)
+
+        For i = 0 To IngradaEindeutigeListe.Count - 1
+            If existiertInProbauG(IngradaEindeutigeListe(i), probaugStrassenListe) Then
+                Debug.Print(IngradaEindeutigeListe(i).ort & " ; " & IngradaEindeutigeListe(i).strasse)
+            Else
+                If IngradaEindeutigeListe(i).strasse.Count = 1 Then
+                Else
+                    sw.WriteLine(IngradaEindeutigeListe(i).ort & " ; " & IngradaEindeutigeListe(i).strasse)
+                End If
+            End If
+        Next
+    End Sub
+
+    Private Function existiertInProbauG(ingrada As strassenOrtItem, probaug As List(Of strassenOrtItem)) As Boolean
+        Try
+            Return probaug.Any(Function(x) x.ort = ingrada.ort AndAlso x.strasse = ingrada.strasse)
+        Catch ex As Exception
+
+        End Try
+    End Function
+
+    Function StrasseUndHausnummerByFirstDigit(input As String, ByRef hausnr As String) As String
+        Dim s = input.Trim()
+        ' erste Position finden, an der ein Ziffernzeichen kommt
+        Dim pos As Integer = -1
+        For i = 0 To s.Length - 1
+            If Char.IsDigit(s(i)) Then
+                pos = i
+                Exit For
+            End If
+        Next
+        If pos = -1 Then
+            Return (s)  ' keine Hausnummer gefunden
+        End If
+        Dim strasse = s.Substring(0, pos).TrimEnd()
+        hausnr = s.Substring(pos).Trim()
+        Return strasse
+    End Function
+
+    Private Function ingradaKorrekturStrasse(ingradaRoh As List(Of strassenOrtItem)) As List(Of strassenOrtItem)
+        Dim cmb As New strassenOrtItem
+        Dim hausnr As String
+        Dim ingradaneu As New List(Of strassenOrtItem)
+        For i = 0 To ingradaRoh.Count - 1
+            hausnr = ""
+            cmb = New strassenOrtItem
+            cmb.ort = ingradaRoh(i).ort
+            If ingradaRoh(i).ort.Contains("(hessen") Then
+                ingradaRoh(i).ort = "langen"
+                cmb.ort = "langen"
+            End If
+            If ingradaRoh(i).strasse.Contains("(") Then
+                Continue For
+            End If
+            If ingradaRoh(i).strasse.StartsWith("am babenhäuser weg links") Then
+                Debug.Print("")
+            End If
+            cmb.strasse = StrasseUndHausnummerByFirstDigit(ingradaRoh(i).strasse, hausnr)
+            If hausnr = String.Empty Then
+                Continue For
+            End If
+            ingradaneu.Add(cmb)
+        Next
+        Return ingradaneu
+    End Function
+
+    Private Shared Function ingrada2obj(meineDT As DataTable) As List(Of strassenOrtItem)
+        Dim cmb As New strassenOrtItem
+        Dim internlist As New List(Of strassenOrtItem)(90000)
+        For i = 0 To meineDT.Rows.Count - 1
+            cmb = New strassenOrtItem
+            cmb.ort = CStr(meineDT.Rows(i).Item(0)).ToLower.Trim
+            cmb.strasse = CStr(meineDT.Rows(i).Item(1)).ToLower.Trim
+            internlist.Add(cmb)
+            'If cmb.ort.StartsWith("Seligenstadt") Then
+
+            '    If cmb.strasse.StartsWith("Zwischen d") Then
+            '        Debug.Print("zwischen d")
+            '    End If
+
+            'End If
+        Next
+        Return internlist
+    End Function
+
+    Private Function getDTingrada(Sql As String) As DataTable
+        Dim cstring As String = "Server=KH-W-INGRADA;Database=LKOF;User=Ingrada;Pwd=Starry-Footless6-Mashing-Backboned;"
+        Dim myConn = New SqlConnection(cstring)
+        'Dim myCmd = myConn.CreateCommand
+        'myCmd.CommandText = Sql
+        l("vor open " & Sql)
+        myConn.Open()
+
+        Dim com As New SqlClient.SqlCommand(Sql, myConn)
+        Dim da As New SqlClient.SqlDataAdapter(com)
+        'da.MissingSchemaAction = MissingSchemaAction.AddWithKey
+
+        Dim mycount As Integer
+        'MsgBox("vorfill")
+        mycount = da.Fill(dt)
+        Return dt
+    End Function
+
     Private Shared Function getSQLConnection() As SqlClient.SqlConnection
         Dim myoracle As SqlClient.SqlConnection
         Dim host, datenbank, schema, tabelle, dbuser, dbpw, dbport As String
@@ -5733,7 +5910,8 @@ Public Class Form1
         ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
 
         'Dim folder = "T:\dokumente\main"
-        Dim outPath = Path.Combine(folder, folderOUT)
+        'Dim outPath = Path.Combine(folder, folderOUT)
+        Dim outPath = (folderOUT)
 
         Dim files = Directory.GetFiles(folder) _
             .Where(Function(f)
