@@ -2986,7 +2986,7 @@ Public Class Form1
                                                        CStr(clsDBtools.fieldvalue(drr.Item("altaz"))),
                                                        CStr(clsDBtools.fieldvalue(drr.Item("internenr"))),
                                                        CStr(clsDBtools.fieldvalue(drr.Item("beschreibung"))),
-                                                        verwandteString, vid, stotitel))
+                                                        verwandteString, vid, stotitel, CStr(clsDBtools.fieldvalue(drr.Item("bemerkung")))))
 
                     'natureg
                     Dim naturegresult As String = ""
@@ -3393,7 +3393,7 @@ Public Class Form1
         End Try
     End Function
 
-    Private Function makeStammNotiz(az As String, altaz As String, interne As String, beschreibung As String, verw As String, vid As String, stotitel As String) As String
+    Private Function makeStammNotiz(az As String, altaz As String, interne As String, beschreibung As String, verw As String, vid As String, stotitel As String, bemerkung As String) As String
         Dim t As Char = " "
         Dim ret As String = ""
         Try
@@ -3401,6 +3401,7 @@ Public Class Form1
             altaz = altaz.Trim
             interne = interne.Trim
             beschreibung = beschreibung.Trim
+            bemerkung = bemerkung.Trim
             If altaz.Length < 1 Then
                 altaz = ""
             Else
@@ -3412,7 +3413,7 @@ Public Class Form1
                 interne = " IntNr: " & interne
             End If
             'Return az & altaz & interne & t & " " & beschreibung & " " & verw & "#" & vid & "#"
-            Return altaz & interne & t & " " & beschreibung & " " & stotitel
+            Return altaz & interne & t & " " & beschreibung & " " & stotitel & " " & bemerkung
 
         Catch ex As Exception
             l("fehler  " & ex.ToString)
