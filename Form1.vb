@@ -37,7 +37,7 @@ Public Class Form1
         ' stammdaten()
         ' fullpathdokumenteErzeugen()
         'PDFumwandeln()
-        strassenabgleichIngradaProsoz()
+        '  strassenabgleichIngradaProsoz()
         'DOCXumwandeln(2113, False)
     End Sub
     Public Sub protokoll()
@@ -2693,7 +2693,7 @@ Public Class Form1
         puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\grunddaten.xlsx"
         puAusgabe = "e:\proumwelt\xls\grunddaten.xlsx"
         puAusgabe = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\grunddaten.xlsx"
-        puAusgabe = "t:\grunddaten\grunddaten.xlsx"
+        puAusgabe = "t:\grunddaten.xlsx"
 
         puFehler = "t:\grunddaten\grunddaten.log"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
@@ -3402,6 +3402,9 @@ Public Class Form1
             interne = interne.Trim
             beschreibung = beschreibung.Trim
             bemerkung = bemerkung.Trim
+            If vid = 44124 Then
+                Debug.Print("bemeerkung " & bemerkung)
+            End If
             If altaz.Length < 1 Then
                 altaz = ""
             Else
@@ -3446,7 +3449,7 @@ Public Class Form1
         'Dim puFehler As String = "O:\UMWELT\B\Proumwelt_Migration\lageadresse\LageAdresse.log"
         'Dim puAusgabe As String = "O:\UMWELT\B\Proumwelt_Migration\lageadresse\LageAdresse.xlsx"
         Dim puFehler As String = "t:\lageadresse\LageAdresse.log"
-        Dim puAusgabe As String = "t:\lageadresse\LageAdresse.xlsx"
+        Dim puAusgabe As String = "t:\LageAdresse.xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -3653,7 +3656,7 @@ Public Class Form1
         'Dim puFehler As String = "O:\UMWELT\B\Proumwelt_Migration\kataster\kataster.log"
         'Dim puAusgabe As String = "O:\UMWELT\B\Proumwelt_Migration\kataster\kataster.xlsx"
         Dim puFehler As String = "t:\kataster\kataster.log"
-        Dim puAusgabe As String = "t:\kataster\kataster.xlsx"
+        Dim puAusgabe As String = "t:\kataster.xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -3832,7 +3835,7 @@ Public Class Form1
     Private Sub Button23_Click(sender As Object, e As EventArgs) Handles Button23.Click
         'beteiligte 2_stakeholder 
         Dim puFehler As String = "t:\stakeholder\stakeholder" & ".log"
-        Dim puAusgabe As String = "t:\stakeholder\stakeholder" & ".csv"
+        Dim puAusgabe As String = "t:\stakeholder" & ".csv"
         Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         puAusgabeStream.AutoFlush = True
         swfehlt = New IO.StreamWriter(puFehler)
@@ -3856,7 +3859,7 @@ Public Class Form1
     Private Sub Button25_Click(sender As Object, e As EventArgs) Handles Button25.Click
         'wiedervorlagen
         Dim puFehler As String = "t:\wiedervorlage\wiedervorlagen.log"
-        Dim puAusgabe As String = "t:\wiedervorlage\wiedervorlagen.xlsx"
+        Dim puAusgabe As String = "t:\wiedervorlagen.xlsx"
         'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
         swfehlt.AutoFlush = True
@@ -4217,8 +4220,8 @@ Public Class Form1
         'Dim pubeteiligte As String = "O:\UMWELT\B\Proumwelt_Migration\antragsteller\beteiligte_1.xlsx"
 
         Dim puFehler As String = "t:\antragsteller\antragsteller.log"
-        Dim puAusgabe As String = "t:\antragsteller\antragsteller.xlsx"
-        Dim pubeteiligte As String = "t:\antragsteller\beteiligte_1.xlsx"
+        Dim puAusgabe As String = "t:\antragsteller.xlsx"
+        Dim pubeteiligte As String = "t:\antragsteller\bloedsinn.xlsx"
         'Dim ausgabeAntragsteller As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
         'Dim ausgabeBeteiligte As New IO.StreamWriter(pubeteiligte, False, System.Text.Encoding.GetEncoding(1252))
         swfehlt = New IO.StreamWriter(puFehler)
@@ -4237,7 +4240,7 @@ Public Class Form1
         'ausgabeBeteiligte.Close()
         'ausgabeBeteiligte.Dispose()
         swfehlt.Dispose()
-        System.Diagnostics.Process.Start("explorer", "O:\UMWELT\B\Proumwelt_Migration\antragsteller")
+        System.Diagnostics.Process.Start("explorer", "t:\")
         End
     End Sub
 
@@ -5673,8 +5676,11 @@ Public Class Form1
     Private Sub Button37_Click(sender As Object, e As EventArgs) Handles Button37.Click
         'merge excel files
         'T:\dokumente\main
-        Mergetest("T:\dokumente\main", "T:\dokumente\MERGEDMainDoks.xlsx")
-        Mergetest("T:\dokumente\ereignisse", "T:\dokumente\MERGEDEreignisseDoks.xlsx")
+        Mergetest("T:\dokumente\main", "T:\MERGED_MainDoks.xlsx")
+        Mergetest("T:\dokumente\ereignisse", "T:\MERGED_EreignisseDoks.xlsx")
+        Mergetest("T:\chronologie", "T:\MERGED_Chronologie.xlsx")
+        TextBox1.Text = "fertig"
+
     End Sub
 
 
