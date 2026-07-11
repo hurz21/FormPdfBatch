@@ -5885,6 +5885,11 @@ Public Class Form1
         Return dt
     End Function
 
+    Private Sub Button39_Click(sender As Object, e As EventArgs) Handles Button39.Click
+        PdfMerge.testmerge()
+
+    End Sub
+
     Private Shared Function getSQLConnection() As SqlClient.SqlConnection
         Dim myoracle As SqlClient.SqlConnection
         Dim host, datenbank, schema, tabelle, dbuser, dbpw, dbport As String

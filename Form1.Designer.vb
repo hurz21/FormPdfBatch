@@ -48,6 +48,7 @@ Partial Class Form1
         Me.Button20 = New System.Windows.Forms.Button()
         Me.Button21 = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.Button38 = New System.Windows.Forms.Button()
         Me.Button37 = New System.Windows.Forms.Button()
         Me.CheckBox2 = New System.Windows.Forms.CheckBox()
         Me.Button36 = New System.Windows.Forms.Button()
@@ -67,7 +68,7 @@ Partial Class Form1
         Me.Button24 = New System.Windows.Forms.Button()
         Me.Button23 = New System.Windows.Forms.Button()
         Me.Button22 = New System.Windows.Forms.Button()
-        Me.Button38 = New System.Windows.Forms.Button()
+        Me.Button39 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -313,6 +314,7 @@ Partial Class Form1
         'GroupBox1
         '
         Me.GroupBox1.BackColor = System.Drawing.SystemColors.ActiveCaption
+        Me.GroupBox1.Controls.Add(Me.Button39)
         Me.GroupBox1.Controls.Add(Me.Button38)
         Me.GroupBox1.Controls.Add(Me.Button37)
         Me.GroupBox1.Controls.Add(Me.CheckBox2)
@@ -343,6 +345,15 @@ Partial Class Form1
         Me.GroupBox1.TabIndex = 26
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "ProbauG Umsetzung"
+        '
+        'Button38
+        '
+        Me.Button38.Location = New System.Drawing.Point(436, 45)
+        Me.Button38.Name = "Button38"
+        Me.Button38.Size = New System.Drawing.Size(175, 23)
+        Me.Button38.TabIndex = 45
+        Me.Button38.Text = "strassenabgleichIngradaProsoz prosoz-ingrada"
+        Me.Button38.UseVisualStyleBackColor = True
         '
         'Button37
         '
@@ -518,14 +529,14 @@ Partial Class Form1
         Me.Button22.Text = "5.Lage-Adresse"
         Me.Button22.UseVisualStyleBackColor = True
         '
-        'Button38
+        'Button39
         '
-        Me.Button38.Location = New System.Drawing.Point(436, 45)
-        Me.Button38.Name = "Button38"
-        Me.Button38.Size = New System.Drawing.Size(175, 23)
-        Me.Button38.TabIndex = 45
-        Me.Button38.Text = "strassenabgleichIngradaProsoz prosoz-ingrada"
-        Me.Button38.UseVisualStyleBackColor = True
+        Me.Button39.Location = New System.Drawing.Point(437, 71)
+        Me.Button39.Name = "Button39"
+        Me.Button39.Size = New System.Drawing.Size(174, 23)
+        Me.Button39.TabIndex = 46
+        Me.Button39.Text = "pdfmergetest"
+        Me.Button39.UseVisualStyleBackColor = True
         '
         'Form1
         '
@@ -609,4 +620,5 @@ End Sub
     Friend WithEvents CheckBox2 As CheckBox
     Friend WithEvents Button37 As Button
     Friend WithEvents Button38 As Button
+    Friend WithEvents Button39 As Button
 End Class
