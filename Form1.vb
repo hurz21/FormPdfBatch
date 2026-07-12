@@ -5676,10 +5676,13 @@ Public Class Form1
     Private Sub Button37_Click(sender As Object, e As EventArgs) Handles Button37.Click
         'merge excel files
         'T:\dokumente\main
+        TextBox1.Text = "T:\dokumente\main"
         Mergetest("T:\dokumente\main", "T:\MERGED_MainDoks.xlsx")
+        TextBox1.Text &= "T:\dokumente\ereignisse"
         Mergetest("T:\dokumente\ereignisse", "T:\MERGED_EreignisseDoks.xlsx")
+        TextBox1.Text &= "T:\chronologie"
         Mergetest("T:\chronologie", "T:\MERGED_Chronologie.xlsx")
-        TextBox1.Text = "fertig"
+        TextBox1.Text &= "fertig"
 
     End Sub
 
@@ -5887,6 +5890,10 @@ Public Class Form1
 
     Private Sub Button39_Click(sender As Object, e As EventArgs) Handles Button39.Click
         PdfMerge.testmerge()
+
+    End Sub
+
+    Private Sub Button18_Click(sender As Object, e As EventArgs)
 
     End Sub
 

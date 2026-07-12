@@ -43,11 +43,11 @@ Partial Class Form1
         Me.Button15 = New System.Windows.Forms.Button()
         Me.Button17 = New System.Windows.Forms.Button()
         Me.Button16 = New System.Windows.Forms.Button()
-        Me.Button18 = New System.Windows.Forms.Button()
         Me.Button19 = New System.Windows.Forms.Button()
         Me.Button20 = New System.Windows.Forms.Button()
         Me.Button21 = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.Button39 = New System.Windows.Forms.Button()
         Me.Button38 = New System.Windows.Forms.Button()
         Me.Button37 = New System.Windows.Forms.Button()
         Me.CheckBox2 = New System.Windows.Forms.CheckBox()
@@ -68,7 +68,6 @@ Partial Class Form1
         Me.Button24 = New System.Windows.Forms.Button()
         Me.Button23 = New System.Windows.Forms.Button()
         Me.Button22 = New System.Windows.Forms.Button()
-        Me.Button39 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -273,16 +272,6 @@ Partial Class Form1
         Me.Button16.Text = "1. fullpath ergänzen in dokumente"
         Me.Button16.UseVisualStyleBackColor = True
         '
-        'Button18
-        '
-        Me.Button18.Location = New System.Drawing.Point(312, 52)
-        Me.Button18.Margin = New System.Windows.Forms.Padding(2)
-        Me.Button18.Name = "Button18"
-        Me.Button18.Size = New System.Drawing.Size(56, 19)
-        Me.Button18.TabIndex = 22
-        Me.Button18.Text = "Button18"
-        Me.Button18.UseVisualStyleBackColor = True
-        '
         'Button19
         '
         Me.Button19.Location = New System.Drawing.Point(5, 47)
@@ -345,6 +334,15 @@ Partial Class Form1
         Me.GroupBox1.TabIndex = 26
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "ProbauG Umsetzung"
+        '
+        'Button39
+        '
+        Me.Button39.Location = New System.Drawing.Point(437, 71)
+        Me.Button39.Name = "Button39"
+        Me.Button39.Size = New System.Drawing.Size(174, 23)
+        Me.Button39.TabIndex = 46
+        Me.Button39.Text = "pdfmergetest"
+        Me.Button39.UseVisualStyleBackColor = True
         '
         'Button38
         '
@@ -529,22 +527,12 @@ Partial Class Form1
         Me.Button22.Text = "5.Lage-Adresse"
         Me.Button22.UseVisualStyleBackColor = True
         '
-        'Button39
-        '
-        Me.Button39.Location = New System.Drawing.Point(437, 71)
-        Me.Button39.Name = "Button39"
-        Me.Button39.Size = New System.Drawing.Size(174, 23)
-        Me.Button39.TabIndex = 46
-        Me.Button39.Text = "pdfmergetest"
-        Me.Button39.UseVisualStyleBackColor = True
-        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1251, 489)
         Me.Controls.Add(Me.GroupBox1)
-        Me.Controls.Add(Me.Button18)
         Me.Controls.Add(Me.Button17)
         Me.Controls.Add(Me.Button15)
         Me.Controls.Add(Me.Button14)
@@ -595,7 +583,6 @@ End Sub
     Friend WithEvents Button15 As Button
     Friend WithEvents Button17 As Button
     Friend WithEvents Button16 As Button
-    Friend WithEvents Button18 As Button
     Friend WithEvents Button19 As Button
     Friend WithEvents Button20 As Button
     Friend WithEvents Button21 As Button
