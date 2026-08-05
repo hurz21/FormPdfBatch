@@ -341,7 +341,7 @@ Partial Class Form1
         Me.Button39.Name = "Button39"
         Me.Button39.Size = New System.Drawing.Size(174, 23)
         Me.Button39.TabIndex = 46
-        Me.Button39.Text = "pdfmergetest"
+        Me.Button39.Text = "pdfmergetest-besser  pdftool"
         Me.Button39.UseVisualStyleBackColor = True
         '
         'Button38
@@ -359,7 +359,7 @@ Partial Class Form1
         Me.Button37.Name = "Button37"
         Me.Button37.Size = New System.Drawing.Size(75, 23)
         Me.Button37.TabIndex = 44
-        Me.Button37.Text = "mergeExcels"
+        Me.Button37.Text = "mergeSegmentedExcels"
         Me.Button37.UseVisualStyleBackColor = True
         '
         'CheckBox2

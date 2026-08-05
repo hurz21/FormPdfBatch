@@ -2487,7 +2487,7 @@ Public Class Form1
         DT = alleDokumentDatenHolen(sql)
 
         l("vor csvverarbeiten")
-
+        Dim mediencenterOrdner As String = "Bilder"
         Dim igesamt As Integer = 0
         Dim relativpfad, dateinameext, typ, dokumentid, bearbeiterid As String
         Dim newsavemode As Boolean
@@ -2600,6 +2600,10 @@ Public Class Form1
                         'batchfile.WriteLine("rem cnt  " & igesamt & " " & DT.Rows.Count)
                         schreib += 1
                     End If
+                    mediencenterOrdner = "Dokumente"
+                    If isBilder(fullfilename) Then mediencenterOrdner = "Bilder"
+                    If isEmail(fullfilename) Then mediencenterOrdner = "Posteingang"
+
                     TextBox3.Text = vid & ", " & igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ] schreib=" & schreib
                     Application.DoEvents()
                     'zeilebilden
@@ -2611,7 +2615,7 @@ Public Class Form1
                     ws.Cells("f" & row).Value = (cleanString(beschreibung))
                     ws.Cells("g" & row).Value = clsString.removeSemikolon(newdir)
                     'ws.Cells("h" & row).Value = dbdatum.ToString("yyyyMMdd") & "_" & cleanString(dateinameext).Trim
-                    ws.Cells("h" & row).Value = "SomeOldBullshit" 'dbdatum.ToString("yyyyMMdd") & "_" & cleanString(dateinameext).Trim
+                    ws.Cells("h" & row).Value = mediencenterOrdner 'dbdatum.ToString("yyyyMMdd") & "_" & cleanString(dateinameext).Trim
                     ws.Cells("i" & row).Value = ""
                     ws.Cells("j" & row).Value = CInt(istRevisionssicher)
 
@@ -2637,6 +2641,30 @@ Public Class Form1
         l("fertig  " & puFehler)
     End Sub
 
+    Private Function isEmail(fullfilename As String) As Boolean
+        Try
+            If fullfilename.ToLower.EndsWith(".msg") Or fullfilename.ToLower.EndsWith(".eml") Then
+                Return True
+            Else
+                Return False
+            End If
+        Catch ex As Exception
+            Return False
+        End Try
+    End Function
+
+    Private Function isBilder(fullfilename As String) As Boolean
+        Try
+            If fullfilename.ToLower.EndsWith(".jpg") Or fullfilename.ToLower.EndsWith(".jpeg") Or fullfilename.ToLower.EndsWith(".png") Or fullfilename.ToLower.EndsWith(".tif") Or fullfilename.ToLower.EndsWith(".tiff") Then
+                Return True
+            Else
+                Return False
+            End If
+        Catch ex As Exception
+            Return False
+        End Try
+    End Function
+
     Private Function altunderledigtDokumenteEinlesen(altunderledigtDokumente As String) As List(Of String)
         Try
             Dim liste As List(Of String) = IO.File.ReadAllLines(altunderledigtDokumente).ToList()
@@ -2646,7 +2674,18 @@ Public Class Form1
             Return Nothing
         End Try
     End Function
-
+    Private Function cleanStringMitZeilenUmbruch(Text As String) As String
+        Try
+            If Text Is Nothing Then Text = " "
+            Text = Text.Replace(Chr(34), " ")
+            Text = Text.Replace(";", "_")
+            'Text = Text.Replace(vbCrLf, "")
+            Text = clsString.noWhiteSpace(Text, " ")
+            Return Text.Trim
+        Catch ex As Exception
+            Return "clean_error"
+        End Try
+    End Function
     Private Function cleanString(Text As String) As String
         Try
             If Text Is Nothing Then Text = " "
@@ -3046,7 +3085,7 @@ Public Class Form1
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
                     ws.Cells("c" & row).Value = ""
                     ws.Cells("d" & row).Value = ""
-                    ws.Cells("e" & row).Value = Bezeichnung
+                    ws.Cells("e" & row).Value = Bezeichnung & " / " & cleanString(Notiz)
                     ws.Cells("f" & row).Value = eingang.ToString("dd.MM.yyyy")
                     ws.Cells("g" & row).Value = antrag.ToString("dd.MM.yyyy")
                     ws.Cells("h" & row).Value = vollstaendigS '.ToString("dd.MM.yyyy")
@@ -3060,7 +3099,7 @@ Public Class Form1
                     ws.Cells("q" & row).Value = sachbearbeiter.TrimEnd("-").TrimEnd(";").TrimEnd(",")
                     ws.Cells("s" & row).Value = Hauptaktenzeichen
                     ws.Cells("t" & row).Value = "" 'hauptaktenjahr.ToString("dd.MM.yyyy")
-                    ws.Cells("v" & row).Value = cleanString(Notiz)
+                    ws.Cells("v" & row).Value = "" 'notiz
                     ws.Cells("w" & row).Value = cleanString(zusatz1)
                     ws.Cells("x" & row).Value = cleanString(zusatz2)
                     ws.Cells("y" & row).Value = cleanString(zusatz3)
@@ -4907,7 +4946,7 @@ Public Class Form1
         'puAusgabeStream.AutoFlush = True
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
         If Form1.vid = "fehler" Then End
-
+        Dim mediencenterordner = "Ereignisse"
         DT = alleDokumentDatenHolen(sql)
         l("vor csvverarbeiten")
         Dim ic As Integer = 0
@@ -5067,12 +5106,12 @@ Public Class Form1
                                            vid As String, eid As String, typnr As String, notiz As String) As String
         Dim pu As New Text.StringBuilder
         Try
-            pu.Append("vorgang: " & vid & " ereignis: " & eid & Environment.NewLine)
+            pu.Append("vorgang: " & vid & " ereignis: " & eid & Environment.NewLine & "\n")
             pu.Append("richtung: " & cleanString(richtung) & " art: " & cleanString(art) & Environment.NewLine)
             pu.Append("datum: " & dbdatum.ToString("yyyyMMdd_hhmmss") & Environment.NewLine)
             pu.Append("typnr: " & cleanString(typnr) & Environment.NewLine)
             pu.Append("beschreibung: " & cleanString(beschreibung) & Environment.NewLine)
-            pu.Append("notiz: " & cleanString(notiz) & Environment.NewLine)
+            pu.Append("notiz: " & cleanStringMitZeilenUmbruch(notiz) & Environment.NewLine)
             Return pu.ToString
         Catch ex As Exception
             l("fehler  " & ex.ToString)
@@ -5890,7 +5929,6 @@ Public Class Form1
 
     Private Sub Button39_Click(sender As Object, e As EventArgs) Handles Button39.Click
         PdfMerge.testmerge()
-
     End Sub
 
     Private Sub Button18_Click(sender As Object, e As EventArgs)
