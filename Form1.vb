@@ -12,6 +12,7 @@ Imports System.IO
 Imports System.Runtime.Serialization.Formatters
 Imports System.Security.Cryptography.X509Certificates
 Imports System.Xml
+Imports Microsoft.Office.Interop.Excel
 Imports Microsoft.Office.Interop.Word
 Imports Mono.Security.Protocol
 Imports OfficeOpenXml
@@ -32,7 +33,7 @@ Public Class Form1
     Private icntREADONLYentfernt As Integer
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.WindowState = FormWindowState.Minimized
+        'Me.WindowState = FormWindowState.Minimized
         'protokoll()
         ' stammdaten()
         ' fullpathdokumenteErzeugen()
@@ -65,7 +66,7 @@ Public Class Form1
 
 
     End Sub
-    Private Shared Function RevSicherdokumentDatenHolen(sql As String) As DataTable
+    Private Shared Function RevSicherdokumentDatenHolen(sql As String) As System.Data.DataTable
 
         Dim dt As New System.Data.DataTable
         Try
@@ -79,9 +80,9 @@ Public Class Form1
             Return Nothing
         End Try
     End Function
-    Private Shared Function PDFdokumentDatenHolen() As DataTable
+    Private Shared Function PDFdokumentDatenHolen() As System.Data.DataTable
         Dim Sql As String
-        Dim dt As New DataTable
+        Dim dt As New System.Data.DataTable
         Try
             Sql = "SELECT * FROM dokumente where   ort<2000000 and ort>0  " &
                   " and ( Vorhaben='pdf') order by ort desc "
@@ -94,9 +95,9 @@ Public Class Form1
             Return Nothing
         End Try
     End Function
-    Private Shared Function alleDokumentDatenHolen(sql As String) As DataTable
+    Private Shared Function alleDokumentDatenHolen(sql As String) As System.Data.DataTable
 
-        Dim dt As New DataTable
+        Dim dt As New System.Data.DataTable
         Try
 
             'MsgBox(Sql)
@@ -108,9 +109,9 @@ Public Class Form1
             Return Nothing
         End Try
     End Function
-    Private Shared Function alleDokumentDatenHolenohnemb() As DataTable
+    Private Shared Function alleDokumentDatenHolenohnemb() As System.Data.DataTable
         Dim Sql As String
-        Dim dt As New DataTable
+        Dim dt As New System.Data.DataTable
         Try
             Sql = "SELECT * FROM dokumente where   ort<2000000 and ort>0  " &
                   "  and mb =0 " &
@@ -194,7 +195,7 @@ Public Class Form1
     End Function
 
     Private Sub DokExistsMain()
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim logfile As String = "\\file-paradigma\paradigma\test\thumbnails\dokuFehlt_" & Format(Now, "ddhhmmss") & ".txt"
         'logfile = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) & "\paradigma\muell\thumbnailer.log"
         sw = New IO.StreamWriter(logfile)
@@ -245,11 +246,11 @@ Public Class Form1
                 End If
                 Dim fo As New IO.FileInfo(inputfile)
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 If fo.Exists Then
                     'l("exists")
-                    'inputFileReadonlyEntfernen(Vorhabensmerkmal)
-                    Continue For
+                'inputFileReadonlyEntfernen(Vorhabensmerkmal)
+                Continue For
                 Else
                     ic += 1
                     l("dokument fehlt: " & ic.ToString & Environment.NewLine & " " &
@@ -261,7 +262,7 @@ Public Class Form1
                       inputfile & Environment.NewLine &
                       vid & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                       TextBox2.Text
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                 End If
 
             Catch ex As Exception
@@ -281,7 +282,7 @@ Public Class Form1
 
 
 
-    'Private Sub PDFSverarbeiten(outdir As String, vid As String, dt As DataTable)
+    'Private Sub PDFSverarbeiten(outdir As String, vid As String, dt as System.Data.datatable)
     '    Dim ic As Integer = 0
     '    Dim sachgebiet As String = "", Verfahrensart As String = "", Vorhaben As String, batchfile As String
     '    Dim newsavemode As Boolean
@@ -321,7 +322,7 @@ Public Class Form1
     '    Next
     'End Sub
     Private Sub PDFumwandeln()
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
 
         l("PDFumwandeln ")
         'Dim logfile As String = "\\file-paradigma\paradigma\test\thumbnails\PDFlog" & Format(Now, "ddhhmmss") & ".txt"
@@ -381,7 +382,7 @@ Public Class Form1
                 outfile = modPrep.GetOutfileName(CInt(vid), outdir, CInt(dokumentid), ".jpg")
                 Dim fo As New IO.FileInfo(outfile.Replace(Chr(34), ""))
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 If fo.Exists Then
                     ' l("exists")
                     Continue For
@@ -391,7 +392,7 @@ Public Class Form1
                 TextBox1.Text = ic.ToString & " / " & dateinameext & Environment.NewLine & " " &
                 inputfile & Environment.NewLine &
                 vid & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")"
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
 
 
                 If Not IO.Directory.Exists(outdir & vid.ToString) Then
@@ -402,7 +403,7 @@ Public Class Form1
             End Try
             Try
                 sw.WriteLine(inputfile)
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 If dokumentid = "60091" Then
                     'Continue For
                     Debug.Print("")
@@ -424,7 +425,7 @@ Public Class Form1
                     TextBox1.Text = ic.ToString & " / " & dateinameext & Environment.NewLine & " " &
                         inputfile & Environment.NewLine &
                         vid & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")"
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                 Else
                     l("erfolglos " & ic.ToString & Environment.NewLine & " " &
                         inputfile & Environment.NewLine &
@@ -433,7 +434,7 @@ Public Class Form1
                         inputfile & Environment.NewLine &
                         vid & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                         TextBox2.Text
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                 End If
             Catch ex As Exception
                 l("fehler2: " & ex.ToString)
@@ -441,7 +442,7 @@ Public Class Form1
                        inputfile & Environment.NewLine &
                        vid & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
             End Try
             GC.Collect()
             GC.WaitForFullGCComplete()
@@ -705,14 +706,14 @@ Public Class Form1
     '    typ = "1"
     '    Using sw As New IO.StreamWriter(logfile)
     '        sw.AutoFlush = True
-    '        Application.DoEvents()
+    '       System.Windows.Forms.Application.DoEvents()
     '        For Each drr As DataRow In dt.Rows
     '            TextBox3.Text = ic & " von " & dt.Rows.Count
 
 
     '            ic += 1
     '            TextBox2.Text = " " & ierfolg & "   konvertierungen von word nach jpg erfolgreich von " & soll & Environment.NewLine
-    '            Application.DoEvents()
+    '           System.Windows.Forms.Application.DoEvents()
     '            datenholden(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, initial)
 
 
@@ -737,7 +738,7 @@ Public Class Form1
     '                Continue For
     '            Else
     '                TextBox1.Text = dateinameext & " ist dran  " & Environment.NewLine
-    '                Application.DoEvents()
+    '               System.Windows.Forms.Application.DoEvents()
     '            End If
 
     '            'inputFileReadonlyEntfernen(Vorhabensmerkmal)
@@ -774,17 +775,17 @@ Public Class Form1
     '                inputFileReadonlyEntfernen(checkoutfile)
     '            End If
     '            TextBox1.Text = checkoutfile & " checkout erfolgreich   " & Environment.NewLine
-    '            Application.DoEvents()
+    '           System.Windows.Forms.Application.DoEvents()
     '            If clsWordTest.konvOneDoc2pdf(checkoutfile, pdffile) Then
     '                TextBox1.Text = TextBox1.Text & " " & pdffile & " pdf erfolgreich" & Environment.NewLine
-    '                Application.DoEvents()
+    '               System.Windows.Forms.Application.DoEvents()
     '                If convertPDF2(pdffile, outfileJPG) Then
     '                    l("erfolg")
     '                    ic += 1
     '                    TextBox1.Text = TextBox1.Text & " / " & dateinameext & " " & "jpg erfolgreich: " & ic.ToString & Environment.NewLine & " " &
     '                        outfileJPG & Environment.NewLine &
     '                        vid & "/" & dokumentid & " " & ic & "(" & dt.Rows.Count.ToString & ")"
-    '                    Application.DoEvents()
+    '                   System.Windows.Forms.Application.DoEvents()
     '                    ierfolg += 1
     '                Else
     '                    l("pdf2jpg erfolglos " & ic.ToString & Environment.NewLine & " " &
@@ -795,14 +796,14 @@ Public Class Form1
     '                        vid & "/" & dokumentid & " " & ic & "(" & dt.Rows.Count.ToString & ")" & Environment.NewLine &
     '                        TextBox2.Text
     '                    sw.WriteLine("fehlerin convertPDF2: " & vid & "/" & dokumentid & " " & outfileJPG & " " & inputfile)
-    '                    Application.DoEvents()
+    '                   System.Windows.Forms.Application.DoEvents()
     '                End If
     '            Else
     '                l("word2pdf erfolglos " & ic.ToString & Environment.NewLine & " " &
     '                    outfileJPG & Environment.NewLine &
     '                    vid & "/" & dokumentid & " " & ic & "(" & dt.Rows.Count.ToString & ")")
     '                sw.WriteLine("fehlerin word2pdf: " & vid & "/" & dokumentid & " " & outfileJPG & " " & inputfile)
-    '                Application.DoEvents()
+    '               System.Windows.Forms.Application.DoEvents()
     '            End If
 
 
@@ -928,14 +929,14 @@ Public Class Form1
         typ = "1"
         Using sw As New IO.StreamWriter(logfile)
             sw.AutoFlush = True
-            Application.DoEvents()
+            System.Windows.Forms.Application.DoEvents()
 
             For Each drr As DataRow In dt.Rows
                 TextBox3.Text = ic & " von " & dt.Rows.Count
 
                 ic += 1
                 TextBox2.Text = " " & ierfolg & "   konvertierungen von word nach jpg erfolgreich von " & soll & Environment.NewLine
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 datenholden(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, initial)
                 If dokumentid = 174865 Then
                     Debug.Print("")
@@ -993,10 +994,10 @@ Public Class Form1
                     inputFileReadonlyEntfernen(checkoutfile)
                 End If
                 TextBox1.Text = checkoutfile & " checkout erfolgreich   " & Environment.NewLine
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 If clsExcel.konvOne(checkoutfile, outfile) Then
                     TextBox1.Text = TextBox1.Text & " " & pdffile & " xls erfolgreich" & Environment.NewLine
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                     'altearchivdatei umbenennen
                     'neuedatei im archiv speichern
                     'in db: Vorhaben anpassen
@@ -1068,7 +1069,7 @@ Public Class Form1
     End Sub
 
     Private Sub bplantn()
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
 
 
         Dim logfile As String = "\\file-paradigma\paradigma\test\thumbnails\PDFlog" & Format(Now, "ddhhmmss") & ".txt"
@@ -1120,7 +1121,7 @@ Public Class Form1
                 outfile = modPrep.GetOutfileName(CInt(vid), outdir, CInt(dokumentid), ".jpg")
                 Dim fo As New IO.FileInfo(outfile.Replace(Chr(34), ""))
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 If fo.Exists Then
                     l("exists")
                     Continue For
@@ -1133,7 +1134,7 @@ Public Class Form1
             End Try
             Try
                 sw.WriteLine(inputfile)
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 If dokumentid = "60091" Then
                     'Continue For
                     Debug.Print("")
@@ -1147,7 +1148,7 @@ Public Class Form1
                     TextBox1.Text = ic.ToString & Environment.NewLine & " " &
                         inputfile & Environment.NewLine &
                         vid & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")"
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                 Else
                     l("erfolglos " & ic.ToString & Environment.NewLine & " " &
                         inputfile & Environment.NewLine &
@@ -1156,7 +1157,7 @@ Public Class Form1
                         inputfile & Environment.NewLine &
                         vid & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                         TextBox2.Text
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                 End If
             Catch ex As Exception
                 l("fehler2: " & ex.ToString)
@@ -1164,7 +1165,7 @@ Public Class Form1
                        inputfile & Environment.NewLine &
                        vid & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
             End Try
             GC.Collect()
             GC.WaitForFullGCComplete()
@@ -1223,7 +1224,7 @@ Public Class Form1
                     TextBox1.Text = ""
                     TextBox2.Text = TextBox2.Text & " " & strFile & Environment.NewLine
                     count += 1
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                     If strFile.Contains("~$") Then Continue For
                     Debug.Print(strFile)
                     fi = New IO.FileInfo(strFile)
@@ -1422,14 +1423,14 @@ Public Class Form1
         Dim fi As IO.FileInfo
         Using sw As New IO.StreamWriter(logfile)
             sw.AutoFlush = True
-            Application.DoEvents()
+            System.Windows.Forms.Application.DoEvents()
 
             For Each drr As DataRow In dt.Rows
                 TextBox3.Text = ic & " von " & dt.Rows.Count
 
                 ic += 1
                 TextBox2.Text = " " & ierfolg & "   konvertierungen von word nach jpg erfolgreich von " & soll & Environment.NewLine
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 datenholden(vid, relativpfad, dateinameext, typ, newsavemode, dokumentid, drr, dbdatum, initial)
                 If dokumentid = 174865 Then
                     Debug.Print("")
@@ -1449,7 +1450,7 @@ Public Class Form1
                 sizeSumme += fi.Length
                 TextBox1.Text = TextBox1.Text & ic & " " & inputfile & " " & fi.Length & Environment.NewLine
                 '   sw.WriteLine(TextBox1.Text)
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 'If ic = 1000 Then Exit For
 
             Next
@@ -1473,7 +1474,7 @@ Public Class Form1
         Dim kuerzel As String = ""
         Dim inputfile, outfile, parameter As String
         Dim innDir, outDir, checkoutfile, pdffile As String
-        Dim bearbeiterDT As DataTable
+        Dim bearbeiterDT As System.Data.DataTable
         parameter = " /1 1"
         Dim checkoutRoot As String = "C:\muell\"
         innDir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv" '"\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
@@ -1511,14 +1512,14 @@ Public Class Form1
         Dim fi As IO.FileInfo
         Using sw As New IO.StreamWriter(logfile)
             sw.AutoFlush = True
-            Application.DoEvents()
+            System.Windows.Forms.Application.DoEvents()
 
             For Each drr As DataRow In dt.Rows
                 TextBox3.Text = ic & " von " & dt.Rows.Count
 
                 ic += 1
                 'TextBox2.Text = " " & ierfolg & "   konvertierungen von word nach jpg erfolgreich von " & soll & Environment.NewLine
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 initial_ = (drr.Item("initial_"))
                 'If initial_.ToLower <> "kosh" Then Continue For
                 bearbeiterid = CInt(drr.Item("bearbeiterid"))
@@ -1537,7 +1538,7 @@ Public Class Form1
                 'sizeSumme += fi.Length
                 'TextBox1.Text = TextBox1.Text & ic & " " & Vorhabensmerkmal & " " & fi.Length & Environment.NewLine
                 '   sw.WriteLine(TextBox1.Text)
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 'If ic = 1000 Then Exit For
 
             Next
@@ -1565,7 +1566,7 @@ Public Class Form1
         Dim kuerzel As String = ""
         Dim inputfile, outfile, parameter As String
         Dim innDir, outDir, checkoutfile, pdffile As String
-        Dim bearbeiterDT As DataTable
+        Dim bearbeiterDT As System.Data.DataTable
         parameter = " /1 1"
         Dim checkoutRoot As String = "C:\muell\"
         innDir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv" '"\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
@@ -1606,14 +1607,14 @@ Public Class Form1
         Dim bids() As Integer
         Using sw As New IO.StreamWriter(logfile)
             sw.AutoFlush = True
-            Application.DoEvents()
+            System.Windows.Forms.Application.DoEvents()
 
             For Each drr As DataRow In dt.Rows
                 TextBox3.Text = ic & " von " & dt.Rows.Count
 
                 ic += 1
                 'TextBox2.Text = " " & ierfolg & "   konvertierungen von word nach jpg erfolgreich von " & soll & Environment.NewLine
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 weitere = (drr.Item("weitereBearb")).tolower
                 Form1.vid = (drr.Item("vorgangsid"))
                 b = weitere.Split(New Char() {";"c},
@@ -1635,7 +1636,7 @@ Public Class Form1
                 'sizeSumme += fi.Length
                 'TextBox1.Text = TextBox1.Text & ic & " " & Vorhabensmerkmal & " " & fi.Length & Environment.NewLine
                 '   sw.WriteLine(TextBox1.Text)
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 'If ic = 1000 Then Exit For
 
             Next
@@ -1662,7 +1663,7 @@ Public Class Form1
 
     End Function
 
-    Private Function getBearbeiterID(initial As String, bearbeiterDT As DataTable) As Integer
+    Private Function getBearbeiterID(initial As String, bearbeiterDT As System.Data.DataTable) As Integer
         For i = 0 To bearbeiterDT.Rows.Count - 1
             If CStr(bearbeiterDT.Rows(i).Item("INITIAL_")).ToLower = initial Then
                 Return bearbeiterDT.Rows(i).Item("BEARBEITERID")
@@ -1674,7 +1675,7 @@ Public Class Form1
     Private Sub Button12_Click(sender As Object, e As EventArgs) Handles Button12.Click
 
         'alle dokus auf vorhandensein prüfen
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         l("PDFumwandeln ")
         'Dim logfile As String = "\\file-paradigma\paradigma\test\thumbnails\PDFlog" & Format(Now, "ddhhmmss") & ".txt"
 
@@ -1725,7 +1726,7 @@ Public Class Form1
                 End If
                 'clsBlob.dokufull_speichern(ort, myoracle, Vorhabensmerkmal)
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 Dim fi As New IO.FileInfo(inputfile.Replace(Chr(34), ""))
                 If Not fi.Exists Then
                     swfehlt.WriteLine(vid & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext & ", " & inputfile & "")
@@ -1739,7 +1740,7 @@ Public Class Form1
                        inputfile & Environment.NewLine &
                        vid & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
             End Try
             GC.Collect()
             GC.WaitForFullGCComplete()
@@ -1783,7 +1784,7 @@ Public Class Form1
         'IO.Directory.SetCurrentDirectory("L:\system\batch\margit")
         ''MessageBox.Show("You are in the Form.Shown event.")
         'If Environment.CommandLine.ToLower.Contains("batchmode=true") Then
-        '    Application.DoEvents()
+        '   System.Windows.Forms.Application.DoEvents()
         '    batchmode = True
         '    PDFumwandeln()
         '    Button7.Text = "jetzt DOCXs"
@@ -1795,7 +1796,7 @@ Public Class Form1
     End Sub
     Private Sub Button13_Click(sender As Object, e As EventArgs) Handles Button13.Click
         'revisionssichere Dokumente zusätzlich nach BLOB sichern
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim relativpfad, dateinameext, typ, dokumentid, inputfile, outfile As String
         Dim newsavemode As Boolean
         Dim istRevisionssicher As Boolean
@@ -1881,7 +1882,7 @@ Public Class Form1
     End Function
 
     Private Sub Button15_Click(sender As Object, e As EventArgs) Handles Button15.Click
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim logfile As String = "\\file-paradigma\paradigma\test\thumbnailsOOOO\dokufilesize_" & Format(Now, "ddhhmmss") & ".txt"
         'logfile = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) & "\paradigma\muell\thumbnailer.log"
         sw = New IO.StreamWriter(logfile)
@@ -1929,7 +1930,7 @@ Public Class Form1
         Next
     End Sub
 
-    Private Shared Sub getvidAufnahemdatum(ByRef DT As DataTable, ByRef Sql As String)
+    Private Shared Sub getvidAufnahemdatum(ByRef DT As System.Data.DataTable, ByRef Sql As String)
         Try
             Sql = "SELECT  [VORGANGSID]    ,[aufnahme]" &
                 "  FROM [Paradigma].[dbo].[t41]" &
@@ -1948,7 +1949,7 @@ Public Class Form1
         DokFileSize()
     End Sub
     Private Sub DokFileSize()
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim logfile As String = "\\file-paradigma\paradigma\test\thumbnailsOOOO\dokufilesize_" & Format(Now, "ddhhmmss") & ".txt"
         'logfile = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) & "\paradigma\muell\thumbnailer.log"
         sw = New IO.StreamWriter(logfile)
@@ -1996,7 +1997,7 @@ Public Class Form1
                 End If
                 Dim fo As New IO.FileInfo(inputfile)
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 If fo.Exists Then
                     str = GetFileSizeInMB(fo.FullName)
                     If str = "0" Then
@@ -2015,7 +2016,7 @@ Public Class Form1
                       inputfile & Environment.NewLine &
                       vid & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                       TextBox2.Text
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                 End If
             Catch ex As Exception
                 l("fehler1: " & ex.ToString)
@@ -2076,7 +2077,7 @@ Public Class Form1
 
     Private Sub S1020dokumenteMitFullpathTabelleErstellen(zieltabelle As String, swfehlt As IO.StreamWriter)
         'alle dokus auf vorhandensein prüfen
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         l("PDFumwandeln ")
         'Dim logfile As String = "\\file-paradigma\paradigma\test\thumbnails\PDFlog" & Format(Now, "ddhhmmss") & ".txt"
 
@@ -2092,9 +2093,9 @@ Public Class Form1
         ' 'alle vorgänge mit referenzfällen
         ' proVorgang:  referenzverwandte zum vorgang
         ' proVorgang:  alle referenzdokus zu einem vorgang
-        Dim alleVorgaengeMitReferenzen As DataTable
-        Dim tempReferenzVorgaenge As DataTable
-        Dim tempREfDokumente As DataTable
+        Dim alleVorgaengeMitReferenzen As System.Data.DataTable
+        Dim tempReferenzVorgaenge As System.Data.DataTable
+        Dim tempREfDokumente As System.Data.DataTable
         Sql = "SELECT  [VORGANGSID]" &
                  " FROM [Paradigma].[dbo].[t44]" &
                  " where FREMDVORGANGSID in" &
@@ -2143,7 +2144,7 @@ Public Class Form1
                 igesamt += 1
                 TextBox3.Text = aktVID & "  " & igesamt & " von " & alleVorgaengeMitReferenzen.Rows.Count
                 TextBox2.Text = dateinameext
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 aktVID = CStr(drr.Item("VORGANGSID"))
                 Sql = "  SELECT   FREMDVORGANGSID  FROM [Paradigma].[dbo].t44 a" &
                      " where     VORGANGSID= " & aktVID & "" &
@@ -2225,7 +2226,7 @@ Public Class Form1
     End Sub
     Private Sub dokumenteMitFullpathTabelleErstellen(swfehlt As IO.StreamWriter)
 
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim idok As Integer = 0
         l("PDFumwandeln ")
         swfehlt.WriteLine("Teil2 normale Dokumente ausschreiben ---------------------")
@@ -2274,7 +2275,7 @@ Public Class Form1
                 End If
 
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 Dim fi As New IO.FileInfo(inputfile.Replace(Chr(34), ""))
                 If Not fi.Exists Then
                     swfehlt.WriteLine("FEhlt: " & vid & "," & dokumentid & ", " & dbdatum & "," & initial & "," & dateinameext) '& ", " & Vorhabensmerkmal & "")
@@ -2300,7 +2301,7 @@ Public Class Form1
                        inputfile & Environment.NewLine &
                        vid & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
             End Try
             GC.Collect()
             GC.WaitForFullGCComplete()
@@ -2470,7 +2471,7 @@ Public Class Form1
                                  maxobj As Integer, outdirroot As String, altunderledigtDokumente As String,
                                  altpruefung As Boolean)
         '####
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim idok As Integer = 0
         Dim row As Integer = 2
         Dim schreib = 0
@@ -2556,7 +2557,7 @@ Public Class Form1
                     '    l(vid & " ?????? " & fullfilename)
                     'End If
                     If dateinameext.Contains("?") Then
-                        dateinameext = dateinameext.Replace("?", "F")
+                        dateinameext = cleanString(dateinameext.Replace("?", "F").Replace(";", ""))
                         l(vid & " ?????? " & dateinameext)
                     End If
                     If fullfilename = String.Empty Then
@@ -2576,7 +2577,8 @@ Public Class Form1
                     If Not IO.Directory.Exists(newdir) Then
                         IO.Directory.CreateDirectory(newdir)
                     End If
-                    newdir = IO.Path.Combine(newdir, dateinameext)
+                    Dim ts = dbdatum.ToString("yyyyMMdd_hhmmss") & "_"
+                    newdir = IO.Path.Combine(newdir, ts & "_" & dateinameext)
 
                     Dim fo As New IO.FileInfo(newdir)
                     existiertschon = fo.Exists
@@ -2605,7 +2607,7 @@ Public Class Form1
                     If isEmail(fullfilename) Then mediencenterOrdner = "Posteingang"
 
                     TextBox3.Text = vid & ", " & igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ] schreib=" & schreib
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                     'zeilebilden
                     ws.Cells("A" & row).Value = vid
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
@@ -2628,7 +2630,7 @@ Public Class Form1
                        fullfilename & Environment.NewLine &
                        vid & "/" & dokumentid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                 End Try
                 GC.Collect()
                 GC.WaitForFullGCComplete()
@@ -2679,7 +2681,7 @@ Public Class Form1
             If Text Is Nothing Then Text = " "
             Text = Text.Replace(Chr(34), " ")
             Text = Text.Replace(";", "_")
-            'Text = Text.Replace(vbCrLf, "")
+            'Text = Text.Replace(vbCrLf, vbCrLf)
             Text = clsString.noWhiteSpace(Text, " ")
             Return Text.Trim
         Catch ex As Exception
@@ -2822,7 +2824,7 @@ Public Class Form1
     Private Sub writeStammdatenPU(puFehler As String, puAusgabe As String, sql As String,
                                   maxobj As Integer, umlautwandeln As Boolean, swfehlt As IO.StreamWriter,
                                   rohausgabe As Boolean)
-        Dim DT, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR As DataTable
+        Dim DT, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR As System.Data.DataTable
         Dim idok As Integer = 0
         swfehlt.WriteLine("writeStammdatenPU---")
         Dim sgfile As String
@@ -2856,14 +2858,14 @@ Public Class Form1
         Dim sql_illegale = "SELECT * FROM [Paradigma].[dbo].[t17] " &
             " order by vorgangsid desc  "
         Dim illStatus, illText As String
-        Dim illegaleDT As DataTable
+        Dim illegaleDT As System.Data.DataTable
         illegaleDT = alleDokumentDatenHolen(sql_illegale)
         '#########################################
         Dim sql_natureg = "SELECT   [VORGANGSID] ,     [NUMMER]      ,[ART]      ,[TYP]      ,[BESCHREIBUNG]      ,[QUELLE]      ,[TS]     ,[NOTIZ]      " &
                             ",[MASSNAHMENNR]" &
                             " FROM [Paradigma].[dbo].[NATUREG]  order by ts desc"
         Dim naturegStatus, naturegText As String
-        Dim naturegDT As DataTable
+        Dim naturegDT As System.Data.DataTable
         naturegDT = alleDokumentDatenHolen(sql_natureg)
         '#########################################
 
@@ -2953,10 +2955,13 @@ Public Class Form1
                         Debug.Print("")
                     End If
                     eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
-                    Bezeichnung = cleanString(makeStammBezeichnung(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))),
-                                                                   CStr(clsDBtools.fieldvalue(drr.Item("PARAGRAF"))),
-                                                                   CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSGEGENSTAND"))),
-                                                                   CStr(clsDBtools.fieldvalue(drr.Item("az2")))))
+                    'Bezeichnung = cleanString(makeStammBezeichnung(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))),
+                    '                                               CStr(clsDBtools.fieldvalue(drr.Item("PARAGRAF"))),
+                    '                                               CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSGEGENSTAND"))),
+                    '                                               CStr(clsDBtools.fieldvalue(drr.Item("az2")))))
+
+                    Bezeichnung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("beschreibung"))))
+
 
                     az2 = CStr(clsDBtools.fieldvalue(drr.Item("az2")))
                     eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
@@ -3025,7 +3030,12 @@ Public Class Form1
                                                        CStr(clsDBtools.fieldvalue(drr.Item("altaz"))),
                                                        CStr(clsDBtools.fieldvalue(drr.Item("internenr"))),
                                                        CStr(clsDBtools.fieldvalue(drr.Item("beschreibung"))),
-                                                        verwandteString, vid, stotitel, CStr(clsDBtools.fieldvalue(drr.Item("bemerkung")))))
+                                                        verwandteString, vid, stotitel,
+                                                        CStr(clsDBtools.fieldvalue(drr.Item("bemerkung"))))) 'beschreibung hab ich in der funktion ausgeschaltet
+                    Notiz = Notiz & " " & cleanString(makeStammBezeichnung(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))),
+                                                 CStr(clsDBtools.fieldvalue(drr.Item("PARAGRAF"))),
+                                                 CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSGEGENSTAND"))),
+                                                 CStr(clsDBtools.fieldvalue(drr.Item("az2"))))) 'az2 wird nicht verwendet
 
                     'natureg
                     Dim naturegresult As String = ""
@@ -3059,9 +3069,11 @@ Public Class Form1
                     Else
                         Vorhabensmerkmal = ""
                     End If
-
+                    If verwandteString.Count > 0 Then
+                        Notiz = Notiz & " " & verwandteString & ") "
+                    End If
                     zusatz1 = az2 '.Substring(0, 16) 'vid 'CStr(clsDBtools.fieldvalue(drr.Item("az2")))
-                    zusatz2 = verwandteString
+                    zusatz2 = vid
                     zusatz3 = CStr(clsDBtools.fieldvalue(drr.Item("probaugaz")))
                     If umlautwandeln Then
                         sgnr = clsString.removeSemikolon(sgnr)
@@ -3079,13 +3091,13 @@ Public Class Form1
                     End If
 
                     TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                     ' Datenzeilen 
                     ws.Cells("A" & row).Value = vid 'az2
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
-                    ws.Cells("c" & row).Value = ""
-                    ws.Cells("d" & row).Value = ""
-                    ws.Cells("e" & row).Value = Bezeichnung & " / " & cleanString(Notiz)
+                    ws.Cells("c" & row).Value = "~"
+                    ws.Cells("d" & row).Value = "Proumwelt"
+                    ws.Cells("e" & row).Value = Bezeichnung '& " / " & cleanString(Notiz)
                     ws.Cells("f" & row).Value = eingang.ToString("dd.MM.yyyy")
                     ws.Cells("g" & row).Value = antrag.ToString("dd.MM.yyyy")
                     ws.Cells("h" & row).Value = vollstaendigS '.ToString("dd.MM.yyyy")
@@ -3099,7 +3111,7 @@ Public Class Form1
                     ws.Cells("q" & row).Value = sachbearbeiter.TrimEnd("-").TrimEnd(";").TrimEnd(",")
                     ws.Cells("s" & row).Value = Hauptaktenzeichen
                     ws.Cells("t" & row).Value = "" 'hauptaktenjahr.ToString("dd.MM.yyyy")
-                    ws.Cells("v" & row).Value = "" 'notiz
+                    ws.Cells("v" & row).Value = Notiz
                     ws.Cells("w" & row).Value = cleanString(zusatz1)
                     ws.Cells("x" & row).Value = cleanString(zusatz2)
                     ws.Cells("y" & row).Value = cleanString(zusatz3)
@@ -3113,7 +3125,7 @@ Public Class Form1
                            Vorhabensmerkmal & Environment.NewLine &
                            vid & "/" & Bezeichnung & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                            TextBox2.Text
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                     row -= 1
                 End Try
                 GC.Collect()
@@ -3133,7 +3145,7 @@ Public Class Form1
         l("fertig  " & puFehler)
     End Sub
 
-    Private Function getIllegaleHuette(vid As String, illegaleDT As DataTable, ByRef illStatus As String, ByRef illText As String) As Boolean
+    Private Function getIllegaleHuette(vid As String, illegaleDT As System.Data.DataTable, ByRef illStatus As String, ByRef illText As String) As Boolean
         l("getIllegaleHuette  " & vid)
         Dim statustext, gebietstext, raeumungstyptext As String
         Try
@@ -3304,7 +3316,7 @@ Public Class Form1
         End If
     End Sub
 
-    Private Function makeVerwandteString(vid As String, alleVIDmitVerwandten As DataTable, alleFremdvorgaengeMitSGNR As DataTable, ByRef jump As Integer) As String
+    Private Function makeVerwandteString(vid As String, alleVIDmitVerwandten As System.Data.DataTable, alleFremdvorgaengeMitSGNR As System.Data.DataTable, ByRef jump As Integer) As String
         Dim verw As String
         Dim summe As New Text.StringBuilder
         Dim sachg As String
@@ -3341,7 +3353,7 @@ Public Class Form1
         End Try
     End Function
 
-    Private Function getsachgebiet4Fremdvorgangsid(verw As String, alleFremdvorgaengeMitSGNR As DataTable) As String
+    Private Function getsachgebiet4Fremdvorgangsid(verw As String, alleFremdvorgaengeMitSGNR As System.Data.DataTable) As String
         Dim sachg As String
         Try
             For i = 0 To alleFremdvorgaengeMitSGNR.Rows.Count - 1
@@ -3440,6 +3452,7 @@ Public Class Form1
             altaz = altaz.Trim
             interne = interne.Trim
             beschreibung = beschreibung.Trim
+            beschreibung = ""
             bemerkung = bemerkung.Trim
             If vid = 44124 Then
                 Debug.Print("bemeerkung " & bemerkung)
@@ -3516,7 +3529,7 @@ Public Class Form1
 
     Private Sub writeAdresseausgabePU(puFehler As String, puAusgabe As String, sql As String,
                                       maxobj As Integer, umlautwandeln As Boolean)
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim idok As Integer = 0
         'puAusgabeStream.AutoFlush = True
         swfehlt.WriteLine("writeStammdatenPU---")
@@ -3615,9 +3628,12 @@ Public Class Form1
                         abstrakt = clsString.removeSemikolon(abstrakt)
 
                     End If
+                    If ort = "Mühlheim" Then
+                        ort = "Mühlheim am Main"
+                    End If
 
                     TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                     'zeilebilden
                     ws.Cells("A" & row).Value = vid
                     'row.Append(vid & t) 'Az
@@ -3672,7 +3688,7 @@ Public Class Form1
                               Environment.NewLine &
                            vid & "/" & ort & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                            TextBox2.Text
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                 End Try
                 GC.Collect()
                 GC.WaitForFullGCComplete()
@@ -3717,7 +3733,7 @@ Public Class Form1
 
     Private Sub writeKatasterausgabePU(puFehler As String, puAusgabe As String, sql As String,
                                        maxobj As Integer, umlautwandeln As Boolean)
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim idok As Integer = 0
         'puAusgabeStream.AutoFlush = True
         swfehlt.WriteLine("writeKatasterausgabePU---")
@@ -3805,13 +3821,16 @@ Public Class Form1
                     FS = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("fs"))))
                     flaecheqm = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("flaecheqm"))))
                     If umlautwandeln Then
-                        gemarkung = clsString.umlaut2ue(gemarkung)
+                        'gemarkung = clsString.umlaut2ue(gemarkung)
                         funktion = clsString.umlaut2ue(funktion)
                         freitext = clsString.umlaut2ue(freitext)
                         abstrakt = clsString.umlaut2ue(abstrakt)
                     End If
+                    If gemarkung = "mühlheim" Then
+                        gemarkung = "mühlheim am main"
+                    End If
                     TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                     'zeilebilden
 
                     ws.Cells("A" & row).Value = vid
@@ -3852,7 +3871,7 @@ Public Class Form1
                               Environment.NewLine &
                            vid & "/" & vid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                            TextBox2.Text
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                 End Try
                 GC.Collect()
                 GC.WaitForFullGCComplete()
@@ -3921,7 +3940,7 @@ Public Class Form1
         End
     End Sub
     Private Sub writeWiedervorlageAusgabePU(puFehler As String, puAusgabe As String, sql As String, maxobj As Integer, umlautwandeln As Boolean)
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim idok As Integer = 0
         'puAusgabeStream.AutoFlush = True
         swfehlt.WriteLine("Wiedervorlage---")
@@ -4005,7 +4024,7 @@ Public Class Form1
                     End If
 
                     TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                     'zeilebilden
                     ws.Cells("A" & row).Value = vid
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
@@ -4046,7 +4065,7 @@ Public Class Form1
                           Environment.NewLine &
                        Form1.vid & "/" & Form1.vid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                 End Try
                 GC.Collect()
                 GC.WaitForFullGCComplete()
@@ -4066,7 +4085,7 @@ Public Class Form1
     End Sub
 
     Private Sub writeStakeholderAusgabePU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim idok As Integer = 0
         swfehlt.WriteLine("writeStakeholderAusgabePU---")
         DT = alleDokumentDatenHolen(sql)
@@ -4089,7 +4108,7 @@ Public Class Form1
         Try
             beteiligter = New person
             igesamt += 1
-            TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
+            TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : System.Windows.Forms.Application.DoEvents()
             vid = 0 'CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
             eingang = CDate("1911-01-01") ' ""CStr(clsDBtools.fieldvalueDate(drr.Item("datum")))'""
             perscoll = getAllStakeholders(perstemp, DT)
@@ -4101,7 +4120,7 @@ Public Class Form1
                     zeileBeteiligte.Clear()
                 End If
                 igesamt += 1
-                TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
+                TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : System.Windows.Forms.Application.DoEvents()
             Next
         Catch ex As Exception
             l("ddd" & ex.ToString)
@@ -4145,7 +4164,7 @@ Public Class Form1
         End Try
     End Function
 
-    Private Function getAllStakeholders(perstemp As person, dt As DataTable) As List(Of person)
+    Private Function getAllStakeholders(perstemp As person, dt As System.Data.DataTable) As List(Of person)
         Dim perlist As New List(Of person)
         Dim per As New person
         Try
@@ -4285,7 +4304,7 @@ Public Class Form1
 
     Private Sub writeAntragstellerausgabePU(puFehler As String, ausgabeAntragsteller As String, ausgabeBeteiligte As String,
                                             sql As String, maxobj As Integer, umlautwandeln As Boolean)
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim rowAntrag As Integer = 1
         Dim rowBeteiligt As Integer = 1
         ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
@@ -4324,10 +4343,10 @@ Public Class Form1
 
                     antragsteller = New person
                     igesamt += 1
-                    TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : Application.DoEvents()
+                    TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : System.Windows.Forms.Application.DoEvents()
                     vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
                     eingang = CStr(clsDBtools.fieldvalueDate(drr.Item("eingang")))
-                    perscoll = getAllBeteiligte4vorgang(perstemp, vid, umlautwandeln)
+                    perscoll = getAllBeteiligte4vorgang(perstemp, vid, umlautwandeln, True) 'ohne EmailEmpfänger =true
                     If hatAntragsteller(perscoll) Then
                         antragsteller = getAntragsteller(perscoll)
                         If antragsteller Is Nothing Then Exit For
@@ -4364,7 +4383,7 @@ Public Class Form1
                               Environment.NewLine &
                            vid & "/" & vid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                            TextBox2.Text
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                 End Try
                 GC.Collect()
                 GC.WaitForFullGCComplete()
@@ -4654,7 +4673,7 @@ Public Class Form1
         Return (perso.Kontakt.Org.Name & ", " & perso.Kontakt.Org.Zusatz & ", " & perso.Kontakt.Org.Bemerkung & ", " & perso.Kontakt.GesellFunktion).Replace(", , , ", "")
     End Function
 
-    Private Function getAllBeteiligte4vorgang(perstemp As person, vid As String, umlautwandeln As Boolean) As List(Of person)
+    Private Function getAllBeteiligte4vorgang(perstemp As person, vid As String, umlautwandeln As Boolean, ohneEmailEmpfaenger As Boolean) As List(Of person)
         Dim sql As String = "select * from beteiligte_t6 where vorgangsid=" & vid
         Dim per As New person
         Dim perlist As New List(Of person)
@@ -4665,6 +4684,9 @@ Public Class Form1
             For Each drr As DataRow In dt.Rows
                 per = New person
                 per.Rolle = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("rolle"))))
+                If per.Rolle = "EmailEmpfänger" And ohneEmailEmpfaenger = True Then
+                    Continue For
+                End If
                 per.Name = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("nachname"))))
                 per.Vorname = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("vorname"))))
                 per.Bemerkung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("bemerkung"))))
@@ -4751,7 +4773,7 @@ Public Class Form1
     End Sub
 
     Private Sub writeSachbearbeiterPU(puFehler As String, puAusgabeStream As IO.StreamWriter, sql As String, maxobj As Integer)
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim idok As Integer = 0
         puAusgabeStream.AutoFlush = True
         swfehlt.WriteLine("writeKatasterausgabePU---")
@@ -4814,7 +4836,7 @@ Public Class Form1
                 sachgebiet = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("EXPANDHEADERINSACHGEBIET"))))
 
                 TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]"
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 'zeilebilden
                 zeile.Append(vid & t) 'Az 
                 zeile.Append(Username & t) ' 
@@ -4845,7 +4867,7 @@ Public Class Form1
                           Environment.NewLine &
                        vid & "/" & vid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                        TextBox2.Text
-                Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
             End Try
             GC.Collect()
             GC.WaitForFullGCComplete()
@@ -4938,7 +4960,7 @@ Public Class Form1
     End Sub
 
     Private Sub writeEreignissePU(puFehler As String, puAusgabe As String, sql As String, maxobj As Integer, relativpfad As String)
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim idok As Integer = 0
         Dim row As Integer = 1
         ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
@@ -5012,20 +5034,25 @@ Public Class Form1
                     End If
                     row += 1
                     l(eid & " " & CStr(art) & " " & ic)
-                    outfile = dbdatum.ToString("yyyyMMdd_hhmmss") & "_Ereignis_" & cleanString(art) & "_" & cleanString(richtung) & ".txt"
+                    'outfile = dbdatum.ToString("yyyyMMdd_hhmmss") & "_Ereignis_" & cleanString(art) & "_" & cleanString(richtung) & ".txt"
+                    outfile = dbdatum.ToString("yyyyMMdd_hhmmss") & "_"
+                    outfile = outfile & cleanString(art) & "_" & cleanString(richtung) & clsString.normalize_Filename(clsString.kuerzeTextauf(cleanString(beschreibung), 100) & ".txt")
                     outfile = relativpfad & vid & "\" & eid & "\" & outfile
                     If Not IO.Directory.Exists(relativpfad & vid & "\" & eid) Then
                         IO.Directory.CreateDirectory(relativpfad & vid & "\" & eid)
                     End If
                     outstring = erzeugeEreignisString(beschreibung, richtung, art, dbdatum, vid, eid, typnr, notiz)
                     If schreibeEreignisdatei(outfile, outstring) Then
-
+                        If setzeDatumfuerEreignisdatei(outfile, dbdatum) Then
+                        Else
+                            l("fehler beim setzeDatumfuerEreignisdatei ")
+                        End If
                     Else
                         l("fehler beim erzeugeEreignisString ")
                     End If
 
                     TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" & "  / " & vid
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                     If vid = 66633 Then
                         Debug.Print("vid=66633")
                     End If
@@ -5074,7 +5101,7 @@ Public Class Form1
                            inputfile & Environment.NewLine &
                            vid & "/" & eid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                            TextBox2.Text
-                    Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                 End Try
                 'GC.Collect()
                 'GC.WaitForFullGCComplete()
@@ -5090,6 +5117,19 @@ Public Class Form1
         End Using
         l("fertig  " & puFehler)
     End Sub
+
+    Private Function setzeDatumfuerEreignisdatei(outfile As String, dbdatum As Date) As Boolean
+        Try
+            If File.Exists(outfile) Then
+                File.SetLastWriteTime(outfile, dbdatum)
+                Return True
+            End If
+            Return False
+        Catch ex As Exception
+            l("fertig  " & ex.ToString)
+            Return False
+        End Try
+    End Function
 
     Private Function schreibeEreignisdatei(outfile As String, outstring As String) As Boolean
         Try
@@ -5110,7 +5150,7 @@ Public Class Form1
             pu.Append("richtung: " & cleanString(richtung) & " art: " & cleanString(art) & Environment.NewLine)
             pu.Append("datum: " & dbdatum.ToString("yyyyMMdd_hhmmss") & Environment.NewLine)
             pu.Append("typnr: " & cleanString(typnr) & Environment.NewLine)
-            pu.Append("beschreibung: " & cleanString(beschreibung) & Environment.NewLine)
+            pu.Append("beschreibung: " & cleanStringMitZeilenUmbruch(beschreibung) & Environment.NewLine)
             pu.Append("notiz: " & cleanStringMitZeilenUmbruch(notiz) & Environment.NewLine)
             Return pu.ToString
         Catch ex As Exception
@@ -5184,7 +5224,7 @@ Public Class Form1
     End Sub
 
     Private Sub writeVerlaufPU(puFehler As String, puAusgabe As String, sql As String, maxobj As Integer, relativpfad As String, startVID As String)
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim idok As Integer = 0
         'puAusgabe.AutoFlush = True
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
@@ -5311,7 +5351,7 @@ Public Class Form1
                     l(eid & " " & CStr(art) & " " & ic)
                     TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" & " vid: " & aktvorgangsid
                     If igesamt Mod 100 = 0 Then
-                        Application.DoEvents()
+                        System.Windows.Forms.Application.DoEvents()
                     End If
 
 
@@ -5409,7 +5449,7 @@ Public Class Form1
             typ = (CStr(clsDBtools.fieldvalue(drr.Item("typ"))))
             dateinameext = (CStr(clsDBtools.fieldvalue(drr.Item("dateinameext"))))
             quelle = (CStr(clsDBtools.fieldvalue(drr.Item("quelle"))))
-
+            quelle = CStr(clsDBtools.fieldvalue(drr.Item("kuerzel1"))) '
             fILEDATUM = CDate(clsDBtools.fieldvalueDate(drr.Item("fILEDATUM")))
             cHECKINDATUM = CDate(clsDBtools.fieldvalueDate(drr.Item("cHECKINDATUM")))
             rEVISIONSSICHER = (CStr(clsDBtools.fieldvalue(drr.Item("rEVISIONSSICHER"))))
@@ -5461,7 +5501,7 @@ Public Class Form1
         Sql = "  Select   " &
             "  e.VORGANGSID,EINGANG,e.beschreibung,datum,art,richtung, notiz,quelle, " &
             "  DATEINAMEEXT,d_beschreibung, " &
-            "  FILEDATUM, typ, CHECKINDATUM, REVISIONSSICHER " &
+            "  FILEDATUM, typ, CHECKINDATUM, REVISIONSSICHER ,kuerzel1" &
             "  FROM [Paradigma].[dbo].[EREIGNIS_und_dok]    e,   " &
             "   [Paradigma].[dbo].[stammdaten_tutti] s  " &
             "   where         e.VORGANGSID = s.VORGANGSID    " &
@@ -5494,7 +5534,7 @@ Public Class Form1
     End Sub
 
     Private Sub writechronologie(puFehler As String, puAusgabe As String, sql As String, maxobj As Integer, relativpfad As String, startvid As Integer)
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim idok As Integer = 0
         'puAusgabe.AutoFlush = True
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
@@ -5543,13 +5583,13 @@ Public Class Form1
             Dim ws = package.Workbook.Worksheets.Add("Daten")
             ws.Cells("A1").Value = "az"
             ws.Cells("B1").Value = "jahr"
-            ws.Cells("c1").Value = "og"
+            ws.Cells("c1").Value = "obergruppe"
             ws.Cells("d1").Value = "datum"
-            ws.Cells("e1").Value = "fd"
-            ws.Cells("f1").Value = "zd"
+            ws.Cells("e1").Value = "fristdatum"
+            ws.Cells("f1").Value = "zuruckdatum"
             ws.Cells("g1").Value = "typ"
-            ws.Cells("h1").Value = "emp"
-            ws.Cells("i1").Value = "sb"
+            ws.Cells("h1").Value = "empfaenger"
+            ws.Cells("i1").Value = "sachbearbeiter"
             ws.Cells("j1").Value = "textzeile"
             ws.Cells("k1").Value = "vermerk"
 
@@ -5570,6 +5610,8 @@ Public Class Form1
                     'alte summary schliessen
                     'schreibeEreignisdatei(summaryOutfile, summe.ToString)
                     'summe.Clear()
+
+                    'CStr(clsDBtools.fieldvalue(drr.Item("kuerzel1"))) '
                     row += 1
                     ws.Cells("A" & row).Value = vid
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
@@ -5627,7 +5669,7 @@ Public Class Form1
                     l(eid & " " & CStr(art) & " " & ic)
                     TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" & " vid: " & aktvorgangsid
                     If igesamt Mod 100 = 0 Then
-                        Application.DoEvents()
+                        System.Windows.Forms.Application.DoEvents()
                     End If
 
 
@@ -5682,10 +5724,10 @@ Public Class Form1
         'writeStammdatenPU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln, swfehlt)
         'writeIllegalePU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln, swfehlt)
 
-        Dim meineDT As DataTable
+        Dim meineDT As System.Data.DataTable
         meineDT = alleDokumentDatenHolen(Sql)
 
-        Dim dt As DataTable = meineDT
+        Dim dt As System.Data.DataTable = meineDT
         Dim filePath As String = puAusgabe '"e:\illegal.csv"
 
         Using writer As New StreamWriter(filePath, False, System.Text.Encoding.UTF8)
@@ -5735,7 +5777,7 @@ Public Class Form1
 
     Private Sub Button17_Click(sender As Object, e As EventArgs) Handles Button17.Click
         ' BLOB als Datei speichern
-        Dim DT As DataTable
+        Dim DT As System.Data.DataTable
         Dim relativpfad, dateinameext, typ, dokumentid, inputfile, outfile As String
         Dim newsavemode As Boolean
         Dim istRevisionssicher As Boolean
@@ -5797,7 +5839,7 @@ Public Class Form1
                  "order by gemeinde, lagebezeichnung "
         'TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        Dim meineDT As DataTable
+        Dim meineDT As System.Data.DataTable
         meineDT = getDTingrada(Sql)
 
         Dim ingradaRoh As List(Of strassenOrtItem)
@@ -5810,7 +5852,7 @@ Public Class Form1
 
 
 
-        Dim probaugstrassendt As DataTable
+        Dim probaugstrassendt As System.Data.DataTable
         Sql = "SELECT  distinct      o.[Bezeichnung] as ort, s.[Bezeichnung]  as strasse       " &
                    "FROM [prosozbau].[dbo].[PBPBauort] o, [prosozbau].[dbo].[PBPStrasse] s  " &
                    "where s.Bauort_Key1=o.id  " &
@@ -5890,7 +5932,7 @@ Public Class Form1
         Return ingradaneu
     End Function
 
-    Private Shared Function ingrada2obj(meineDT As DataTable) As List(Of strassenOrtItem)
+    Private Shared Function ingrada2obj(meineDT As System.Data.DataTable) As List(Of strassenOrtItem)
         Dim cmb As New strassenOrtItem
         Dim internlist As New List(Of strassenOrtItem)(90000)
         For i = 0 To meineDT.Rows.Count - 1
@@ -5909,7 +5951,7 @@ Public Class Form1
         Return internlist
     End Function
 
-    Private Function getDTingrada(Sql As String) As DataTable
+    Private Function getDTingrada(Sql As String) As System.Data.DataTable
         Dim cstring As String = "Server=KH-W-INGRADA;Database=LKOF;User=Ingrada;Pwd=Starry-Footless6-Mashing-Backboned;"
         Dim myConn = New SqlConnection(cstring)
         'Dim myCmd = myConn.CreateCommand
