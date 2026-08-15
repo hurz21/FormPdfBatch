@@ -2557,8 +2557,20 @@ Public Class Form1
                     '    l(vid & " ?????? " & fullfilename)
                     'End If
                     If dateinameext.Contains("?") Then
-                        dateinameext = cleanString(dateinameext.Replace("?", "F").Replace(";", ""))
+                        dateinameext = cleanString(dateinameext.Replace("?", "_"))
                         l(vid & " ?????? " & dateinameext)
+                    End If
+                    If dateinameext.Contains(";") Then
+                        dateinameext = cleanString(dateinameext.Replace(";", ""))
+                        l(vid & " ; " & dateinameext)
+                    End If
+                    If dateinameext.Contains(",") Then
+                        dateinameext = cleanString(dateinameext.Replace(",", ""))
+                        l(vid & " , " & dateinameext)
+                    End If
+                    If dateinameext.Contains("&") Then
+                        dateinameext = cleanString(dateinameext.Replace("&", "u"))
+                        l(vid & " u " & dateinameext)
                     End If
                     If fullfilename = String.Empty Then
                         Continue For
@@ -5501,7 +5513,7 @@ Public Class Form1
         Sql = "  Select   " &
             "  e.VORGANGSID,EINGANG,e.beschreibung,datum,art,richtung, notiz,quelle, " &
             "  DATEINAMEEXT,d_beschreibung, " &
-            "  FILEDATUM, typ, CHECKINDATUM, REVISIONSSICHER ,kuerzel1" &
+            "  FILEDATUM, typ, CHECKINDATUM, REVISIONSSICHER " &
             "  FROM [Paradigma].[dbo].[EREIGNIS_und_dok]    e,   " &
             "   [Paradigma].[dbo].[stammdaten_tutti] s  " &
             "   where         e.VORGANGSID = s.VORGANGSID    " &
