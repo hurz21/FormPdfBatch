@@ -5461,7 +5461,7 @@ Public Class Form1
             typ = (CStr(clsDBtools.fieldvalue(drr.Item("typ"))))
             dateinameext = (CStr(clsDBtools.fieldvalue(drr.Item("dateinameext"))))
             quelle = (CStr(clsDBtools.fieldvalue(drr.Item("quelle"))))
-            quelle = CStr(clsDBtools.fieldvalue(drr.Item("kuerzel1"))) '
+            'quelle = CStr(clsDBtools.fieldvalue(drr.Item("kuerzel1"))) '
             fILEDATUM = CDate(clsDBtools.fieldvalueDate(drr.Item("fILEDATUM")))
             cHECKINDATUM = CDate(clsDBtools.fieldvalueDate(drr.Item("cHECKINDATUM")))
             rEVISIONSSICHER = (CStr(clsDBtools.fieldvalue(drr.Item("rEVISIONSSICHER"))))
@@ -5571,20 +5571,20 @@ Public Class Form1
         myoracle = getMSSQLCon()
         myoracle.Open()
         Dim zeile As New Text.StringBuilder
-        Dim excelkopf As New Text.StringBuilder
+        'Dim excelkopf As New Text.StringBuilder
         Dim fullfilename, quelle, d_beschreibung, typ, REVISIONSSICHER As String
         Dim t As String = ";"
-        excelkopf.Append("Ereignis" & t) 'Az
-        excelkopf.Append("datum" & t) 'jahr
-        excelkopf.Append("richtung" & t) 'datum
-        excelkopf.Append("quelle" & t) 'oberbegriff Protokolle
-        excelkopf.Append((cleanString("beschreibung")) & t) 'bezeichnung beschreibung
-        excelkopf.Append(("dateiname") & t) 'pfad
-        excelkopf.Append("dateibeschreibung" & t) 'ordner im mediencenter
-        excelkopf.Append("dateityp" & t) ' 
-        excelkopf.Append("revisionssicher" & t) ' 
-        excelkopf.Append("filedatum" & t) ' 
-        excelkopf.Append("checkindatum" & Environment.NewLine) '  
+        'excelkopf.Append("Ereignis" & t) 'Az
+        'excelkopf.Append("datum" & t) 'jahr
+        'excelkopf.Append("richtung" & t) 'datum
+        'excelkopf.Append("quelle" & t) 'oberbegriff Protokolle
+        'excelkopf.Append((cleanString("beschreibung")) & t) 'bezeichnung beschreibung
+        'excelkopf.Append(("dateiname") & t) 'pfad
+        'excelkopf.Append("dateibeschreibung" & t) 'ordner im mediencenter
+        'excelkopf.Append("dateityp" & t) ' 
+        'excelkopf.Append("revisionssicher" & t) ' 
+        'excelkopf.Append("filedatum" & t) ' 
+        'excelkopf.Append("checkindatum" & Environment.NewLine) '  
         'ExcelPackage.LicenseContext = LicenseContext.NonCommercial
         'ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
 
