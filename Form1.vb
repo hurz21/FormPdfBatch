@@ -71,9 +71,8 @@ Public Class Form1
         Dim dt As New System.Data.DataTable
         Try
 
-            'MsgBox(Sql)
             dt = getDT(sql)
-            'MsgBox(dt.Rows.Count)
+
             'l("nach getDT")
             Return dt
         Catch ex As Exception
@@ -86,9 +85,9 @@ Public Class Form1
         Try
             Sql = "SELECT * FROM dokumente where   ort<2000000 and ort>0  " &
                   " and ( Vorhaben='pdf') order by ort desc "
-            'MsgBox(Sql)
+
             dt = getDT(Sql)
-            'MsgBox(dt.Rows.Count)
+
             'l("nach getDT")
             Return dt
         Catch ex As Exception
@@ -100,9 +99,9 @@ Public Class Form1
         Dim dt As New System.Data.DataTable
         Try
 
-            'MsgBox(Sql)
+
             dt = getDT(sql)
-            'MsgBox(dt.Rows.Count)
+
             'l("nach getDT")
             Return dt
         Catch ex As Exception
@@ -116,9 +115,9 @@ Public Class Form1
             Sql = "SELECT * FROM dokumente where   ort<2000000 and ort>0  " &
                   "  and mb =0 " &
                   "  order by ort desc "
-            'MsgBox(Sql)
+
             dt = getDT(Sql)
-            'MsgBox(dt.Rows.Count)
+
             'l("nach getDT")
             Return dt
         Catch ex As Exception
@@ -249,8 +248,8 @@ Public Class Form1
                 System.Windows.Forms.Application.DoEvents()
                 If fo.Exists Then
                     'l("exists")
-                'inputFileReadonlyEntfernen(Vorhabensmerkmal)
-                Continue For
+                    'inputFileReadonlyEntfernen(Vorhabensmerkmal)
+                    Continue For
                 Else
                     ic += 1
                     l("dokument fehlt: " & ic.ToString & Environment.NewLine & " " &
@@ -2770,18 +2769,18 @@ Public Class Form1
 
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        writeStammdatenPU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln, swfehlt, rohausgabe:=True)
+        writeStammdatenPU(puFehler, puAusgabe, Sql, maxobj, umlautwandeln, swfehlt, rohausgabe:=False)
         System.Diagnostics.Process.Start("explorer", puFehler)
         System.Diagnostics.Process.Start("explorer", puAusgabe) '"e:\proumwelt\xls\grunddaten.xlsx")
         End
     End Sub
     Public Class zeile
-        Public pAlt As String
+
         Public pNeu As String
         Public Verfahrensart As String
         Public vorhaben As String
-        Public Bezeichnung As String
-        Public notiz As String
+        Public bezeichnung As String
+
     End Class
     Private Sub getCollection(sgfile As String, swfehlt As IO.StreamWriter, coll As List(Of zeile))
         Dim tmpstream As StreamReader = File.OpenText(sgfile)
@@ -2798,26 +2797,25 @@ Public Class Form1
                 row = New zeile
                 strlines(x) = strlines(x).Replace(vbCrLf, "").Replace(vbLf, "")
                 p = (strlines(x)).Split(";")
-                row.pAlt = p(0).Trim
+
                 row.pNeu = p(1).Trim
                 row.Verfahrensart = p(2).Trim
                 row.vorhaben = p(3).Trim
-                row.Bezeichnung = p(4).Trim
-                row.notiz = p(5).Trim
-                If row.pAlt.Count < 4 Then Continue For
+                row.bezeichnung = p(5).Trim
+
+
                 If row.pNeu.ToLower.Contains("x") Then Continue For
                 If row.pNeu.Count < 4 Then
-                    row.pNeu = row.pAlt 'es gilt dann nur die neue nummer
+
+                    swfehlt.WriteLine(x & " row.pNeu.Count < 4 ")
                 End If
-                If row.pAlt.Count < 4 Then
-                    row.pAlt = row.pNeu 'es gilt dann nur die neue nummer
-                End If
+
                 If row.Verfahrensart.Trim.Count < 3 Then
-                    swfehlt.WriteLine(row.pAlt & "  Verfahrensart fehlt . => ignore")
+                    swfehlt.WriteLine(row.pNeu & "  Verfahrensart fehlt . => ignore " & x)
                     Continue For
                 End If
                 If row.vorhaben.Trim.Count < 3 Then
-                    swfehlt.WriteLine(row.pAlt & "  vorhaben fehlt . => ignore")
+                    swfehlt.WriteLine(row.pNeu & "  vorhaben fehlt . => ignore" & x)
                     Continue For
                 End If
                 icnt += 1
@@ -2841,7 +2839,7 @@ Public Class Form1
         swfehlt.WriteLine("writeStammdatenPU---")
         Dim sgfile As String
         'sgfile = "E:\proumwelt\s2.txt"
-        sgfile = "E:\Sachgebiete FD.csv"
+        sgfile = "T:\HILFS_TABELLEN\SachgebieteTEST.csv"
         Dim kontrolldatei = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\Grundaten_gueltigeSGnummern.txt"
         Dim abgewiesendat = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\Grundaten_abgewieseneVorgaenge.txt"
         Dim gueltigeVorgaenge = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\Grundaten_gueltigeVorgaenge.txt"
@@ -3012,7 +3010,7 @@ Public Class Form1
                     End If
 
                     If Verfahrensart = "????" Or Vorhaben = "????" Then
-                        geloeschteVorgaengeStream.WriteLine(vid & ";" & sgnr & ";" & az2) ' & ";" & str.pAlt & ";" &)
+                        geloeschteVorgaengeStream.WriteLine("Keine verfahrensart/vorhaben: " & vid & ";" & sgnr & ";" & az2) ' & ";" & str.pAlt & ";" &)
                         Continue For
                     End If
 
@@ -3075,11 +3073,11 @@ Public Class Form1
                         Debug.Print("")
                         If getIllegaleHuette(vid, illegaleDT, illStatus, illText) Then
                             Notiz = Notiz & " (ill.: " & illText & ") "
-                            Vorhabensmerkmal = illStatus
+                            Vorhabensmerkmal = illStatus + 100
                             Verfahrensart = "305"
                         End If
                     Else
-                        Vorhabensmerkmal = ""
+                        Vorhabensmerkmal = "999"
                     End If
                     If verwandteString.Count > 0 Then
                         Notiz = Notiz & " " & verwandteString & ") "
@@ -3247,14 +3245,16 @@ Public Class Form1
 
     Private Shared Sub writeCollectionKontrollfile(kontrollfile As StreamWriter, coll As List(Of zeile))
         For Each str As zeile In coll
-            kontrollfile.WriteLine(str.pAlt & ";" & str.Verfahrensart & ";" & str.vorhaben & ";" & str.Bezeichnung) ' & ";" & str.pAlt & ";" &)
+            kontrollfile.WriteLine(str.pNeu & ";" & str.Verfahrensart & ";" & str.vorhaben & ";" & str.bezeichnung) ' & ";" & str.pAlt & ";" &)
         Next
     End Sub
 
     Private Sub getVerfahrensartUndVorhaben(sgnr As String, ByRef verfahrensart As String, ByRef vorhaben As String, ByRef vorhabensmerkmal As String, coll As List(Of zeile))
+        Dim dummy As String
         Try
             For Each item As zeile In coll
-                If item.pAlt.Trim = sgnr Then
+                dummy = item.pNeu.Trim
+                If item.pNeu.Trim = sgnr Then
                     verfahrensart = item.Verfahrensart
                     vorhaben = item.vorhaben
                     vorhabensmerkmal = "999"
@@ -3273,20 +3273,20 @@ Public Class Form1
         Try
             If sgnr.Count < 4 Then
                 Debug.Print("")
-                swfehlt.WriteLine("tcount: " & sgnr)
+                swfehlt.WriteLine("plösser <4: " & sgnr)
                 sgnr = "1101"
                 If az2.ToLower.Contains("-plöb") Or
                        az2.ToLower.Contains("-klib") Or
                        az2.ToLower.EndsWith("-kl") Or
                        az2.ToLower.EndsWith("-pl") Then
-                    sgnr = "5031"
+                    sgnr = "5333"
                     Exit Sub
                 End If
                 If az2.ToLower.Contains("-webs") Or
                        az2.ToLower.Contains("-resl") Or
                        az2.ToLower.EndsWith("-we") Or
                        az2.ToLower.EndsWith("-re") Then
-                    sgnr = "4031"
+                    sgnr = "4000"
                     Exit Sub
                 End If
                 If az2.ToLower.Contains("-gaig") Or
@@ -3304,14 +3304,14 @@ Public Class Form1
                 End If
             End If
             If sgnr.Trim.Substring(3, 1) = "-" Then
-                swfehlt.WriteLine("tcount: " & sgnr)
+                swfehlt.WriteLine("Weber142Minus: " & sgnr)
                 If sgnr.Contains("142-") Then
                     Debug.Print("")
                 Else
                     Debug.Print("")
                 End If
                 tcount += 1
-                sgnr = "4031"
+                sgnr = "4000"
             End If
 
         Catch ex As Exception
@@ -3498,7 +3498,7 @@ Public Class Form1
             If paragraf.Length < 1 Then
                 paragraf = ""
             Else
-                paragraf = t & " $: " & paragraf
+                paragraf = t & " §: " & paragraf
             End If
             ret = sgtext & paragraf & t & " " & vgGegenstand '& " (" & az & ")"
             Return ret
@@ -4385,6 +4385,9 @@ Public Class Form1
                     For Each perso As person In perscoll
                         rowBeteiligt += 1
                         erfolg = bildeZeilePerson(eingang, wsBeteiligte, perso, rowBeteiligt)
+                        If Not erfolg Then
+                            rowBeteiligt -= 1
+                        End If
                         'If csvzeileSpeichern(zeileBeteiligte.ToString, ausgabeBeteiligte) Then
                         '    zeileBeteiligte.Clear()
                         'End If
@@ -4568,15 +4571,19 @@ Public Class Form1
     End Function
 
     Private Shared Function bildeZeilePerson(eingang As Date, ws As ExcelWorksheet, perso As person, row As Integer) As Boolean
+        If perso.Rolle.ToLower.Contains("ntragsteller") Then
+            Return False
+        End If
         ws.Cells("A" & row).Value = vid
         ws.Cells("b" & row).Value = eingang.ToString("yyyy")
-        ws.Cells("c" & row).Value = "???"
-        ws.Cells("d" & row).Value = "???" 'adressog
+        ws.Cells("c" & row).Value = perso.Rolle.Trim
+        ws.Cells("d" & row).Value = "" ' "???" 'adressog
         ws.Cells("e" & row).Value = perso.Anrede
         ws.Cells("f" & row).Value = bildeFirma(perso)
         ws.Cells("g" & row).Value = perso.Namenszusatz
         ws.Cells("h" & row).Value = perso.Vorname
-        ws.Cells("i" & row).Value = perso.Name
+        'ws.Cells("i" & row).Value = perso.Name
+        ws.Cells("i" & row).Value = perso.Name '& " (" & perso.Rolle & ")"
         ws.Cells("m" & row).Value = perso.Kontakt.Anschrift.Strasse
         ws.Cells("n" & row).Value = perso.Kontakt.Anschrift.Hausnr
         ws.Cells("o" & row).Value = perso.Kontakt.Anschrift.Hausnr
@@ -4594,7 +4601,9 @@ Public Class Form1
         ws.Cells("aa" & row).Value = ""
         ws.Cells("ab" & row).Value = ""
         ws.Cells("ac" & row).Value = perso.Kassenkonto
-        ws.Cells("ad" & row).Value = perso.Rolle
+        'ws.Cells("ad" & row).Value = perso.Rolle
+
+
         'zeileAntragsteller.Append(vid & t) 'Az
         'zeileAntragsteller.Append(eingang.ToString("yyyy") & t) 'jahr 
         'zeileAntragsteller.Append(perso.Rolle & t) ' 
@@ -5225,7 +5234,6 @@ Public Class Form1
 
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        'MsgBox("max. objekte für test: " & maxobj)
         writeVerlaufPU(puFehler, puAusgabe, Sql, maxobj, relativpfad, startvid)
         'puAusgabeStream.Close()
         'puAusgabeStream.Dispose()
@@ -5529,7 +5537,6 @@ Public Class Form1
 
         TextBox1.Text = puAusgabe
         TextBox2.Text = Sql
-        'MsgBox("max. objekte für test: " & maxobj)
         'writeVerlaufPU(puFehler, puAusgabe, Sql, maxobj, relativpfad, startvid)
         writechronologie(puFehler, puAusgabe, Sql, maxobj, relativpfad, startvid)
         'puAusgabeStream.Close()
@@ -5775,6 +5782,8 @@ Public Class Form1
         Mergetest("T:\dokumente\ereignisse", "T:\MERGED_EreignisseDoks.xlsx")
         TextBox1.Text &= "T:\chronologie"
         Mergetest("T:\chronologie", "T:\MERGED_Chronologie.xlsx")
+        'TextBox1.Text &= "dokumente"
+        'Mergetest("T:\mergedDokus", "T:\MERGED_alleDoks.xlsx")
         TextBox1.Text &= "fertig"
 
     End Sub
@@ -5976,7 +5985,6 @@ Public Class Form1
         'da.MissingSchemaAction = MissingSchemaAction.AddWithKey
 
         Dim mycount As Integer
-        'MsgBox("vorfill")
         mycount = da.Fill(dt)
         Return dt
     End Function
