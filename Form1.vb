@@ -2798,10 +2798,10 @@ Public Class Form1
                 strlines(x) = strlines(x).Replace(vbCrLf, "").Replace(vbLf, "")
                 p = (strlines(x)).Split(";")
 
-                row.pNeu = p(1).Trim
-                row.Verfahrensart = p(2).Trim
-                row.vorhaben = p(3).Trim
-                row.bezeichnung = p(5).Trim
+                row.pNeu = p(0).Trim
+                row.Verfahrensart = p(1).Trim
+                row.vorhaben = p(2).Trim
+                row.bezeichnung = p(4).Trim
 
 
                 If row.pNeu.ToLower.Contains("x") Then Continue For
@@ -3010,6 +3010,8 @@ Public Class Form1
                     End If
 
                     If Verfahrensart = "????" Or Vorhaben = "????" Then
+                        Verfahrensart = "9999"
+                        Vorhaben = "9999"
                         geloeschteVorgaengeStream.WriteLine("Keine verfahrensart/vorhaben: " & vid & ";" & sgnr & ";" & az2) ' & ";" & str.pAlt & ";" &)
                         Continue For
                     End If
@@ -3069,7 +3071,7 @@ Public Class Form1
                         naturegresult = ""
                     End If
                     'illegale
-                    If Verfahrensart = "3307" Then
+                    If sgnr = "3307" Then
                         Debug.Print("")
                         If getIllegaleHuette(vid, illegaleDT, illStatus, illText) Then
                             Notiz = Notiz & " (ill.: " & illText & ") "
@@ -3274,19 +3276,19 @@ Public Class Form1
             If sgnr.Count < 4 Then
                 Debug.Print("")
                 swfehlt.WriteLine("plösser <4: " & sgnr)
-                sgnr = "1101"
+                sgnr = "9999" '"1101"
                 If az2.ToLower.Contains("-plöb") Or
                        az2.ToLower.Contains("-klib") Or
                        az2.ToLower.EndsWith("-kl") Or
                        az2.ToLower.EndsWith("-pl") Then
-                    sgnr = "5333"
+                    sgnr = "9999" '"5333"
                     Exit Sub
                 End If
                 If az2.ToLower.Contains("-webs") Or
                        az2.ToLower.Contains("-resl") Or
                        az2.ToLower.EndsWith("-we") Or
                        az2.ToLower.EndsWith("-re") Then
-                    sgnr = "4000"
+                    sgnr = "9999" '"4000"
                     Exit Sub
                 End If
                 If az2.ToLower.Contains("-gaig") Or
@@ -3299,7 +3301,7 @@ Public Class Form1
                     az2.ToLower.EndsWith("-ro") Or
                     az2.ToLower.EndsWith("-gg") Or
                     az2.ToLower.EndsWith("-sm") Then
-                    sgnr = "3017"
+                    sgnr = "9999" '"3017"
                     Exit Sub
                 End If
             End If
@@ -3311,7 +3313,7 @@ Public Class Form1
                     Debug.Print("")
                 End If
                 tcount += 1
-                sgnr = "4000"
+                sgnr = "9999" '"4000"
             End If
 
         Catch ex As Exception
