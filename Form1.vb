@@ -12,12 +12,13 @@ Imports System.IO
 Imports System.Runtime.Serialization.Formatters
 Imports System.Security.Cryptography.X509Certificates
 Imports System.Xml
+Imports iText.Forms.Form.Element
 Imports Microsoft.Office.Interop.Excel
 Imports Microsoft.Office.Interop.Word
 Imports Mono.Security.Protocol
 Imports OfficeOpenXml
 Public Class Form1
-
+    Private grunddaten As List(Of primekey)
     'Public wordVorlagen As New Microsoft.Office.Interop.Word.Application 'habe hier new ergänzt ????
     'Public docVorlagen As New Microsoft.Office.Interop.Word.Document
     Private immerUeberschreiben As Boolean
@@ -283,7 +284,7 @@ Public Class Form1
 
     'Private Sub PDFSverarbeiten(outdir As String, vid As String, dt as System.Data.datatable)
     '    Dim ic As Integer = 0
-    '    Dim sachgebiet As String = "", Verfahrensart As String = "", Vorhaben As String, batchfile As String
+    '    Dim PUsachgebiet As String = "", Verfahrensart As String = "", Vorhaben As String, batchfile As String
     '    Dim newsavemode As Boolean
     '    Dim dbdatum As Date
     '    Dim Vorhabensmerkmal, checkoutfile, bearbeiter As String
@@ -291,13 +292,13 @@ Public Class Form1
     '    For Each drr As DataRow In dt.Rows
     '        Try
     '            ic += 1
-    '            DbMetaDatenDokumentHolen(vid, sachgebiet, Verfahrensart, Vorhaben, newsavemode, ort, drr, dbdatum)
+    '            DbMetaDatenDokumentHolen(vid, PUsachgebiet, Verfahrensart, Vorhaben, newsavemode, ort, drr, dbdatum)
     '            l(vid & " " & ort.ToString & " " & ic & " (" & dt.Rows.Count & ")")
     '            TextBox1.Text = TextBox1.Text & vid & " " & ort.ToString & " " & ic & " (" & dt.Rows.Count & ")"
     '            If newsavemode Then
-    '                Vorhabensmerkmal = GetInputfile(inndir, sachgebiet, CInt(ort))
+    '                Vorhabensmerkmal = GetInputfile(inndir, PUsachgebiet, CInt(ort))
     '            Else
-    '                Vorhabensmerkmal = GetInputfile1(inndir, sachgebiet, Verfahrensart)
+    '                Vorhabensmerkmal = GetInputfile1(inndir, PUsachgebiet, Verfahrensart)
     '            End If
     '            bearbeiter = modPrep.GetOutfile(CInt(vid), outdir, CInt(ort), ".jpg")
     '            Dim fi As New IO.FileInfo(bearbeiter.Replace(Chr(34), ""))
@@ -1044,7 +1045,7 @@ Public Class Form1
         End Try
     End Function
     Private Function db_eintragExcelAendern(vid As Integer, relativpfad As String, dateinameext As String, typ As String, newsavemode As Boolean, dokumentid As Integer, drr As DataRow) As Boolean
-        'modOracle.setExcelAttribute2(vid, sachgebiet, Verfahrensart, Vorhaben, newsavemode, ort, drr)
+        'modOracle.setExcelAttribute2(vid, PUsachgebiet, Verfahrensart, Vorhaben, newsavemode, ort, drr)
     End Function
     Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
         'doc2docx
@@ -2776,7 +2777,8 @@ Public Class Form1
     End Sub
     Public Class zeile
 
-        Public pNeu As String
+        Public paradigmaSGNR As String
+        Public PUsachgebiet As String
         Public Verfahrensart As String
         Public vorhaben As String
         Public bezeichnung As String
@@ -2786,7 +2788,7 @@ Public Class Form1
         Dim tmpstream As StreamReader = File.OpenText(sgfile)
         Dim strlines() As String
         Dim p() As String
-        'Dim coll As New List(Of row)
+        'Dim sachgebietCollection As New List(Of row)
         Dim row As New zeile
         Dim num_rows
         Dim icnt As Integer
@@ -2798,24 +2800,25 @@ Public Class Form1
                 strlines(x) = strlines(x).Replace(vbCrLf, "").Replace(vbLf, "")
                 p = (strlines(x)).Split(";")
 
-                row.pNeu = p(0).Trim
-                row.Verfahrensart = p(1).Trim
-                row.vorhaben = p(2).Trim
-                row.bezeichnung = p(4).Trim
+                row.paradigmaSGNR = p(0).Trim
+                row.PUsachgebiet = p(1).Trim
+                row.Verfahrensart = p(2).Trim
+                row.vorhaben = p(3).Trim
+                row.bezeichnung = p(5).Trim
 
 
-                If row.pNeu.ToLower.Contains("x") Then Continue For
-                If row.pNeu.Count < 4 Then
+                If row.paradigmaSGNR.ToLower.Contains("x") Then Continue For
+                If row.paradigmaSGNR.Count < 4 Then
 
-                    swfehlt.WriteLine(x & " row.pNeu.Count < 4 ")
+                    swfehlt.WriteLine(x & " row.paradigmaSGNR.Count < 4 ")
                 End If
 
                 If row.Verfahrensart.Trim.Count < 3 Then
-                    swfehlt.WriteLine(row.pNeu & "  Verfahrensart fehlt . => ignore " & x)
+                    swfehlt.WriteLine(row.paradigmaSGNR & "  Verfahrensart fehlt . => ignore " & x)
                     Continue For
                 End If
                 If row.vorhaben.Trim.Count < 3 Then
-                    swfehlt.WriteLine(row.pNeu & "  vorhaben fehlt . => ignore" & x)
+                    swfehlt.WriteLine(row.paradigmaSGNR & "  vorhaben fehlt . => ignore" & x)
                     Continue For
                 End If
                 icnt += 1
@@ -2856,11 +2859,11 @@ Public Class Form1
         geloeschteVorgaengeStream.AutoFlush = True
         erledigtUndAltStream.AutoFlush = True
         kontrollstream.AutoFlush = True
-        Dim coll As New List(Of zeile)
+        Dim sachgebietCollection As New List(Of zeile)
         If rohausgabe Then
         Else
-            getCollection(sgfile, swfehlt, coll)
-            writeCollectionKontrollfile(kontrollstream, coll)
+            getCollection(sgfile, swfehlt, sachgebietCollection)
+            writeCollectionKontrollfile(kontrollstream, sachgebietCollection)
             kontrollstream.Close()
         End If
 
@@ -2895,7 +2898,7 @@ Public Class Form1
         Dim az2 As String = ""
         Dim ic As Integer = 0
         Dim igesamt As Integer = 0
-        Dim sachgebiet, Verfahrensart, Vorhaben, Bezeichnung, Vorhabensmerkmal, Notiz, sachbearbeiter As String
+        Dim PUsachgebiet, Verfahrensart, Vorhaben, Bezeichnung, Vorhabensmerkmal, Notiz, sachbearbeiter As String
         Dim newsavemode As Boolean
         Dim verwandteString As String
         Dim istRevisionssicher As Boolean
@@ -2940,7 +2943,7 @@ Public Class Form1
             ws.Cells("k1").Value = "aktenstandort"
             ws.Cells("l1").Value = "aktenstandortSachbearb"
 
-            ws.Cells("m1").Value = "sachgebiet".Trim("-")
+            ws.Cells("m1").Value = "PUsachgebiet".Trim("-")
             ws.Cells("n1").Value = "verfahrensart".Trim("-")
             ws.Cells("o1").Value = "vorhaben".Trim("-")
             ws.Cells("p1").Value = "vorhmerkmal".Trim("-")
@@ -3006,7 +3009,7 @@ Public Class Form1
                         Vorhaben = sgnr
                         Vorhabensmerkmal = sgnr
                     Else
-                        getVerfahrensartUndVorhaben(sgnr, Verfahrensart, Vorhaben, Vorhabensmerkmal, coll)
+                        getVerfahrensartUndVorhaben(sgnr, PUsachgebiet, Verfahrensart, Vorhaben, Vorhabensmerkmal, sachgebietCollection)
                     End If
 
                     If Verfahrensart = "????" Or Vorhaben = "????" Then
@@ -3021,7 +3024,7 @@ Public Class Form1
                     '#########################################################################
                     gueltigeVorgaengeStream.WriteLine(vid & ";" & az2 & ";" & eingang.ToString("yyyy"))
                     row += 1
-                    sachgebiet = "67" & sgnr.Substring(0, 1) '& "-" & sachgebiet
+                    'PUsachgebiet = "67" & sgnr.Substring(0, 1) '& "-" & PUsachgebiet   leider nicht machbar
 
                     'sachbearbeiter = CStr(clsDBtools.fieldvalue(drr.Item("bearbeiter"))) ' & "," & CStr(clsDBtools.fieldvalue(drr.Item("weiterebearb")))
                     sachbearbeiter = CStr(clsDBtools.fieldvalue(drr.Item("kuerzel1"))) ' & "," & CStr(clsDBtools.fieldvalue(drr.Item("weiterebearb")))
@@ -3048,7 +3051,6 @@ Public Class Form1
                                                  CStr(clsDBtools.fieldvalue(drr.Item("PARAGRAF"))),
                                                  CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSGEGENSTAND"))),
                                                  CStr(clsDBtools.fieldvalue(drr.Item("az2"))))) 'az2 wird nicht verwendet
-
                     'natureg
                     Dim naturegresult As String = ""
                     If Verfahrensart.StartsWith("3") Then
@@ -3093,7 +3095,7 @@ Public Class Form1
                         geschlossen = clsString.removeSemikolon(geschlossen)
                         Bezeichnung = clsString.removeSemikolon(Bezeichnung)
                         aktenstandort = clsString.removeSemikolon(aktenstandort)
-                        sachgebiet = clsString.removeSemikolon(sachgebiet)
+                        PUsachgebiet = clsString.removeSemikolon(PUsachgebiet)
                         Verfahrensart = clsString.removeSemikolon(Verfahrensart)
                         Vorhaben = clsString.removeSemikolon(Vorhaben)
                         Vorhabensmerkmal = clsString.removeSemikolon(Vorhabensmerkmal)
@@ -3116,7 +3118,7 @@ Public Class Form1
                     ws.Cells("i" & row).Value = bescheidS '.ToString("dd.MM.yyyy")
                     ws.Cells("j" & row).Value = abgeschlossenDatumString '.ToString("dd.MM.yyyy")
                     ws.Cells("k" & row).Value = aktenstandort
-                    ws.Cells("m" & row).Value = sachgebiet
+                    ws.Cells("m" & row).Value = PUsachgebiet
                     ws.Cells("n" & row).Value = Verfahrensart.TrimEnd("-")
                     ws.Cells("o" & row).Value = Vorhaben 'Vorhaben.TrimEnd("-")
                     ws.Cells("p" & row).Value = Vorhabensmerkmal.TrimEnd("-").TrimEnd(";").TrimEnd(",")
@@ -3247,16 +3249,17 @@ Public Class Form1
 
     Private Shared Sub writeCollectionKontrollfile(kontrollfile As StreamWriter, coll As List(Of zeile))
         For Each str As zeile In coll
-            kontrollfile.WriteLine(str.pNeu & ";" & str.Verfahrensart & ";" & str.vorhaben & ";" & str.bezeichnung) ' & ";" & str.pAlt & ";" &)
+            kontrollfile.WriteLine(str.paradigmaSGNR & ";" & str.Verfahrensart & ";" & str.vorhaben & ";" & str.bezeichnung) ' & ";" & str.pAlt & ";" &)
         Next
     End Sub
 
-    Private Sub getVerfahrensartUndVorhaben(sgnr As String, ByRef verfahrensart As String, ByRef vorhaben As String, ByRef vorhabensmerkmal As String, coll As List(Of zeile))
+    Private Sub getVerfahrensartUndVorhaben(sgnr As String, ByRef PUsachgebiet As String, ByRef verfahrensart As String, ByRef vorhaben As String, ByRef vorhabensmerkmal As String, coll As List(Of zeile))
         Dim dummy As String
         Try
             For Each item As zeile In coll
-                dummy = item.pNeu.Trim
-                If item.pNeu.Trim = sgnr Then
+                dummy = item.paradigmaSGNR.Trim
+                If item.paradigmaSGNR.Trim = sgnr Then
+                    PUsachgebiet = item.PUsachgebiet
                     verfahrensart = item.Verfahrensart
                     vorhaben = item.vorhaben
                     vorhabensmerkmal = "999"
@@ -4835,7 +4838,7 @@ Public Class Form1
         zeile.Append("titel" & t) 'telefon
         zeile.Append("email" & t) 'fax
         zeile.Append("rolle" & t) 'fs
-        zeile.Append("sachgebiet" & t) ' 
+        zeile.Append("PUsachgebiet" & t) ' 
         csvzeileSpeichern(zeile.ToString, puAusgabeStream) : zeile.Clear()
         Dim titel, email, rolle, sachgebiet As String
         For Each drr As DataRow In DT.Rows
@@ -5999,6 +6002,7 @@ Public Class Form1
 
     End Sub
 
+
     Private Shared Function getSQLConnection() As SqlClient.SqlConnection
         Dim myoracle As SqlClient.SqlConnection
         Dim host, datenbank, schema, tabelle, dbuser, dbpw, dbport As String
@@ -6080,4 +6084,157 @@ Public Class Form1
 
         Console.WriteLine("Fertig: " & outPath)
     End Sub
+    Private Sub Button34_Click(sender As Object, e As EventArgs) Handles Button34.Click
+        'Dim grunddaten As List(Of primekey)
+        TextBox1.Text = "konsistenzprüfung" & Environment.NewLine & "Grunddaten einlesen"
+
+        grunddaten = spaltenAufLISTeinlesen("t:\grunddaten.xlsx")
+        TextBox1.Text &= " fertig"
+        TextBox2.Text = ""
+        testXLS("t:\antragsdteller.xlsx")
+        TextBox2.Text &= " fertig"
+
+        testXLS("t:\kataster.xlsx")
+        TextBox2.Text &= " fertig"
+
+        testXLS("t:\lageadresse.xlsx")
+        TextBox2.Text &= " fertig"
+
+        testXLS("t:\merged_chronologie.xlsx")
+        TextBox2.Text &= " fertig"
+
+        testXLS("t:\merged_maindoks.xlsx")
+        TextBox2.Text &= " fertig"
+
+        testXLS("t:\merged_ereignissedoks.xlsx")
+        TextBox2.Text &= " fertig"
+
+
+        testXLS("t:\wiedervorlagen.xlsx")
+        TextBox2.Text &= " fertig"
+        'Environment.Exit(0)
+    End Sub
+    Public Function spaltenAufLISTeinlesen(dateiname As String) As List(Of primekey)
+        ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
+        Dim liste As New List(Of primekey)
+
+        Try
+
+
+            Using package As New ExcelPackage(New FileInfo(dateiname))
+
+                Dim ws As ExcelWorksheet = package.Workbook.Worksheets(0)
+
+                If ws.Dimension Is Nothing Then
+                    Return liste
+                End If
+
+                ' Ab Zeile 2, da Zeile 1 die Überschriften enthält
+                For r As Integer = 2 To ws.Dimension.End.Row
+
+                    Dim az As String = ws.Cells(r, 1).Text.Trim()
+                    Dim jahr As String = ws.Cells(r, 2).Text.Trim()
+
+                    ' Leere Zeilen überspringen
+                    If az <> "" OrElse jahr <> "" Then
+
+                        Dim z As New primekey With {
+                        .az = az,
+                        .jahr = jahr
+                    }
+
+                        liste.Add(z)
+
+                    End If
+
+                Next
+
+            End Using
+
+        Catch ex As Exception
+            MsgBox("Fehler beim Einlesen von " & dateiname & vbCrLf &
+               ex.Message)
+
+        End Try
+
+        Return liste
+
+    End Function
+    Public Function istvorhanden(z As primekey) As Boolean
+
+        If grunddaten Is Nothing Then
+            Return False
+        End If
+
+        For Each eintrag As primekey In grunddaten
+
+            If eintrag.az = z.az AndAlso
+           eintrag.jahr = z.jahr Then
+
+                Return True
+
+            End If
+
+        Next
+
+        Return False
+
+    End Function
+    Public Sub testXLS(dateiname As String)
+        ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
+        Try
+            Using package As New ExcelPackage(New FileInfo(dateiname))
+
+                Dim ws As ExcelWorksheet = package.Workbook.Worksheets(0)
+
+                If ws.Dimension Is Nothing Then
+                    Exit Sub
+                End If
+
+                For r As Integer = 2 To ws.Dimension.End.Row
+                    TextBox2.Text = r & " von " & ws.Dimension.End.Row
+                    System.Windows.Forms.Application.DoEvents()
+
+
+                    Dim az As String = ws.Cells(r, 1).Text.Trim()
+                    Dim jahr As String = ws.Cells(r, 2).Text.Trim()
+
+                    ' Leere Zeilen ignorieren
+                    If az = "" AndAlso jahr = "" Then
+                        Continue For
+                    End If
+
+                    Dim z As New primekey With {
+                    .az = az,
+                    .jahr = jahr
+                }
+
+                    If Not istvorhanden(z) Then
+
+                        MsgBox("Zeile nicht in den Grunddaten vorhanden:" &
+                           vbCrLf &
+                           "AZ: " & az &
+                           vbCrLf &
+                           "Jahr: " & jahr &
+                           vbCrLf &
+                           "Excel-Zeile: " & r)
+
+                    End If
+
+                Next
+
+            End Using
+
+        Catch ex As Exception
+
+            MsgBox("Fehler beim Testen von " & dateiname & vbCrLf &
+               ex.Message)
+
+        End Try
+
+    End Sub
+    Public Class primekey
+        Public az As String
+        Public jahr As String
+    End Class
 End Class
