@@ -6091,7 +6091,11 @@ Public Class Form1
         grunddaten = spaltenAufLISTeinlesen("t:\grunddaten.xlsx")
         TextBox1.Text &= " fertig"
         TextBox2.Text = ""
-        testXLS("t:\antragsdteller.xlsx")
+
+
+
+
+        testXLS("t:\antragsteller.xlsx")
         TextBox2.Text &= " fertig"
 
         testXLS("t:\kataster.xlsx")
@@ -6109,9 +6113,9 @@ Public Class Form1
         testXLS("t:\merged_ereignissedoks.xlsx")
         TextBox2.Text &= " fertig"
 
-
         testXLS("t:\wiedervorlagen.xlsx")
         TextBox2.Text &= " fertig"
+
         'Environment.Exit(0)
     End Sub
     Public Function spaltenAufLISTeinlesen(dateiname As String) As List(Of primekey)
@@ -6192,7 +6196,7 @@ Public Class Form1
                 End If
 
                 For r As Integer = 2 To ws.Dimension.End.Row
-                    TextBox2.Text = r & " von " & ws.Dimension.End.Row
+                    TextBox2.Text &= dateiname & ": " & r & " von " & ws.Dimension.End.Row
                     System.Windows.Forms.Application.DoEvents()
 
 
