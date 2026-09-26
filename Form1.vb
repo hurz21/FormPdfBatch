@@ -15,6 +15,7 @@ Imports System.Xml
 Imports iText.Forms.Form.Element
 Imports Microsoft.Office.Interop.Excel
 Imports Microsoft.Office.Interop.Word
+Imports Microsoft.VisualBasic.Logging
 Imports Mono.Security.Protocol
 Imports OfficeOpenXml
 Public Class Form1
@@ -2475,6 +2476,10 @@ Public Class Form1
         Dim idok As Integer = 0
         Dim row As Integer = 2
         Dim schreib = 0
+        TextBox1.Text = "konsistenzprüfung" & Environment.NewLine & "Grunddaten einlesen"
+
+        grunddaten = spaltenAufLISTeinlesen("t:\grunddaten.xlsx")
+        TextBox1.Text &= " fertig"
         ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
         'puAusgabeStream.AutoFlush = True
         'ausgabeAntragsteller.WriteLine(Now)
@@ -2530,7 +2535,7 @@ Public Class Form1
             ws.Cells("i1").Value = "dokumentid"
             ws.Cells("j1").Value = "revisionssicher"
             Dim vorhanden As Boolean
-
+            Dim neuEingang As String
             Dim newdir As String
             Dim erfolg As Boolean
             For Each drr As DataRow In DT.Rows
@@ -2544,8 +2549,8 @@ Public Class Form1
                     If vid = String.Empty Then
                         Continue For
                     End If
+                    neuEingang = getNeueingang4vid(vid)
                     If altpruefung Then
-
                         If alt.Contains(vid) Then
                             'nicht kopiert
                             Debug.Print("kein eintrag in xls und kein eintrag in die batch-copierdatei")
@@ -2622,7 +2627,7 @@ Public Class Form1
                     System.Windows.Forms.Application.DoEvents()
                     'zeilebilden
                     ws.Cells("A" & row).Value = vid
-                    ws.Cells("b" & row).Value = eingang.ToString("yyyy")
+                    ws.Cells("b" & row).Value = neuEingang 'eingang.ToString("yyyy")
                     ws.Cells("c" & row).Value = ""
                     ws.Cells("d" & row).Value = dbdatum.ToString("dd.MM.yyyy")
                     ws.Cells("e" & row).Value = clsString.removeSemikolon(typ)
@@ -2654,6 +2659,24 @@ Public Class Form1
         swfehlt.WriteLine(idok & "Teil2 fertig  -------" & Now.ToString & "-------------- " & igesamt & ", neu ausgeschrieben: " & schreib)
         l("fertig  " & puFehler)
     End Sub
+
+    Private Function getNeueingang4vid(vid As String) As String
+        Try
+            If grunddaten Is Nothing Then
+                Return False
+            End If
+            For Each eintrag As primekey In grunddaten
+                If eintrag.az = vid Then
+                    Return eintrag.jahr
+                End If
+            Next
+            Return ""
+        Catch ex As Exception
+            MsgBox("istvorhanden  Fehler beim Testen von " & vid & vbCrLf &
+           ex.Message)
+            Return ""
+        End Try
+    End Function
 
     Private Function isEmail(fullfilename As String) As Boolean
         Try
@@ -5779,6 +5802,7 @@ Public Class Form1
     End Sub
 
     Private Sub Button37_Click(sender As Object, e As EventArgs) Handles Button37.Click
+        TextBox1.Text &= "merge " & Environment.NewLine
         'merge excel files
         'T:\dokumente\main
         TextBox1.Text = "T:\dokumente\main"
@@ -6033,11 +6057,12 @@ Public Class Form1
         ' Lizenz kontext (erforderlich ab EPPlus 5)
         'ExcelPackage.LicenseContext = LicenseContext.NonCommercial
         ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
-
+        Dim zeilenStarter As Integer = 2 ' Startzeile für das Zusammenführen (1 = erste Zeile, 2 = zweite Zeile usw.)
         'Dim folder = "T:\dokumente\main"
         'Dim outPath = Path.Combine(folder, folderOUT)
         Dim outPath = (folderOUT)
-
+        Dim filecounter As Integer = 0
+        Dim istErsteDatei As Boolean = True
         Dim files = Directory.GetFiles(folder) _
             .Where(Function(f)
                        Dim ext = Path.GetExtension(f).ToLowerInvariant()
@@ -6056,6 +6081,7 @@ Public Class Form1
             Dim nextRow As Integer = 1
 
             For Each file In files
+
                 Using inPkg As New ExcelPackage(New FileInfo(file))
                     Dim inWs = inPkg.Workbook.Worksheets.FirstOrDefault()
                     If inWs Is Nothing Then Continue For
@@ -6068,16 +6094,18 @@ Public Class Form1
                     End If
 
                     If endRow = 0 OrElse endCol = 0 Then Continue For
-
-                    For r As Integer = 1 To endRow
+                    If filecounter > 0 Then zeilenStarter = 2 Else zeilenStarter = 1
+                    For r As Integer = zeilenStarter To endRow
                         For c As Integer = 1 To endCol
+                            'If inWs.Cells(r, c).Value.tolower() = "az" Then                                 Continue For
                             outWs.Cells(nextRow, c).Value = inWs.Cells(r, c).Value
                         Next
                         nextRow += 1
                     Next
                 End Using
+                filecounter += 1
             Next
-
+            filecounter = 0
             If File.Exists(outPath) Then File.Delete(outPath)
             outPkg.SaveAs(New FileInfo(outPath))
         End Using
@@ -6086,6 +6114,7 @@ Public Class Form1
     End Sub
     Private Sub Button34_Click(sender As Object, e As EventArgs) Handles Button34.Click
         'Dim grunddaten As List(Of primekey)
+
         TextBox1.Text = "konsistenzprüfung" & Environment.NewLine & "Grunddaten einlesen"
 
         grunddaten = spaltenAufLISTeinlesen("t:\grunddaten.xlsx")
@@ -6095,26 +6124,39 @@ Public Class Form1
 
 
 
-        testXLS("t:\antragsteller.xlsx")
-        TextBox2.Text &= " fertig"
 
-        testXLS("t:\kataster.xlsx")
-        TextBox2.Text &= " fertig"
+        TextBox1.Text &= "merged_maindoks " & Environment.NewLine
+        testCSV("t:\merged_maindoks.csv", swfehlt)
+        TextBox1.Text &= " fertig" & Environment.NewLine
 
-        testXLS("t:\lageadresse.xlsx")
-        TextBox2.Text &= " fertig"
+        TextBox1.Text &= "merged_ereignissedoks " & Environment.NewLine
+        testCSV("t:\merged_ereignissedoks.csv", swfehlt)
+        TextBox1.Text &= " fertig" & Environment.NewLine
 
-        testXLS("t:\merged_chronologie.xlsx")
-        TextBox2.Text &= " fertig"
 
-        testXLS("t:\merged_maindoks.xlsx")
-        TextBox2.Text &= " fertig"
+        TextBox1.Text &= "merged_chronologie " & Environment.NewLine
+        testCSV("t:\merged_chronologie.csv", swfehlt)
+        TextBox1.Text &= " fertig" & Environment.NewLine
 
-        testXLS("t:\merged_ereignissedoks.xlsx")
-        TextBox2.Text &= " fertig"
+        TextBox1.Text &= "antragsteller " & Environment.NewLine
+        testXLS("t:\antragsteller.xlsx", swfehlt)
+        TextBox1.Text &= " fertig" & Environment.NewLine
 
-        testXLS("t:\wiedervorlagen.xlsx")
-        TextBox2.Text &= " fertig"
+        TextBox1.Text &= "kataster " & Environment.NewLine
+        testXLS("t:\kataster.xlsx", swfehlt)
+        TextBox1.Text &= " fertig" & Environment.NewLine
+
+        TextBox1.Text &= "lageadresse " & Environment.NewLine
+        testXLS("t:\lageadresse.xlsx", swfehlt)
+        TextBox1.Text &= " fertig" & Environment.NewLine
+
+
+        TextBox1.Text &= "wiedervorlagen " & Environment.NewLine
+        testXLS("t:\wiedervorlagen.xlsx", swfehlt)
+        TextBox1.Text &= " fertig" & Environment.NewLine
+
+
+
 
         'Environment.Exit(0)
     End Sub
@@ -6165,26 +6207,24 @@ Public Class Form1
 
     End Function
     Public Function istvorhanden(z As primekey) As Boolean
-
-        If grunddaten Is Nothing Then
-            Return False
-        End If
-
-        For Each eintrag As primekey In grunddaten
-
-            If eintrag.az = z.az AndAlso
-           eintrag.jahr = z.jahr Then
-
-                Return True
-
+        Try
+            If grunddaten Is Nothing Then
+                Return False
             End If
-
-        Next
-
-        Return False
-
+            For Each eintrag As primekey In grunddaten
+                If eintrag.az = z.az AndAlso
+           eintrag.jahr = z.jahr Then
+                    Return True
+                End If
+            Next
+            Return False
+        Catch ex As Exception
+            MsgBox("istvorhanden  Fehler beim Testen von " & z.az & vbCrLf &
+           ex.Message)
+            Return False
+        End Try
     End Function
-    Public Sub testXLS(dateiname As String)
+    Public Sub testXLS(dateiname As String, logfile As IO.StreamWriter)
         ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
         Try
             Using package As New ExcelPackage(New FileInfo(dateiname))
@@ -6196,7 +6236,7 @@ Public Class Form1
                 End If
 
                 For r As Integer = 2 To ws.Dimension.End.Row
-                    TextBox2.Text &= dateiname & ": " & r & " von " & ws.Dimension.End.Row
+                    TextBox2.Text = r & " von " & ws.Dimension.End.Row
                     System.Windows.Forms.Application.DoEvents()
 
 
@@ -6215,13 +6255,11 @@ Public Class Form1
 
                     If Not istvorhanden(z) Then
 
-                        MsgBox("Zeile nicht in den Grunddaten vorhanden:" &
-                           vbCrLf &
+                        logfile.WriteLine("Zeile nicht in den Grunddaten vorhanden:" &
                            "AZ: " & az &
-                           vbCrLf &
                            "Jahr: " & jahr &
-                           vbCrLf &
-                           "Excel-Zeile: " & r)
+                           "Excel-Zeile: " & r & dateiname)
+
 
                     End If
 
@@ -6231,7 +6269,74 @@ Public Class Form1
 
         Catch ex As Exception
 
-            MsgBox("Fehler beim Testen von " & dateiname & vbCrLf &
+            MsgBox("testXLS  Fehler beim Testen von " & dateiname & vbCrLf &
+               ex.Message)
+
+        End Try
+
+    End Sub
+    Public Sub testCSV(dateiname As String, logfile As IO.StreamWriter)
+
+        Try
+
+            TextBox1.Text &= Environment.NewLine & dateiname & Environment.NewLine
+            Dim zeilennummer As Integer = 0
+
+            Using sr As New StreamReader(dateiname, System.Text.Encoding.Default)
+
+                ' Überschrift überspringen
+                Dim kopf As String = sr.ReadLine()
+                zeilennummer += 1
+
+                While Not sr.EndOfStream
+
+                    Dim line As String = sr.ReadLine()
+                    zeilennummer += 1
+
+                    If String.IsNullOrWhiteSpace(line) Then
+                        Continue While
+                    End If
+                    TextBox2.Text = zeilennummer & " von "
+                    System.Windows.Forms.Application.DoEvents()
+                    ' CSV in Spalten zerlegen
+                    Dim spalten() As String = line.Split(";"c)
+
+                    ' Mindestens zwei Spalten erforderlich
+                    If spalten.Length < 2 Then
+                        MsgBox("Ungültige CSV-Zeile " & zeilennummer &
+                           " in " & dateiname & vbCrLf &
+                           line)
+                        Continue While
+                    End If
+
+                    Dim az As String = spalten(0).Trim()
+                    Dim jahr As String = spalten(1).Trim()
+
+                    If az = "" AndAlso jahr = "" Then
+                        Continue While
+                    End If
+
+                    Dim z As New primekey With {
+                    .az = az,
+                    .jahr = jahr
+                }
+
+                    If Not istvorhanden(z) Then
+
+                        logfile.WriteLine("Zeile nicht in den Grunddaten vorhanden:" &
+                           " AZ: " & az &
+                           " Jahr: " & jahr &
+                           " CSV-Zeile: " & zeilennummer & dateiname)
+
+                    End If
+
+                End While
+
+            End Using
+
+        Catch ex As Exception
+
+            MsgBox("Fehler beim Lesen von " & dateiname & vbCrLf &
                ex.Message)
 
         End Try

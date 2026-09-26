@@ -395,9 +395,9 @@ Partial Class Form1
         '
         'Button34
         '
-        Me.Button34.Location = New System.Drawing.Point(688, 72)
+        Me.Button34.Location = New System.Drawing.Point(437, 99)
         Me.Button34.Name = "Button34"
-        Me.Button34.Size = New System.Drawing.Size(128, 23)
+        Me.Button34.Size = New System.Drawing.Size(174, 23)
         Me.Button34.TabIndex = 40
         Me.Button34.Text = "testeKonsistenz"
         Me.Button34.UseVisualStyleBackColor = True
