@@ -68,6 +68,7 @@ Partial Class Form1
         Me.Button24 = New System.Windows.Forms.Button()
         Me.Button23 = New System.Windows.Forms.Button()
         Me.Button22 = New System.Windows.Forms.Button()
+        Me.TextBox5 = New System.Windows.Forms.TextBox()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -303,6 +304,7 @@ Partial Class Form1
         'GroupBox1
         '
         Me.GroupBox1.BackColor = System.Drawing.SystemColors.ActiveCaption
+        Me.GroupBox1.Controls.Add(Me.TextBox5)
         Me.GroupBox1.Controls.Add(Me.Button39)
         Me.GroupBox1.Controls.Add(Me.Button38)
         Me.GroupBox1.Controls.Add(Me.Button37)
@@ -337,7 +339,7 @@ Partial Class Form1
         '
         'Button39
         '
-        Me.Button39.Location = New System.Drawing.Point(437, 71)
+        Me.Button39.Location = New System.Drawing.Point(437, 130)
         Me.Button39.Name = "Button39"
         Me.Button39.Size = New System.Drawing.Size(174, 23)
         Me.Button39.TabIndex = 46
@@ -346,7 +348,7 @@ Partial Class Form1
         '
         'Button38
         '
-        Me.Button38.Location = New System.Drawing.Point(436, 45)
+        Me.Button38.Location = New System.Drawing.Point(437, 99)
         Me.Button38.Name = "Button38"
         Me.Button38.Size = New System.Drawing.Size(175, 23)
         Me.Button38.TabIndex = 45
@@ -357,7 +359,7 @@ Partial Class Form1
         '
         Me.Button37.Location = New System.Drawing.Point(436, 18)
         Me.Button37.Name = "Button37"
-        Me.Button37.Size = New System.Drawing.Size(75, 23)
+        Me.Button37.Size = New System.Drawing.Size(175, 23)
         Me.Button37.TabIndex = 44
         Me.Button37.Text = "mergeSegmentedExcels"
         Me.Button37.UseVisualStyleBackColor = True
@@ -395,7 +397,7 @@ Partial Class Form1
         '
         'Button34
         '
-        Me.Button34.Location = New System.Drawing.Point(437, 99)
+        Me.Button34.Location = New System.Drawing.Point(436, 47)
         Me.Button34.Name = "Button34"
         Me.Button34.Size = New System.Drawing.Size(174, 23)
         Me.Button34.TabIndex = 40
@@ -417,7 +419,7 @@ Partial Class Form1
         Me.Button32.Name = "Button32"
         Me.Button32.Size = New System.Drawing.Size(75, 23)
         Me.Button32.TabIndex = 38
-        Me.Button32.Text = "verwandte"
+        Me.Button32.Text = "stichprobe"
         Me.Button32.UseVisualStyleBackColor = True
         '
         'Button31
@@ -527,6 +529,14 @@ Partial Class Form1
         Me.Button22.Text = "5.Lage-Adresse"
         Me.Button22.UseVisualStyleBackColor = True
         '
+        'TextBox5
+        '
+        Me.TextBox5.Location = New System.Drawing.Point(770, 47)
+        Me.TextBox5.Name = "TextBox5"
+        Me.TextBox5.Size = New System.Drawing.Size(100, 20)
+        Me.TextBox5.TabIndex = 47
+        Me.TextBox5.Text = "49732 "
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -608,4 +618,5 @@ End Sub
     Friend WithEvents Button37 As Button
     Friend WithEvents Button38 As Button
     Friend WithEvents Button39 As Button
+    Friend WithEvents TextBox5 As TextBox
 End Class

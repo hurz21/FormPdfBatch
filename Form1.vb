@@ -11,6 +11,7 @@ Imports System.Drawing.Imaging
 Imports System.IO
 Imports System.Runtime.Serialization.Formatters
 Imports System.Security.Cryptography.X509Certificates
+Imports System.Text
 Imports System.Xml
 Imports iText.Forms.Form.Element
 Imports Microsoft.Office.Interop.Excel
@@ -42,6 +43,8 @@ Public Class Form1
         'PDFumwandeln()
         '  strassenabgleichIngradaProsoz()
         'DOCXumwandeln(2113, False)
+
+        'macheStichprobe()
     End Sub
     Public Sub protokoll()
         With My.Application.Log.DefaultFileLogWriter
@@ -581,7 +584,7 @@ Public Class Form1
 
                 ' Create an Encoder object based on the GUID
                 ' for the Quality parameter category.
-                myEncoder = Encoder.Quality
+                'myEncoder = System.Text.Encoder.Quality
 
                 ' Create an EncoderParameters object.
                 ' An EncoderParameters object has an array of EncoderParameter
@@ -2550,6 +2553,11 @@ Public Class Form1
                         Continue For
                     End If
                     neuEingang = getNeueingang4vid(vid)
+                    If neuEingang = String.Empty Then
+                        'keine grunddaten gefunden upps
+                        l(vid & " keine grunddaten gefunden upps ")
+                        Continue For
+                    End If
                     If altpruefung Then
                         If alt.Contains(vid) Then
                             'nicht kopiert
@@ -2665,7 +2673,7 @@ Public Class Form1
             If grunddaten Is Nothing Then
                 Return False
             End If
-            For Each eintrag As primekey In grunddaten
+            For Each eintrag As PrimeKey In grunddaten
                 If eintrag.az = vid Then
                     Return eintrag.jahr
                 End If
@@ -6060,6 +6068,11 @@ Public Class Form1
         Dim zeilenStarter As Integer = 2 ' Startzeile für das Zusammenführen (1 = erste Zeile, 2 = zweite Zeile usw.)
         'Dim folder = "T:\dokumente\main"
         'Dim outPath = Path.Combine(folder, folderOUT)
+        Dim csvdatei As String = folderOUT.Replace(".xlsx", ".csv")
+        Dim sw As New IO.StreamWriter(csvdatei)
+
+        sw.AutoFlush = True
+        Dim csvZeile As New Text.StringBuilder
         Dim outPath = (folderOUT)
         Dim filecounter As Integer = 0
         Dim istErsteDatei As Boolean = True
@@ -6099,7 +6112,10 @@ Public Class Form1
                         For c As Integer = 1 To endCol
                             'If inWs.Cells(r, c).Value.tolower() = "az" Then                                 Continue For
                             outWs.Cells(nextRow, c).Value = inWs.Cells(r, c).Value
+                            csvZeile.Append(inWs.Cells(r, c).Value.ToString().Replace(";", " ").Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " ") & ";")
                         Next
+                        sw.WriteLine(csvZeile.ToString())
+                        csvZeile.Clear()
                         nextRow += 1
                     Next
                 End Using
@@ -6109,11 +6125,17 @@ Public Class Form1
             If File.Exists(outPath) Then File.Delete(outPath)
             outPkg.SaveAs(New FileInfo(outPath))
         End Using
-
+        sw.Close()
+        sw.Dispose()
         Console.WriteLine("Fertig: " & outPath)
     End Sub
     Private Sub Button34_Click(sender As Object, e As EventArgs) Handles Button34.Click
-        'Dim grunddaten As List(Of primekey)
+
+        Dim puFehler = "t:\konsistenzz.log"
+        'Dim puAusgabeStream As New IO.StreamWriter(puAusgabe, False, System.Text.Encoding.GetEncoding(1252))
+        swfehlt = New IO.StreamWriter(puFehler)
+        swfehlt.AutoFlush = True
+
 
         TextBox1.Text = "konsistenzprüfung" & Environment.NewLine & "Grunddaten einlesen"
 
@@ -6125,16 +6147,16 @@ Public Class Form1
 
 
 
-        TextBox1.Text &= "merged_maindoks " & Environment.NewLine
+        TextBox1.Text &= "merged_maindoks csv" & Environment.NewLine
         testCSV("t:\merged_maindoks.csv", swfehlt)
         TextBox1.Text &= " fertig" & Environment.NewLine
 
-        TextBox1.Text &= "merged_ereignissedoks " & Environment.NewLine
+        TextBox1.Text &= "merged_ereignissedoks csv" & Environment.NewLine
         testCSV("t:\merged_ereignissedoks.csv", swfehlt)
         TextBox1.Text &= " fertig" & Environment.NewLine
 
 
-        TextBox1.Text &= "merged_chronologie " & Environment.NewLine
+        TextBox1.Text &= "merged_chronologie csv" & Environment.NewLine
         testCSV("t:\merged_chronologie.csv", swfehlt)
         TextBox1.Text &= " fertig" & Environment.NewLine
 
@@ -6160,9 +6182,9 @@ Public Class Form1
 
         'Environment.Exit(0)
     End Sub
-    Public Function spaltenAufLISTeinlesen(dateiname As String) As List(Of primekey)
+    Public Function spaltenAufLISTeinlesen(dateiname As String) As List(Of PrimeKey)
         ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
-        Dim liste As New List(Of primekey)
+        Dim liste As New List(Of PrimeKey)
 
         Try
 
@@ -6184,7 +6206,7 @@ Public Class Form1
                     ' Leere Zeilen überspringen
                     If az <> "" OrElse jahr <> "" Then
 
-                        Dim z As New primekey With {
+                        Dim z As New PrimeKey With {
                         .az = az,
                         .jahr = jahr
                     }
@@ -6206,12 +6228,12 @@ Public Class Form1
         Return liste
 
     End Function
-    Public Function istvorhanden(z As primekey) As Boolean
+    Public Function istvorhanden(z As PrimeKey) As Boolean
         Try
             If grunddaten Is Nothing Then
                 Return False
             End If
-            For Each eintrag As primekey In grunddaten
+            For Each eintrag As PrimeKey In grunddaten
                 If eintrag.az = z.az AndAlso
            eintrag.jahr = z.jahr Then
                     Return True
@@ -6224,6 +6246,28 @@ Public Class Form1
             Return False
         End Try
     End Function
+
+    Private Sub Button32_Click(sender As Object, e As EventArgs) Handles Button32.Click
+        macheStichprobe()
+
+    End Sub
+
+    Private Sub macheStichprobe()
+        Dim az = TextBox5.Text.Trim
+        erstelleStichprobe(19800)
+        erstelleStichprobe(5110)
+        erstelleStichprobe(1868)
+        erstelleStichprobe(481)
+        erstelleStichprobe(31200)
+        erstelleStichprobe(44400)
+        erstelleStichprobe(56200)
+        erstelleStichprobe(66632)
+        erstelleStichprobe(66633)
+        erstelleStichprobe(76000)
+        erstelleStichprobe(34351)
+        erstelleStichprobe(19800)
+    End Sub
+
     Public Sub testXLS(dateiname As String, logfile As IO.StreamWriter)
         ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
         Try
@@ -6326,7 +6370,7 @@ Public Class Form1
                         logfile.WriteLine("Zeile nicht in den Grunddaten vorhanden:" &
                            " AZ: " & az &
                            " Jahr: " & jahr &
-                           " CSV-Zeile: " & zeilennummer & dateiname)
+                           " CSV-Zeile: " & zeilennummer & " " & dateiname)
 
                     End If
 
@@ -6342,8 +6386,521 @@ Public Class Form1
         End Try
 
     End Sub
-    Public Class primekey
-        Public az As String
-        Public jahr As String
+    Public Class PrimeKey
+        Public Property az As String
+        Public Property jahr As String
+
+        Public Function KeyString() As String
+            Return az.Trim() & "|" & jahr.Trim()
+        End Function
     End Class
+    ' Primekey aus AZ + Jahr
+    'Public Class PrimeKey
+
+    '    Public Property az As String
+    '    Public Property jahr As String
+
+    '    Public Function KeyString() As String
+    '        Return az.Trim() & "|" & jahr.Trim()
+    '    End Function
+
+    'End Class
+
+    Public Sub erstelleStichprobe(az As String)
+
+        Dim basis As String = "O:\UMWELT\B\Proumwelt_Migration"
+
+        Dim grunddatenDatei As String =
+            Path.Combine(basis, "grunddaten.xlsx")
+
+        Dim ergebnisVerzeichnis As String =
+            Path.Combine(basis, "stichproben")
+
+        ergebnisVerzeichnis =
+            Path.Combine(ergebnisVerzeichnis, az)
+
+        Dim ergebnisDatei As String =
+            Path.Combine(ergebnisVerzeichnis, az & ".txt")
+
+        ' ---------------------------------------------------------
+        ' Primekeys aus den Grunddaten
+        ' ---------------------------------------------------------
+
+        Dim primekeys As New List(Of PrimeKey)
+
+        Try
+
+            If Not Directory.Exists(ergebnisVerzeichnis) Then
+                Directory.CreateDirectory(ergebnisVerzeichnis)
+            End If
+
+            ' -----------------------------------------------------
+            ' Ergebnisdatei öffnen
+            ' -----------------------------------------------------
+
+            Using sw As New StreamWriter(
+                ergebnisDatei,
+                False,
+                System.Text.Encoding.UTF8)
+                sw.AutoFlush = True
+                ' =================================================
+                ' 1. GRUNDDATEN
+                ' =================================================
+
+                sw.WriteLine("grunddaten-xlsx")
+
+                primekeys = leseGrunddaten(
+                    grunddatenDatei,
+                    az,
+                    sw)
+
+                ' =================================================
+                ' 2. WEITERE TABELLEN
+                ' =================================================
+
+                schreibeTabelle(
+                    Path.Combine(basis, "antragsteller.xlsx"),
+                    "antragsteller-xlsx",
+                    primekeys,
+                    sw)
+
+                schreibeTabelle(
+                    Path.Combine(basis, "beteiligte.xlsx"),
+                    "beteiligte-xlsx",
+                    primekeys,
+                    sw)
+
+                schreibeTabelle(
+                    Path.Combine(basis, "kataster.xlsx"),
+                    "kataster-xlsx",
+                    primekeys,
+                    sw)
+
+                schreibeTabelle(
+                    Path.Combine(basis, "lageadresse.xlsx"),
+                    "lageadresse-xlsx",
+                    primekeys,
+                    sw)
+
+
+
+                schreibeTabelle(
+                    Path.Combine(basis, "wiedervorlagen.xlsx"),
+                    "wiedervorlagen-xlsx",
+                    primekeys,
+                    sw)
+
+
+
+                schreibeTabelleCSV(
+                    Path.Combine(basis, "merged_ereignissedoks.csv"),
+                    "merged_ereignissedoks-csv",
+                    primekeys,
+                    sw, ergebnisDatei)
+
+                schreibeTabelleCSV(
+                    Path.Combine(basis, "merged_maindoks.csv"),
+                    "merged_maindoks-csv",
+                    primekeys,
+                    sw, ergebnisDatei)
+
+
+                schreibeTabelleCSV(
+                    Path.Combine(basis, "merged_chronologie.csv"),
+                    "merged_chronologie-csv",
+                    primekeys,
+                    sw, ergebnisDatei)
+            End Using
+
+            'MsgBox(
+            '    "Stichprobe wurde erstellt:" &
+            '    vbCrLf & vbCrLf &
+            '    ergebnisDatei)
+            Process.Start(ergebnisDatei)
+        Catch ex As Exception
+
+            MsgBox(
+                "Fehler beim Erstellen der Stichprobe:" &
+                vbCrLf & vbCrLf &
+                ex.Message)
+
+        End Try
+
+    End Sub
+    Private Function leseGrunddaten(
+    dateiname As String,
+    gesuchtesAz As String,
+    sw As StreamWriter) As List(Of PrimeKey)
+
+        Dim primekeys As New List(Of PrimeKey)
+
+        Try
+
+            ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
+
+
+            Using package As New ExcelPackage(
+                New FileInfo(dateiname))
+
+                Dim ws As ExcelWorksheet =
+                    package.Workbook.Worksheets(0)
+
+                If ws.Dimension Is Nothing Then
+                    Return primekeys
+                End If
+
+                Dim letzteZeile As Integer =
+                    ws.Dimension.End.Row
+
+                Dim letzteSpalte As Integer =
+                    ws.Dimension.End.Column
+
+                ' -----------------------------------------------
+                ' Spaltenüberschriften einlesen
+                ' -----------------------------------------------
+
+                Dim spaltennamen As New List(Of String)
+
+                For c As Integer = 1 To letzteSpalte
+
+                    spaltennamen.Add(
+                        ws.Cells(1, c).Text.Trim())
+
+                Next
+
+                ' -----------------------------------------------
+                ' Daten lesen
+                ' -----------------------------------------------
+
+                For r As Integer = 2 To letzteZeile
+
+                    Dim az As String =
+                        ws.Cells(r, 1).Text.Trim()
+
+                    If az = gesuchtesAz.Trim() Then
+
+                        Dim jahr As String =
+                            ws.Cells(r, 2).Text.Trim()
+
+                        ' Primekey merken
+                        Dim pk As New PrimeKey With {
+                            .az = az,
+                            .jahr = jahr
+                        }
+
+                        primekeys.Add(pk)
+
+                        ' Komplette Zeile schreiben
+                        sw.WriteLine(
+                            excelZeileAlsString(
+                                ws,
+                                r,
+                                spaltennamen))
+
+                    End If
+
+                Next
+
+            End Using
+
+        Catch ex As Exception
+
+            sw.WriteLine(
+                "FEHLER beim Lesen von " &
+                Path.GetFileName(dateiname) &
+                ": " &
+                ex.Message)
+
+        End Try
+
+        Return primekeys
+
+    End Function
+    Private Sub schreibeTabelle(
+    dateiname As String,
+    tabellenname As String,
+    primekeys As List(Of PrimeKey),
+    sw As StreamWriter)
+
+        ' ---------------------------------------------------------
+        ' Tabellenname zuerst schreiben
+        ' ---------------------------------------------------------
+
+        sw.WriteLine(Environment.NewLine & tabellenname & "======================================")
+
+        Try
+
+            If Not File.Exists(dateiname) Then
+
+                sw.WriteLine(
+                    "DATEI NICHT GEFUNDEN: " &
+                    dateiname)
+
+                Return
+
+            End If
+
+            ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
+
+
+            Using package As New ExcelPackage(
+                New FileInfo(dateiname))
+
+                Dim ws As ExcelWorksheet =
+                    package.Workbook.Worksheets(0)
+
+                If ws.Dimension Is Nothing Then
+                    Return
+                End If
+
+                Dim letzteZeile As Integer =
+                    ws.Dimension.End.Row
+
+                Dim letzteSpalte As Integer =
+                    ws.Dimension.End.Column
+
+                ' -----------------------------------------------
+                ' Spaltennamen
+                ' -----------------------------------------------
+
+                Dim spaltennamen As New List(Of String)
+
+                For c As Integer = 1 To letzteSpalte
+
+                    spaltennamen.Add(
+                        ws.Cells(1, c).Text.Trim())
+
+                Next
+
+                ' -----------------------------------------------
+                ' Alle Datenzeilen prüfen
+                ' -----------------------------------------------
+
+                For r As Integer = 2 To letzteZeile
+
+                    Dim az As String =
+                        ws.Cells(r, 1).Text.Trim()
+
+                    Dim jahr As String =
+                        ws.Cells(r, 2).Text.Trim()
+
+                    If az = "" Then
+                        Continue For
+                    End If
+
+                    ' Primekey bilden
+                    Dim key As String =
+                        az & "|" & jahr
+
+                    ' Prüfen, ob Primekey aus Grunddaten stammt
+                    If primekeyVorhanden(
+                        primekeys,
+                        key) Then
+
+                        sw.WriteLine(
+                            excelZeileAlsString(
+                                ws,
+                                r,
+                                spaltennamen) & Environment.NewLine)
+
+                    End If
+
+                Next
+
+            End Using
+
+        Catch ex As Exception
+
+            sw.WriteLine(
+                "FEHLER beim Lesen: " &
+                ex.Message)
+
+        End Try
+
+    End Sub
+
+    Private Function primekeyVorhanden(
+    primekeys As List(Of PrimeKey),
+    key As String) As Boolean
+
+        For Each pk As PrimeKey In primekeys
+
+            If pk.KeyString() = key Then
+                Return True
+            End If
+
+        Next
+
+        Return False
+
+    End Function
+    Private Function excelZeileAlsString(
+    ws As ExcelWorksheet,
+    zeilennummer As Integer,
+    spaltennamen As List(Of String)) As String
+
+        Dim teile As New List(Of String)
+
+        For c As Integer = 1 To spaltennamen.Count
+
+            Dim spaltenname As String =
+                spaltennamen(c - 1)
+
+            Dim wert As String =
+                ws.Cells(zeilennummer, c).Text.Trim()
+
+            teile.Add(
+                spaltenname & ":" & wert)
+
+            If spaltenname = "relativer pfad" Then
+                Debug.Print("")
+            End If
+
+        Next
+
+        Return String.Join(";", teile)
+
+    End Function
+    Private Sub schreibeTabelleCSV(
+    dateiname As String,
+    tabellenname As String,
+    primekeys As List(Of PrimeKey),
+    sw As StreamWriter, ergebnisDatei As String)
+
+        ' ---------------------------------------------------------
+        ' Tabellenname zuerst schreiben
+        ' ---------------------------------------------------------
+
+        sw.WriteLine(Environment.NewLine & tabellenname & "======================================")
+        Dim zielverz As String = Path.GetDirectoryName(ergebnisDatei)
+        Dim kopieFile As String
+        Try
+
+            If Not File.Exists(dateiname) Then
+
+                sw.WriteLine(
+                    "DATEI NICHT GEFUNDEN: " &
+                    dateiname)
+
+                Return
+
+            End If
+
+            Using sr As New StreamReader(
+                dateiname,
+                Encoding.UTF8)
+
+                ' -------------------------------------------------
+                ' Kopfzeile lesen
+                ' -------------------------------------------------
+
+                Dim kopfzeile As String = sr.ReadLine()
+
+                If kopfzeile Is Nothing Then
+                    Return
+                End If
+
+                ' -------------------------------------------------
+                ' Spaltennamen einlesen
+                ' -------------------------------------------------
+
+                Dim spaltennamen() As String =
+                    kopfzeile.Split(";"c)
+
+                ' -------------------------------------------------
+                ' Datenzeilen
+                ' -------------------------------------------------
+
+                Dim zeilennummer As Integer = 1
+
+                While Not sr.EndOfStream
+
+                    Dim zeile As String = sr.ReadLine()
+
+                    zeilennummer += 1
+
+                    If String.IsNullOrWhiteSpace(zeile) Then
+                        Continue While
+                    End If
+
+                    ' ---------------------------------------------
+                    ' CSV-Spalten zerlegen
+                    ' ---------------------------------------------
+
+                    Dim werte() As String =
+                        zeile.Split(";"c)
+
+                    ' Mindestens AZ und Jahr erforderlich
+                    If werte.Length < 2 Then
+                        Continue While
+                    End If
+
+                    Dim az As String =
+                        werte(0).Trim()
+
+                    Dim jahr As String =
+                        werte(1).Trim()
+
+                    If az = "" Then
+                        Continue While
+                    End If
+
+                    ' ---------------------------------------------
+                    ' Primekey bilden
+                    ' ---------------------------------------------
+
+                    Dim key As String =
+                        az & "|" & jahr
+
+                    ' ---------------------------------------------
+                    ' Prüfen
+                    ' ---------------------------------------------
+
+                    If primekeyVorhanden(
+                        primekeys,
+                        key) Then
+
+                        Dim teile As New List(Of String)
+
+                        For i As Integer = 0 To werte.Length - 1
+
+                            Dim spaltenname As String
+
+                            If i < spaltennamen.Length Then
+                                spaltenname =
+                                    spaltennamen(i).Trim()
+                            Else
+                                spaltenname =
+                                    "Spalte" & (i + 1).ToString()
+                            End If
+                            If spaltenname = "relativer pfad" Then
+                                Debug.Print("ddd")
+                                kopieFile = Path.Combine(zielverz, Path.GetFileName(werte(i).Trim()))
+                                File.Copy(werte(i).Trim(), kopieFile, True)
+                            End If
+                            teile.Add(
+                                spaltenname &
+                                ":" &
+                                werte(i).Trim())
+
+                        Next
+
+                        sw.WriteLine(
+                            String.Join(";", teile) & Environment.NewLine)
+
+                    End If
+
+                End While
+
+            End Using
+
+        Catch ex As Exception
+
+            sw.WriteLine(
+                "FEHLER beim Lesen: " &
+                ex.Message)
+
+        End Try
+
+    End Sub
 End Class
