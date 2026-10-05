@@ -2490,7 +2490,7 @@ Public Class Form1
         Dim idok As Integer = 0
         Dim row As Integer = 2
         Dim schreib = 0
-        TextBox1.Text = "konsistenzprüfung" & Environment.NewLine & "Grunddaten einlesen"
+        TextBox1.Text = "writeDokumentePU" & Environment.NewLine & "Grunddaten einlesen"
 
         grunddaten = spaltenAufLISTeinlesen("t:\grunddaten.xlsx")
         TextBox1.Text &= " fertig"
@@ -2566,9 +2566,9 @@ Public Class Form1
                     If vid = 78849 Then
                         Debug.Print("vid 78849")
                     End If
-                    If dateinameext = "img_2934.jpg" Then
-                        Debug.Print("vid 78849")
-                    End If
+                    'If dateinameext = "img_2934.jpg" Then
+                    '    Debug.Print("vid 78849")
+                    'End If
                     neuEingang = getNeueingang4vid(vid)
                     If neuEingang = String.Empty Then
                         'keine grunddaten gefunden upps
@@ -2603,6 +2603,7 @@ Public Class Form1
                         l(vid & " u " & dateinameext)
                     End If
                     If fullfilename = String.Empty Then
+                        l("fehler bei fullfilename ist leer: " & vid & "/" & dokumentid & ", " & dbdatum & ", " & initial & ", " & dateinameext)
                         Continue For
                     End If
 
@@ -2652,7 +2653,7 @@ Public Class Form1
                     System.Windows.Forms.Application.DoEvents()
                     'zeilebilden
                     ws.Cells("A" & row).Value = vid
-                    ws.Cells("b" & row).Value = neuEingang 'eingang.ToString("yyyy")
+                    ws.Cells("b" & row).Value = neuEingang 'neueingang.ToString("yyyy")
                     ws.Cells("c" & row).Value = ""
                     ws.Cells("d" & row).Value = dbdatum.ToString("dd.MM.yyyy")
                     ws.Cells("e" & row).Value = clsString.removeSemikolon(typ)
@@ -2752,6 +2753,8 @@ Public Class Form1
         Try
             If Text Is Nothing Then Text = " "
             Text = Text.Replace(Chr(34), " ")
+            Text = Text.Replace("?", "_")
+            Text = Text.Replace("|", "_")
             Text = Text.Replace(";", "_")
             Text = Text.Replace(vbCrLf, "")
             Text = clsString.noWhiteSpace(Text, " ")
@@ -3044,9 +3047,9 @@ Public Class Form1
                     If sgnr.Length = 3 Then sgnr = sgnr & "0"
                     If sgnr.Length = 2 Then sgnr = sgnr & "00"
                     If sgnr.Length = 1 Then sgnr = sgnr & "000"
-                    'If vid = 79415 Then 
+                    'If vid = 78849 Then
                     '    Debug.Print("")
-                    'End If 
+                    'End If
                     'gisMapping(sgnr, test)  
                     If dokuskip > 0 Then
                         erledigtUndAltStream.WriteLine(vid, ";", sgnr)
@@ -3173,7 +3176,7 @@ Public Class Form1
                     ws.Cells("q" & row).Value = sachbearbeiter.TrimEnd("-").TrimEnd(";").TrimEnd(",")
                     ws.Cells("s" & row).Value = Hauptaktenzeichen
                     ws.Cells("t" & row).Value = "" 'hauptaktenjahr.ToString("dd.MM.yyyy")
-                    ws.Cells("v" & row).Value = Notiz
+                    ws.Cells("x" & row).Value = Notiz
                     ws.Cells("w" & row).Value = cleanString(zusatz1)
                     ws.Cells("x" & row).Value = cleanString(zusatz2)
                     ws.Cells("y" & row).Value = cleanString(zusatz3)
@@ -3704,9 +3707,9 @@ Public Class Form1
                     'row.Append(vid & t) 'Az
 
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
-                    'row.Append(eingang.ToString("yyyy") & t) 'jahr
+                    'row.Append(neueingang.ToString("yyyy") & t) 'jahr
 
-                    ws.Cells("c" & row).Value = "???" 'obergruppe 
+                    ws.Cells("c" & row).Value = "" 'obergruppe 
 
                     ws.Cells("d" & row).Value = ort
                     'row.Append(ort & t) ' 
@@ -3798,6 +3801,12 @@ Public Class Form1
 
     Private Sub writeKatasterausgabePU(puFehler As String, puAusgabe As String, sql As String,
                                        maxobj As Integer, umlautwandeln As Boolean)
+        TextBox1.Text = "writeKatasterausgabePU" & Environment.NewLine & "Grunddaten einlesen"
+
+        grunddaten = spaltenAufLISTeinlesen("t:\grunddaten.xlsx")
+        TextBox1.Text &= "grunddaten gelesen fertig"
+
+
         Dim DT As System.Data.DataTable
         Dim idok As Integer = 0
         'puAusgabeStream.AutoFlush = True
@@ -3817,6 +3826,7 @@ Public Class Form1
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
         myoracle.Open()
+        Dim neueingang As String
         Dim zeile As New Text.StringBuilder
         Dim fullfilename As String
         Dim t As String = ";"
@@ -3871,6 +3881,15 @@ Public Class Form1
                     row += 1
                     vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
                     eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+
+                    neueingang = getNeueingang4vid(vid)
+                    If neueingang = String.Empty Then
+                        'keine grunddaten gefunden upps
+                        l(vid & " keine grunddaten gefunden upps  kataster")
+                        Continue For
+                    End If
+
+
                     gemarkung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemarkungstext"))))
                     flur = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("flur"))))
                     flurstueck = cleanString((clsDBtools.fieldvalue(drr.Item("znkombi"))))
@@ -3899,12 +3918,12 @@ Public Class Form1
                     'zeilebilden
 
                     ws.Cells("A" & row).Value = vid
-                    ws.Cells("b" & row).Value = eingang.ToString("yyyy")
-                    ws.Cells("c" & row).Value = "???"
+                    ws.Cells("b" & row).Value = neueingang ' neueingang.ToString("yyyy")
+                    ws.Cells("c" & row).Value = ""
 
 
                     'row.Append(vid & t) 'Az
-                    'row.Append(eingang.ToString("yyyy") & t) 'jahr 
+                    'row.Append(neueingang.ToString("yyyy") & t) 'jahr 
                     ws.Cells("d" & row).Value = gemarkung
                     'row.Append(gemarkung & t) ' 
                     ws.Cells("e" & row).Value = flur
@@ -3932,8 +3951,7 @@ Public Class Form1
                     If idok > maxobj Then Exit For
                 Catch ex As Exception
                     l("fehler2: " & ex.ToString)
-                    TextBox2.Text = ic.ToString & Environment.NewLine & " " &
-                              Environment.NewLine &
+                    TextBox2.Text = ic.ToString & Environment.NewLine & " " & Environment.NewLine &
                            vid & "/" & vid & " " & igesamt & "(" & DT.Rows.Count.ToString & ")" & Environment.NewLine &
                            TextBox2.Text
                     System.Windows.Forms.Application.DoEvents()
@@ -4093,7 +4111,7 @@ Public Class Form1
                     'zeilebilden
                     ws.Cells("A" & row).Value = vid
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
-                    ws.Cells("c" & row).Value = "???"
+                    ws.Cells("c" & row).Value = ""
                     ws.Cells("d" & row).Value = todo
                     ws.Cells("e" & row).Value = datum.ToString("dd.MM.yyyy")
                     ws.Cells("f" & row).Value = sachbearbeiter
@@ -4103,7 +4121,7 @@ Public Class Form1
                     ws.Cells("j" & row).Value = erledigt
 
                     'row.Append(vid & t) 'Az
-                    'row.Append(eingang.ToString("yyyy") & t) 'jahr .ToString("dd.MM.yyyy") 
+                    'row.Append(neueingang.ToString("yyyy") & t) 'jahr .ToString("dd.MM.yyyy") 
                     'row.Append(todo & t) 'Az 
                     'row.Append(datum.ToString("dd.MM.yyyy") & t) ' 
                     'row.Append(sachbearbeiter & t) ' 
@@ -4179,7 +4197,7 @@ Public Class Form1
             perscoll = getAllStakeholders(perstemp, DT)
 
             For Each perso As person In perscoll
-                'zeileBeteiligte = bildeZeilePerson(eingang, t, perso)  
+                'zeileBeteiligte = bildeZeilePerson(neueingang, t, perso)  
                 Dim a = bildezeilebeteiligter(perso, t, eingang)
                 If csvzeileSpeichern(a, puAusgabeStream) Then
                     zeileBeteiligte.Clear()
@@ -4198,8 +4216,8 @@ Public Class Form1
         Try
             a.Append("vid" & t)
             a.Append(eingang.ToString("yyyy") & t)
-            a.Append("???" & t)
-            a.Append("???" & t)
+            a.Append("" & t)
+            a.Append("" & t)
             a.Append(perso.Anrede & t)
             a.Append(bildeFirma(perso) & t)
             a.Append(perso.Namenszusatz & t)
@@ -4369,6 +4387,14 @@ Public Class Form1
 
     Private Sub writeAntragstellerausgabePU(puFehler As String, ausgabeAntragsteller As String, ausgabeBeteiligte As String,
                                             sql As String, maxobj As Integer, umlautwandeln As Boolean)
+        TextBox1.Text = "writeAntragstellerausgabePU" & Environment.NewLine & "Grunddaten einlesen"
+
+        grunddaten = spaltenAufLISTeinlesen("t:\grunddaten.xlsx")
+        TextBox1.Text &= " fertig"
+
+
+
+
         Dim DT As System.Data.DataTable
         Dim rowAntrag As Integer = 1
         Dim rowBeteiligt As Integer = 1
@@ -4381,7 +4407,7 @@ Public Class Form1
 
         Dim ic As Integer = 0
         Dim igesamt As Integer = 0
-
+        Dim neueingang As String
         Dim eingang As Date
         Dim myoracle As SqlClient.SqlConnection
         myoracle = getMSSQLCon()
@@ -4411,12 +4437,21 @@ Public Class Form1
                     TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : System.Windows.Forms.Application.DoEvents()
                     vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
                     eingang = CStr(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+
+                    neueingang = getNeueingang4vid(vid)
+                    If neueingang = String.Empty Then
+                        'keine grunddaten gefunden upps
+                        l(vid & " keine grunddaten gefunden upps antragsteller " & vid)
+                        Continue For
+                    End If
+
+
                     perscoll = getAllBeteiligte4vorgang(perstemp, vid, umlautwandeln, True) 'ohne EmailEmpfänger =true
                     If hatAntragsteller(perscoll) Then
                         antragsteller = getAntragsteller(perscoll)
                         If antragsteller Is Nothing Then Exit For
                         rowAntrag += 1
-                        erfolg = bildeZeileantragsteller(eingang, wsAntragst, antragsteller, rowAntrag)
+                        erfolg = bildeZeileantragsteller(neueingang, wsAntragst, antragsteller, rowAntrag)
                         'row Nach antragsteller ausschreiben
                         'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
                         'zeileAntragsteller.Clear()
@@ -4430,7 +4465,7 @@ Public Class Form1
                             antragsteller.Rolle = "dummy"
                         End If
                         rowAntrag += 1
-                        erfolg = bildeZeileantragsteller(eingang, wsAntragst, antragsteller, rowAntrag)
+                        erfolg = bildeZeileantragsteller(neueingang, wsAntragst, antragsteller, rowAntrag)
                         'row Nach antragsteller ausschreiben
                         'csvzeileSpeichern(zeileAntragsteller.ToString, ausgabeAntragsteller)
                         'zeileAntragsteller.Clear()
@@ -4646,7 +4681,7 @@ Public Class Form1
         ws.Cells("s" & row).Value = perso.Bemerkung
         ws.Cells("t" & row).Value = "pf: " & perso.Kontakt.Anschrift.Postfach
         ws.Cells("u" & row).Value = perso.Kontakt.elektr.Telefon1
-        ws.Cells("v" & row).Value = perso.Kontakt.elektr.Fax1
+        ws.Cells("x" & row).Value = perso.Kontakt.elektr.Fax1
         ws.Cells("w" & row).Value = perso.Kontakt.elektr.MobilFon
         ws.Cells("x" & row).Value = perso.Kontakt.elektr.Email
         ws.Cells("y" & row).Value = ""
@@ -4658,7 +4693,7 @@ Public Class Form1
 
 
         'zeileAntragsteller.Append(vid & t) 'Az
-        'zeileAntragsteller.Append(eingang.ToString("yyyy") & t) 'jahr 
+        'zeileAntragsteller.Append(neueingang.ToString("yyyy") & t) 'jahr 
         'zeileAntragsteller.Append(perso.Rolle & t) ' 
         'zeileAntragsteller.Append(perso.Anrede & t) ' 
         'zeileAntragsteller.Append(bildeFirma(perso) & t) ' 
@@ -4685,10 +4720,10 @@ Public Class Form1
         'zeileAntragsteller.Append(perso.Kassenkonto & t) '  
         Return True
     End Function
-    Private Shared Function bildeZeileantragsteller(eingang As Date, ws As ExcelWorksheet, perso As person, row As Integer) As Boolean
+    Private Shared Function bildeZeileantragsteller(neueingang As String, ws As ExcelWorksheet, perso As person, row As Integer) As Boolean
         ws.Cells("A" & row).Value = vid
-        ws.Cells("b" & row).Value = eingang.ToString("yyyy")
-        ws.Cells("c" & row).Value = "???"
+        ws.Cells("b" & row).Value = neueingang 'eingang.ToString("yyyy")
+        ws.Cells("c" & row).Value = ""
         ws.Cells("d" & row).Value = perso.Anrede
         ws.Cells("e" & row).Value = bildeFirma(perso)
         ws.Cells("f" & row).Value = perso.Namenszusatz
@@ -4701,10 +4736,15 @@ Public Class Form1
         ws.Cells("p" & row).Value = perso.Kontakt.Anschrift.PLZ
         ws.Cells("q" & row).Value = perso.Kontakt.Anschrift.Gemeindename
         ws.Cells("r" & row).Value = perso.Bemerkung
-        ws.Cells("s" & row).Value = "pf: " & perso.Kontakt.Anschrift.Postfach
+        If perso.Kontakt.Anschrift.Postfach IsNot Nothing AndAlso perso.Kontakt.Anschrift.Postfach <> String.Empty Then
+            ws.Cells("s" & row).Value = "pf: " & perso.Kontakt.Anschrift.Postfach
+        Else
+            ws.Cells("s" & row).Value = ""
+        End If
+        'ws.Cells("s" & row).Value = "pf: " & perso.Kontakt.Anschrift.Postfach
         ws.Cells("t" & row).Value = perso.Kontakt.elektr.Telefon1
         ws.Cells("u" & row).Value = perso.Kontakt.elektr.Fax1
-        ws.Cells("v" & row).Value = perso.Kontakt.elektr.MobilFon
+        ws.Cells("x" & row).Value = perso.Kontakt.elektr.MobilFon
         ws.Cells("w" & row).Value = perso.Kontakt.elektr.Email
         ws.Cells("x" & row).Value = ""
         ws.Cells("y" & row).Value = perso.Kontakt.elektr.Homepage
@@ -4715,7 +4755,7 @@ Public Class Form1
         'Dim zeileAntragsteller As New Text.StringBuilder
         'zeileAntragsteller.Clear()
         'zeileAntragsteller.Append(vid & t) 'Az
-        'zeileAntragsteller.Append(eingang.ToString("yyyy") & t) 'jahr  
+        'zeileAntragsteller.Append(neueingang.ToString("yyyy") & t) 'jahr  
         'zeileAntragsteller.Append(perso.Anrede & t) ' 
         'zeileAntragsteller.Append(bildeFirma(perso) & t) ' 
         'zeileAntragsteller.Append(perso.Namenszusatz & t) ' 
@@ -5007,6 +5047,14 @@ Public Class Form1
                 " order by    e.VORGANGSID desc,  e.DATUM desc"
 
 
+        Sql = "    Select   * FROM [Paradigma].[dbo].[EREIGNIS_T16]    e, " &
+                "  [Paradigma].[dbo].[stammdaten_tutti] s " &
+                " where  " &
+                "   e.VORGANGSID = s.VORGANGSID " &
+                "  and    not( art like '%email%' or art like '%wiederv%' or  (NOTIZ) is  null  ) " &
+                " and s.VORGANGSID <=" & 9999999 & " and s.VORGANGSID>" & 0 &
+                " order by    e.VORGANGSID desc,  e.DATUM desc"
+
 
         'vid <=" & maxobj & " and vid>" & untergrenze & "
 
@@ -5110,7 +5158,9 @@ Public Class Form1
                     l(eid & " " & CStr(art) & " " & ic)
                     'outfile = dbdatum.ToString("yyyyMMdd_hhmmss") & "_Ereignis_" & cleanString(art) & "_" & cleanString(richtung) & ".txt"
                     outfile = dbdatum.ToString("yyyyMMdd_hhmmss") & "_"
-                    outfile = outfile & cleanString(art) & "_" & cleanString(richtung) & clsString.normalize_Filename(clsString.kuerzeTextauf(cleanString(beschreibung), 100) & ".txt")
+                    outfile = outfile & cleanString(art) & "_" & cleanString(richtung).Trim & clsString.normalize_Filename(clsString.kuerzeTextauf(cleanString(beschreibung), 100).Trim.Replace("\", "_").Replace("/", "_"))
+                    outfile = outfile.Replace("/", "_").Replace("/", "_").Replace(" ", "_")
+                    outfile = outfile & ".txt"
                     outfile = relativpfad & vid & "\" & eid & "\" & outfile
                     If Not IO.Directory.Exists(relativpfad & vid & "\" & eid) Then
                         IO.Directory.CreateDirectory(relativpfad & vid & "\" & eid)
@@ -5133,7 +5183,7 @@ Public Class Form1
                     'zeilebilden
                     ws.Cells("A" & row).Value = vid
                     ws.Cells("b" & row).Value = eingang.ToString("yyyy")
-                    ws.Cells("c" & row).Value = "???"
+                    ws.Cells("c" & row).Value = ""
                     ws.Cells("d" & row).Value = dbdatum.ToString("dd.MM.yyyy")
                     ws.Cells("e" & row).Value = "ereignis"
                     ws.Cells("f" & row).Value = art & " " & (cleanString(beschreibung))
@@ -5388,7 +5438,7 @@ Public Class Form1
 
                         ws.Cells("A" & row).Value = aktvorgangsid
                         ws.Cells("b" & row).Value = alter_eingang.ToString("yyyy")
-                        ws.Cells("c" & row).Value = "???"
+                        ws.Cells("c" & row).Value = ""
                         ws.Cells("d" & row).Value = dbdatum.ToString("dd.MM.yyyy")
                         ws.Cells("e" & row).Value = "summary"
                         ws.Cells("f" & row).Value = art & " " & (cleanString(beschreibung))
@@ -5608,6 +5658,11 @@ Public Class Form1
     Private Sub writechronologie(puFehler As String, puAusgabe As String, sql As String, maxobj As Integer, relativpfad As String, startvid As Integer)
         Dim DT As System.Data.DataTable
         Dim idok As Integer = 0
+
+        TextBox1.Text = "writeDokumentePU" & Environment.NewLine & "Grunddaten einlesen"
+        grunddaten = spaltenAufLISTeinlesen("t:\grunddaten.xlsx")
+        TextBox1.Text &= " fertig"
+
         'puAusgabe.AutoFlush = True
         inndir = "\\file-paradigma\paradigma\test\paradigmaArchiv\backup\archiv"
         If Form1.vid = "fehler" Then End
@@ -5623,7 +5678,7 @@ Public Class Form1
         Dim istRevisionssicher As Boolean
         Dim dbdatum, FILEDATUM, CHECKINDATUM As Date
         Dim aFILEDATUM, aCHECKINDATUM As String
-        Dim notiz As String
+        Dim notiz, neueingang As String
         Dim beschreibung As String
         Dim eingang As Date
         Dim eid, vid As String
@@ -5666,7 +5721,7 @@ Public Class Form1
             ws.Cells("k1").Value = "vermerk"
 
             Dim aktvorgangsid As String = "0"
-            Dim alter_eingang As Date
+            Dim alter_eingang As String
             'Dim summe As New Text.StringBuilder
             'summaryOutfile = makeAktOutfile(dbdatum, aktvorgangsid, relativpfad)
             For Each drr As DataRow In DT.Rows
@@ -5684,9 +5739,16 @@ Public Class Form1
                     'summe.Clear()
 
                     'CStr(clsDBtools.fieldvalue(drr.Item("kuerzel1"))) '
+                    neuEingang = getNeueingang4vid(vid)
+                    If neuEingang = String.Empty Then
+                        'keine grunddaten gefunden upps
+                        l(vid & " keine grunddaten gefunden upps ")
+                        Continue For
+                    End If
+
                     row += 1
                     ws.Cells("A" & row).Value = vid
-                    ws.Cells("b" & row).Value = eingang.ToString("yyyy")
+                    ws.Cells("b" & row).Value = neueingang 'eingang.ToString("yyyy")
                     ws.Cells("c" & row).Value = "-"
                     ws.Cells("d" & row).Value = dbdatum.ToString("dd.MM.yyyy")
 
@@ -5731,7 +5793,7 @@ Public Class Form1
                     'End If
                     'neue aufmachen
                     'summaryOutfile = makeAktOutfile(dbdatum, vid, relativpfad)
-                    alter_eingang = eingang
+                    alter_eingang = neueingang
                     'summe = New Text.StringBuilder
                     'summe.Append(excelkopf.ToString)
                     aktvorgangsid = vid
@@ -5828,15 +5890,24 @@ Public Class Form1
 
     Private Sub Button37_Click(sender As Object, e As EventArgs) Handles Button37.Click
         TextBox1.Text &= "merge " & Environment.NewLine
+        System.Windows.Forms.Application.DoEvents()
         'merge excel files
         'T:\dokumente\main
-        TextBox1.Text = "T:\dokumente\main"
-        Mergetest("T:\dokumente\main", "T:\MERGED_MainDoks.xlsx")
         TextBox1.Text &= "T:\dokumente\ereignisse"
+        System.Windows.Forms.Application.DoEvents()
         Mergetest("T:\dokumente\ereignisse", "T:\MERGED_EreignisseDoks.xlsx")
+
+        TextBox1.Text &= "T:\dokumente\main"
+        System.Windows.Forms.Application.DoEvents()
+        Mergetest("T:\dokumente\main", "T:\MERGED_MainDoks.xlsx")
+
         TextBox1.Text &= "T:\chronologie"
+        System.Windows.Forms.Application.DoEvents()
         Mergetest("T:\chronologie", "T:\MERGED_Chronologie.xlsx")
+
+
         'TextBox1.Text &= "dokumente"
+        'System.Windows.Forms.Application.DoEvents()
         'Mergetest("T:\mergedDokus", "T:\MERGED_alleDoks.xlsx")
         TextBox1.Text &= "fertig"
 
@@ -6160,39 +6231,53 @@ Public Class Form1
         TextBox1.Text &= " fertig"
         TextBox2.Text = ""
 
-
-
-
-
-        TextBox1.Text &= "merged_maindoks csv" & Environment.NewLine
-        testCSV("t:\merged_maindoks.csv", swfehlt)
-        TextBox1.Text &= " fertig" & Environment.NewLine
-
-        TextBox1.Text &= "merged_ereignissedoks csv" & Environment.NewLine
-        testCSV("t:\merged_ereignissedoks.csv", swfehlt)
-        TextBox1.Text &= " fertig" & Environment.NewLine
-
-
-        TextBox1.Text &= "merged_chronologie csv" & Environment.NewLine
-        testCSV("t:\merged_chronologie.csv", swfehlt)
-        TextBox1.Text &= " fertig" & Environment.NewLine
-
         TextBox1.Text &= "antragsteller " & Environment.NewLine
+        System.Windows.Forms.Application.DoEvents()
         testXLS("t:\antragsteller.xlsx", swfehlt)
         TextBox1.Text &= " fertig" & Environment.NewLine
 
         TextBox1.Text &= "kataster " & Environment.NewLine
+        System.Windows.Forms.Application.DoEvents()
         testXLS("t:\kataster.xlsx", swfehlt)
         TextBox1.Text &= " fertig" & Environment.NewLine
 
         TextBox1.Text &= "lageadresse " & Environment.NewLine
         testXLS("t:\lageadresse.xlsx", swfehlt)
         TextBox1.Text &= " fertig" & Environment.NewLine
-
+        System.Windows.Forms.Application.DoEvents()
 
         TextBox1.Text &= "wiedervorlagen " & Environment.NewLine
+        System.Windows.Forms.Application.DoEvents()
         testXLS("t:\wiedervorlagen.xlsx", swfehlt)
         TextBox1.Text &= " fertig" & Environment.NewLine
+        System.Windows.Forms.Application.DoEvents()
+
+
+
+        TextBox1.Text &= "merged_chronologie csv" & Environment.NewLine
+        swfehlt.WriteLine("merged_chronologie csv")
+        System.Windows.Forms.Application.DoEvents()
+        testCSV("t:\merged_chronologie.csv", swfehlt)
+        TextBox1.Text &= " fertig" & Environment.NewLine
+
+
+        TextBox1.Text &= "merged_ereignissedoks csv" & Environment.NewLine
+        swfehlt.WriteLine("merged_ereignissedoks csv")
+        System.Windows.Forms.Application.DoEvents()
+        testCSV("t:\merged_ereignissedoks.csv", swfehlt)
+        TextBox1.Text &= " fertig" & Environment.NewLine
+
+
+        TextBox1.Text &= "merged_maindoks csv" & Environment.NewLine
+        swfehlt.WriteLine("merged_maindoks csv")
+        System.Windows.Forms.Application.DoEvents()
+        testCSV("t:\merged_maindoks.csv", swfehlt)
+        TextBox1.Text &= " fertig" & Environment.NewLine
+
+
+
+
+
 
 
 
@@ -6271,7 +6356,7 @@ Public Class Form1
 
     Private Sub macheStichprobe()
 
-        Dim azListe As String = "73715 64689 73448 64758 62431 79464 80873 52780 79500 79950 64799 77210 76077 78096 78849 80196 41706 61928 61928 77698 80315 80479 80103 44124"
+        Dim azListe As String = "80103 73715 64689 73448 64758 62431 79464 80873 52780 79500 79950 64799 77210 76077 78096 78849 80196 41706 61928 61928 77698 80315 80479  44124"
 
         For Each az As String In azListe.Split(" "c).Distinct()
             erstelleStichprobe(az)
@@ -6283,6 +6368,7 @@ Public Class Form1
 
     Public Sub testXLS(dateiname As String, logfile As IO.StreamWriter)
         ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
+        logfile.WriteLine("csv: " & dateiname & " ")
         Try
             Using package As New ExcelPackage(New FileInfo(dateiname))
 
@@ -6305,7 +6391,7 @@ Public Class Form1
                         Continue For
                     End If
 
-                    Dim z As New primekey With {
+                    Dim z As New PrimeKey With {
                     .az = az,
                     .jahr = jahr
                 }
@@ -6316,8 +6402,6 @@ Public Class Form1
                            "AZ: " & az &
                            "Jahr: " & jahr &
                            "Excel-Zeile: " & r & dateiname)
-
-
                     End If
 
                 Next
@@ -6335,8 +6419,9 @@ Public Class Form1
     Public Sub testCSV(dateiname As String, logfile As IO.StreamWriter)
 
         Try
-
+            Dim xchronos As Boolean = dateiname.Contains("chronologie")
             TextBox1.Text &= Environment.NewLine & dateiname & Environment.NewLine
+            logfile.WriteLine("csv: " & dateiname & " ")
             Dim zeilennummer As Integer = 0
 
             Using sr As New StreamReader(dateiname, System.Text.Encoding.UTF8)
@@ -6369,9 +6454,16 @@ Public Class Form1
                     Dim az As String = spalten(0).Trim()
                     Dim jahr As String = spalten(1).Trim()
                     Dim dokudateiname As String = spalten(6).Trim
-                    If Not File.Exists(dokudateiname) Then
-                        logfile.WriteLine("Dokumentdatei nicht vorhanden: " & dokudateiname)
+
+
+                    If xchronos Then
+                    Else
+                        If Not File.Exists(dokudateiname) Then
+                            logfile.WriteLine("Dokumentdatei nicht vorhanden: " & dokudateiname & " " & az & " " & jahr)
+                        End If
                     End If
+
+
 
                     If az = "" AndAlso jahr = "" Then
                         Continue While
