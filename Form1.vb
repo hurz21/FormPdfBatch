@@ -3138,8 +3138,8 @@ Public Class Form1
                         Notiz = Notiz & " " & verwandteString & ") "
                     End If
                     zusatz1 = az2 '.Substring(0, 16) 'vid 'CStr(clsDBtools.fieldvalue(drr.Item("az2")))
-                    zusatz2 = vid
-                    zusatz3 = CStr(clsDBtools.fieldvalue(drr.Item("probaugaz"))) & "; " & CStr(clsDBtools.fieldvalue(drr.Item("bemerkung")))
+                    zusatz2 = CStr(clsDBtools.fieldvalue(drr.Item("bemerkung")))
+                    zusatz3 = CStr(clsDBtools.fieldvalue(drr.Item("probaugaz")))
                     If umlautwandeln Then
                         sgnr = clsString.removeSemikolon(sgnr)
                         Hauptaktenzeichen = clsString.removeSemikolon(Hauptaktenzeichen)
@@ -4066,8 +4066,8 @@ Public Class Form1
             ws.Cells("g1").Value = "betreff"
             'optionale
             ws.Cells("h1").Value = "info"
-            ws.Cells("i1").Value = "erledigtam"
-            ws.Cells("j1").Value = "erledigt"
+            'ws.Cells("i1").Value = "erledigtam"
+            'ws.Cells("i1").Value = "erledigt"
 
 
             'row.Append("az" & t) '     vid   
@@ -4096,8 +4096,17 @@ Public Class Form1
                     info = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Bemerkung"))))
 
                     bearbeiterid = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("bearbeiterid"))))
-                    erledigtam = ((clsDBtools.fieldvalueDate(drr.Item("erledigtam"))))
+                    'erledigtam = ((clsDBtools.fieldvalueDate(drr.Item("erledigtam"))))
+                    'If drr.Item("erledigtam") IsNot Nothing AndAlso drr.Item("erledigtam") IsNot DBNull.Value Then
+                    '    If drr.Item("erledigtam") <> #1/1/0001 01:01:01 AM# Then
+                    '        Debug.Print("")
+                    '    End If
+                    'End If
                     erledigt = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("erledigt"))))
+                    If erledigt Then
+                        row -= 1
+                        Continue For
+                    End If
                     'angelegtam = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("weingang"))))
                     If umlautwandeln Then
                         todo = clsString.umlaut2ue(todo)
@@ -4117,8 +4126,8 @@ Public Class Form1
                     ws.Cells("f" & row).Value = sachbearbeiter
                     ws.Cells("g" & row).Value = Betreff
                     ws.Cells("h" & row).Value = info
-                    ws.Cells("i" & row).Value = erledigtam.ToString("dd.MM.yyyy")
-                    ws.Cells("j" & row).Value = erledigt
+                    'ws.Cells("i" & row).Value = erledigtam.ToString("dd.MM.yyyy")
+                    'ws.Cells("i" & row).Value = erledigt
 
                     'row.Append(vid & t) 'Az
                     'row.Append(neueingang.ToString("yyyy") & t) 'jahr .ToString("dd.MM.yyyy") 
