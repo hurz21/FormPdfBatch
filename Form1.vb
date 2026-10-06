@@ -4436,6 +4436,9 @@ Public Class Form1
                     igesamt += 1
                     TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : System.Windows.Forms.Application.DoEvents()
                     vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
+                    If vid = 80103 Then
+                        Debug.Print("")
+                    End If
                     eingang = CStr(clsDBtools.fieldvalueDate(drr.Item("eingang")))
 
                     neueingang = getNeueingang4vid(vid)
@@ -4567,6 +4570,12 @@ Public Class Form1
                     Return perso
                 End If
             Next
+            If perscoll IsNot Nothing AndAlso perscoll.Count > 0 Then
+                Return perscoll(0)
+            Else
+                Return Nothing
+            End If
+            Return perscoll(0)
             Return Nothing
         Catch ex As Exception
             l("fertig  " & ex.ToString)
@@ -4674,7 +4683,7 @@ Public Class Form1
         ws.Cells("i" & row).Value = perso.Name '& " (" & perso.Rolle & ")"
         ws.Cells("m" & row).Value = perso.Kontakt.Anschrift.Strasse
         ws.Cells("n" & row).Value = perso.Kontakt.Anschrift.Hausnr
-        ws.Cells("o" & row).Value = perso.Kontakt.Anschrift.Hausnr
+        ws.Cells("o" & row).Value = "" 'perso.Kontakt.Anschrift.Hausnr
         ws.Cells("p" & row).Value = "hessen"
         ws.Cells("q" & row).Value = perso.Kontakt.Anschrift.PLZ
         ws.Cells("r" & row).Value = perso.Kontakt.Anschrift.Gemeindename
@@ -4731,7 +4740,7 @@ Public Class Form1
         ws.Cells("h" & row).Value = perso.Name
         ws.Cells("l" & row).Value = perso.Kontakt.Anschrift.Strasse
         ws.Cells("m" & row).Value = perso.Kontakt.Anschrift.Hausnr
-        ws.Cells("n" & row).Value = perso.Kontakt.Anschrift.Hausnr
+        ws.Cells("n" & row).Value = "" 'perso.Kontakt.Anschrift.Hausnr
         ws.Cells("o" & row).Value = "hessen"
         ws.Cells("p" & row).Value = perso.Kontakt.Anschrift.PLZ
         ws.Cells("q" & row).Value = perso.Kontakt.Anschrift.Gemeindename
@@ -5159,7 +5168,7 @@ Public Class Form1
                     'outfile = dbdatum.ToString("yyyyMMdd_hhmmss") & "_Ereignis_" & cleanString(art) & "_" & cleanString(richtung) & ".txt"
                     outfile = dbdatum.ToString("yyyyMMdd_hhmmss") & "_"
                     outfile = outfile & cleanString(art) & "_" & cleanString(richtung).Trim & clsString.normalize_Filename(clsString.kuerzeTextauf(cleanString(beschreibung), 100).Trim.Replace("\", "_").Replace("/", "_"))
-                    outfile = outfile.Replace("/", "_").Replace("/", "_").Replace(" ", "_")
+                    outfile = outfile.Replace("/", "_").Replace("/", "_").Replace(" ", "_").Replace(".", "_")
                     outfile = outfile & ".txt"
                     outfile = relativpfad & vid & "\" & eid & "\" & outfile
                     If Not IO.Directory.Exists(relativpfad & vid & "\" & eid) Then
@@ -6368,7 +6377,7 @@ Public Class Form1
 
     Public Sub testXLS(dateiname As String, logfile As IO.StreamWriter)
         ExcelPackage.License.SetNonCommercialOrganization("Kreis Offenbach") ' //This will also Set the Company Property To the organization name provided In the argument.
-        logfile.WriteLine("csv: " & dateiname & " ")
+        logfile.WriteLine("xls: " & dateiname & " ")
         Try
             Using package As New ExcelPackage(New FileInfo(dateiname))
 
