@@ -2490,6 +2490,7 @@ Public Class Form1
         Dim idok As Integer = 0
         Dim row As Integer = 2
         Dim schreib = 0
+        Dim fii As FileInfo
         TextBox1.Text = "writeDokumentePU" & Environment.NewLine & "Grunddaten einlesen"
 
         grunddaten = spaltenAufLISTeinlesen("t:\grunddaten.xlsx")
@@ -2563,9 +2564,13 @@ Public Class Form1
                     If vid = String.Empty Then
                         Continue For
                     End If
-                    If vid = 78849 Then
-                        Debug.Print("vid 78849")
+                    If beschreibung Is Nothing OrElse beschreibung.Trim = String.Empty Then
+                        fii = New IO.FileInfo(dateinameext)
+                        beschreibung = fii.Name.Trim
                     End If
+                    'If vid = 78849 Then
+                    '    Debug.Print("vid 78849")
+                    'End If
                     'If dateinameext = "img_2934.jpg" Then
                     '    Debug.Print("vid 78849")
                     'End If
@@ -2689,7 +2694,7 @@ Public Class Form1
     Private Function getNeueingang4vid(vid As String) As String
         Try
             If grunddaten Is Nothing Then
-                Return False
+                Return ""
             End If
             For Each eintrag As PrimeKey In grunddaten
                 If eintrag.az = vid Then
@@ -2793,10 +2798,10 @@ Public Class Form1
     Private Sub stammdaten()
         'probaugstammdaten
         Dim puFehler As String = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\grunddaten.log"
-        Dim puAusgabe As String = "e:\proumwelt\xls\" & "grunddaten" & ".xlsx"
-        puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\grunddaten.xlsx"
-        puAusgabe = "e:\proumwelt\xls\grunddaten.xlsx"
-        puAusgabe = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\grunddaten.xlsx"
+        Dim puAusgabe As String '= "e:\proumwelt\xls\" & "grunddaten" & ".xlsx"
+        'puAusgabe = "O:\UMWELT\B\GISDatenEkom\proumweltaufbereitung\umsetzung\grunddaten.xlsx"
+        'puAusgabe = "e:\proumwelt\xls\grunddaten.xlsx"
+        'puAusgabe = "O:\UMWELT\B\Proumwelt_Migration\grunddaten\grunddaten.xlsx"
         puAusgabe = "t:\grunddaten.xlsx"
 
         puFehler = "t:\grunddaten\grunddaten.log"
@@ -3015,7 +3020,7 @@ Public Class Form1
                     igesamt += 1
 
                     vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                    If vid = 79717 Then
+                    If vid = 81183 Then
                         Debug.Print("")
                     End If
                     eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
@@ -3025,9 +3030,16 @@ Public Class Form1
                     '                                               CStr(clsDBtools.fieldvalue(drr.Item("az2")))))
 
                     Bezeichnung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("beschreibung"))))
+                    If Bezeichnung.Length < 3 Or Bezeichnung Is Nothing Then
+                        Bezeichnung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("az2"))))
+                        If Bezeichnung.Length < 3 Or Bezeichnung Is Nothing Then
+                            igesamt -= 1
+                            Continue For
+                        End If
+                    End If
 
 
-                    az2 = CStr(clsDBtools.fieldvalue(drr.Item("az2")))
+                        az2 = CStr(clsDBtools.fieldvalue(drr.Item("az2")))
                     eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                     antrag = CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
                     vollstaendigS = "" '"CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG")))
@@ -3598,6 +3610,10 @@ Public Class Form1
     Private Sub writeAdresseausgabePU(puFehler As String, puAusgabe As String, sql As String,
                                       maxobj As Integer, umlautwandeln As Boolean)
         Dim DT As System.Data.DataTable
+        TextBox1.Text = "writeDokumentePU" & Environment.NewLine & "Grunddaten einlesen"
+
+        grunddaten = spaltenAufLISTeinlesen("t:\grunddaten.xlsx")
+        TextBox1.Text &= " fertig"
         Dim idok As Integer = 0
         'puAusgabeStream.AutoFlush = True
         swfehlt.WriteLine("writeStammdatenPU---")
@@ -3609,7 +3625,7 @@ Public Class Form1
         Dim newsavemode As Boolean
         Dim istRevisionssicher As Boolean
         Dim dbdatum, hauptaktenjahr As Date
-        Dim spalte1 As String
+        Dim spalte1, neueingang As String
         Dim veraltet As String
         Dim eingang, antrag, vollstaendig, bescheid, abgeschlossen As Date
         Dim aktenstandort As String
@@ -3669,6 +3685,15 @@ Public Class Form1
                     igesamt += 1
                     vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
                     eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
+
+                    neuEingang = getNeueingang4vid(vid)
+                    If neuEingang = String.Empty Then
+                        'keine grunddaten gefunden upps
+                        l(vid & "lageadr keine grunddaten gefunden upps " & vid)
+                        Continue For
+                    End If
+
+
                     ort = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemeindetext"))))
                     ortsteil = ""
                     strasse = (clsDBtools.fieldvalue(drr.Item("strassenname")))
@@ -3802,6 +3827,7 @@ Public Class Form1
     Private Sub writeKatasterausgabePU(puFehler As String, puAusgabe As String, sql As String,
                                        maxobj As Integer, umlautwandeln As Boolean)
         TextBox1.Text = "writeKatasterausgabePU" & Environment.NewLine & "Grunddaten einlesen"
+        Dim gemparms As New clsGemarkungsParams
 
         grunddaten = spaltenAufLISTeinlesen("t:\grunddaten.xlsx")
         TextBox1.Text &= "grunddaten gelesen fertig"
@@ -3819,7 +3845,7 @@ Public Class Form1
         Dim newsavemode As Boolean
         Dim istRevisionssicher As Boolean
         Dim dbdatum, hauptaktenjahr As Date
-        Dim spalte1 As String
+        Dim spalte1, bauort As String
         Dim veraltet As String
         Dim eingang, antrag, vollstaendig, bescheid, abgeschlossen As Date
         Dim aktenstandort As String
@@ -3849,7 +3875,7 @@ Public Class Form1
             ws.Cells("h1").Value = "nord"
             ws.Cells("i1").Value = "veraltet"
             ws.Cells("j1").Value = "funktion"
-            ws.Cells("k1").Value = "freitext"
+            ws.Cells("k1").Value = "bauort"
             ws.Cells("l1").Value = "abstrakt"
             ws.Cells("m1").Value = "gemcode"
             ws.Cells("n1").Value = "fs"
@@ -3886,12 +3912,29 @@ Public Class Form1
                     If neueingang = String.Empty Then
                         'keine grunddaten gefunden upps
                         l(vid & " keine grunddaten gefunden upps  kataster")
+                        igesamt -= 1
+                        row -= 1
                         Continue For
                     End If
 
 
                     gemarkung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("gemarkungstext"))))
-                    flur = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("flur"))))
+                    If gemarkung = String.Empty Then
+                        igesamt -= 1
+                        row -= 1
+                        Continue For
+                    End If
+
+                    'If gemparms.gemarkungstext2gemeindetext(gemarkung.ToString) <> "ERROR" Then
+
+                    bauort = gemparms.gemarkungstext2gemeindetext(gemarkung.ToString)
+                        'Else
+                        '    bauort = "Dietzenbach000"
+                        'End If
+
+
+
+                        flur = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("flur"))))
                     flurstueck = cleanString((clsDBtools.fieldvalue(drr.Item("znkombi"))))
                     ost = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("rechts"))))
                     nord = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("hoch"))))
@@ -3938,7 +3981,7 @@ Public Class Form1
                     'row.Append(spalte1 & t) 
                     ws.Cells("j" & row).Value = funktion ' 
                     'row.Append(funktion & t)
-                    ws.Cells("k" & row).Value = freitext ' 
+                    ws.Cells("k" & row).Value = bauort ' 
                     'row.Append(freitext & t)
                     ws.Cells("l" & row).Value = abstrakt ' 
                     'row.Append(abstrakt & t)
@@ -4401,9 +4444,6 @@ Public Class Form1
         grunddaten = spaltenAufLISTeinlesen("t:\grunddaten.xlsx")
         TextBox1.Text &= " fertig"
 
-
-
-
         Dim DT As System.Data.DataTable
         Dim rowAntrag As Integer = 1
         Dim rowBeteiligt As Integer = 1
@@ -4445,7 +4485,7 @@ Public Class Form1
                     igesamt += 1
                     TextBox3.Text = igesamt & " von " & DT.Rows.Count & "   [maxobj4test: " & maxobj & " ]" : System.Windows.Forms.Application.DoEvents()
                     vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                    If vid = 80103 Then
+                    If vid = 81799 Then
                         Debug.Print("")
                     End If
                     eingang = CStr(clsDBtools.fieldvalueDate(drr.Item("eingang")))
@@ -4817,19 +4857,25 @@ Public Class Form1
                 per = New person
                 per.Rolle = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("rolle"))))
                 If per.Rolle = "EmailEmpfänger" And ohneEmailEmpfaenger = True Then
-                    Continue For
+                    per.Name = "dummy_e"
+                    per.Anrede = "dummy_e"
+                    per.Rolle = "dummy_e"
+                    per.Kontakt.Org.Name = "dummy_e"
+                    per.Kontakt.elektr.Email = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFemail"))))
+                Else
+                    per.Name = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("nachname"))))
+                    per.Anrede = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Anrede"))))
+                    per.Vorname = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("vorname"))))
+                    per.Kontakt.Org.Name = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgname"))))
                 End If
-                per.Name = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("nachname"))))
-                per.Vorname = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("vorname"))))
+
                 per.Bemerkung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("bemerkung"))))
                 per.Namenszusatz = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Namenszusatz"))))
-                per.Anrede = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Anrede"))))
                 per.Kontakt.Anschrift.Gemeindename = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Gemeindename"))))
                 per.Kontakt.Anschrift.Strasse = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Strasse"))))
                 per.Kontakt.Anschrift.Hausnr = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Hausnr"))))
                 per.Kontakt.Anschrift.Postfach = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Postfach"))))
                 per.Kontakt.Anschrift.PLZ = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("plz"))))
-                per.Kontakt.Org.Name = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgname"))))
                 per.Kontakt.Org.Zusatz = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgzusatz"))))
                 per.Kontakt.Org.Typ1 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgtyp1"))))
                 per.Kontakt.Org.Typ2 = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("orgtyp2"))))
@@ -5695,7 +5741,7 @@ Public Class Form1
         Dim newsavemode As Boolean
         Dim istRevisionssicher As Boolean
         Dim dbdatum, FILEDATUM, CHECKINDATUM As Date
-        Dim aFILEDATUM, aCHECKINDATUM As String
+        Dim fristdatum, aCHECKINDATUM As String
         Dim notiz, neueingang As String
         Dim beschreibung As String
         Dim eingang As Date
@@ -5757,10 +5803,10 @@ Public Class Form1
                     'summe.Clear()
 
                     'CStr(clsDBtools.fieldvalue(drr.Item("kuerzel1"))) '
-                    neuEingang = getNeueingang4vid(vid)
-                    If neuEingang = String.Empty Then
+                    neueingang = getNeueingang4vid(vid)
+                    If neueingang = String.Empty Then
                         'keine grunddaten gefunden upps
-                        l(vid & " keine grunddaten gefunden upps ")
+                        l(vid & " keine grunddaten gefunden upps " & vid)
                         Continue For
                     End If
 
@@ -5773,9 +5819,9 @@ Public Class Form1
 
                     If clsDBtools.fieldvalueDate(FILEDATUM) < "1/1/1990" Then
                         'pu.Append("" & t)
-                        aFILEDATUM = ""
+                        fristdatum = ""
                     Else
-                        aFILEDATUM = cleanString(clsDBtools.fieldvalueDate(FILEDATUM).ToString("yyyyMMdd_hhmmss"))
+                        fristdatum = cleanString(clsDBtools.fieldvalueDate(FILEDATUM).ToString("yyyyMMdd_hhmmss"))
                     End If
                     If clsDBtools.fieldvalueDate(CHECKINDATUM) < "1/1/1990" Then
                         aCHECKINDATUM = ""
@@ -5785,7 +5831,7 @@ Public Class Form1
                     d_beschreibung = (CStr(clsDBtools.fieldvalue(drr.Item("d_beschreibung"))))
 
 
-                    ws.Cells("e" & row).Value = aFILEDATUM
+                    ws.Cells("e" & row).Value = fristdatum
                     ws.Cells("f" & row).Value = aCHECKINDATUM
                     ws.Cells("g" & row).Value = art ' & " " & (cleanString(beschreibung))
                     ws.Cells("h" & row).Value = "-"
@@ -6418,8 +6464,8 @@ Public Class Form1
 
                         logfile.WriteLine("Zeile nicht in den Grunddaten vorhanden:" &
                            "AZ: " & az &
-                           "Jahr: " & jahr &
-                           "Excel-Zeile: " & r & dateiname)
+                           " Jahr: " & jahr &
+                           " Excel-Zeile: " & r & dateiname)
                     End If
 
                 Next

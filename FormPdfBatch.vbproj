@@ -288,6 +288,7 @@
     <Compile Include="clsBlob.vb" />
     <Compile Include="clsDatenbankZugriff.vb" />
     <Compile Include="clsExcel.vb" />
+    <Compile Include="clsGemarkungsParams.vb" />
     <Compile Include="clsstring.vb" />
     <Compile Include="clsWordTest.vb" />
     <Compile Include="Form1.vb">
@@ -520,7 +521,7 @@
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Release ( 
 
-  copy $(targetfilename) T:\exe\formpdfbatch.exe
+ copy $(targetfilename) T:\exe\formpdfbatch.exe
   copy $(targetfilename) T:\exe2\formpdfbatch.exe
 )</PostBuildEvent>
   </PropertyGroup>
