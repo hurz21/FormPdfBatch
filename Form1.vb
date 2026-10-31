@@ -3096,6 +3096,9 @@ Public Class Form1
                     geschlossen = CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))
 
                     verwandteString = makeVerwandteString(vid, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR, jump).Trim
+                    If vid = 48217 Then
+                        Debug.Print("")
+                    End If
                     If verwandteString.Count > 2 Then
                         Debug.Print("")
                     End If
@@ -4858,10 +4861,19 @@ Public Class Form1
                 per.Rolle = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("rolle"))))
                 If per.Rolle = "EmailEmpfänger" And ohneEmailEmpfaenger = True Then
                     per.Name = "dummy_e"
-                    per.Anrede = "dummy_e"
-                    per.Rolle = "dummy_e"
-                    per.Kontakt.Org.Name = "dummy_e"
+                    per.Anrede = ""
+                    per.Rolle = ""
+                    per.Kontakt.Org.Name = ""
                     per.Kontakt.elektr.Email = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("FFemail"))))
+                    If per.Kontakt.elektr.Email.Contains("@") Then
+                        per.Kontakt.elektr.Email = per.Kontakt.elektr.Email.ToLower
+                        Dim a() As String = per.Kontakt.elektr.Email.Split("@")
+                        per.Name = a(1).Replace(".", "_").Trim
+                        per.Vorname = a(0).Replace(".", "_").Trim
+                    Else
+                        Continue For
+                    End If
+
                 Else
                     per.Name = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("nachname"))))
                     per.Anrede = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("Anrede"))))
