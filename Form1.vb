@@ -3020,9 +3020,11 @@ Public Class Form1
                     igesamt += 1
 
                     vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                    If vid = 81183 Then
-                        Debug.Print("")
-                    End If
+                    'If vid <> 10127 Then
+                    '    Continue For
+                    'Else
+                    '    Debug.Print("")
+                    'End If
                     eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                     'Bezeichnung = cleanString(makeStammBezeichnung(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))),
                     '                                               CStr(clsDBtools.fieldvalue(drr.Item("PARAGRAF"))),
@@ -3034,6 +3036,7 @@ Public Class Form1
                         Bezeichnung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("az2"))))
                         If Bezeichnung.Length < 3 Or Bezeichnung Is Nothing Then
                             igesamt -= 1
+                            geloeschteVorgaengeStream.WriteLine("Keine verfahrensart/vorhaben: " & vid & ";" & sgnr & ";" & az2) ' & ";" & str.pAlt & ";" &)
                             Continue For
                         End If
                     End If
@@ -3096,9 +3099,9 @@ Public Class Form1
                     geschlossen = CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))
 
                     verwandteString = makeVerwandteString(vid, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR, jump).Trim
-                    If vid = 48217 Then
-                        Debug.Print("")
-                    End If
+                    'If vid = 48217 Then
+                    '    Debug.Print("")
+                    'End If
                     If verwandteString.Count > 2 Then
                         Debug.Print("")
                     End If
