@@ -2568,12 +2568,15 @@ Public Class Form1
                         fii = New IO.FileInfo(dateinameext)
                         beschreibung = fii.Name.Trim
                     End If
-                    'If vid = 78849 Then
-                    '    Debug.Print("vid 78849")
-                    'End If
+#If debug Then
+
+                    If dokumentid <> 608951 Then
+                    Continue For
+                    End If
                     'If dateinameext = "img_2934.jpg" Then
                     '    Debug.Print("vid 78849")
                     'End If
+#End If
                     neuEingang = getNeueingang4vid(vid)
                     If neuEingang = String.Empty Then
                         'keine grunddaten gefunden upps
@@ -2915,6 +2918,8 @@ Public Class Form1
         geloeschteVorgaengeStream.AutoFlush = True
         erledigtUndAltStream.AutoFlush = True
         kontrollstream.AutoFlush = True
+
+        TextBox1.Text += Environment.NewLine & "sgfile: " & sgfile
         Dim sachgebietCollection As New List(Of zeile)
         If rohausgabe Then
         Else
@@ -3020,11 +3025,14 @@ Public Class Form1
                     igesamt += 1
 
                     vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
-                    'If vid <> 10127 Then
-                    '    Continue For
-                    'Else
-                    '    Debug.Print("")
-                    'End If
+#If DEBUG Then
+
+                    If vid <> 31576 Then
+                        Continue For
+                    Else
+                        Debug.Print("")
+                    End If
+#End If
                     eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                     'Bezeichnung = cleanString(makeStammBezeichnung(CStr(clsDBtools.fieldvalue(drr.Item("SACHGEBIETSTEXT"))),
                     '                                               CStr(clsDBtools.fieldvalue(drr.Item("PARAGRAF"))),
@@ -3036,7 +3044,7 @@ Public Class Form1
                         Bezeichnung = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("az2"))))
                         If Bezeichnung.Length < 3 Or Bezeichnung Is Nothing Then
                             igesamt -= 1
-                            geloeschteVorgaengeStream.WriteLine("Keine verfahrensart/vorhaben: " & vid & ";" & sgnr & ";" & az2) ' & ";" & str.pAlt & ";" &)
+                            geloeschteVorgaengeStream.WriteLine("Keine bezeichnung az2 is null: " & vid & ";" & sgnr & ";" & az2) ' & ";" & str.pAlt & ";" &)
                             Continue For
                         End If
                     End If
@@ -3049,10 +3057,10 @@ Public Class Form1
                     bescheidS = "" '"CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
                     abgeschlossenDatumString = makeAbgeschlossen(CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG"))),
                                                       CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))) 'falls erledigt
-                    dokuskip = makeDokuskip(CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG"))),
-                                            CDate(clsDBtools.fieldvalueDate(drr.Item("AUFNAHME"))),
-                                                      CStr(clsDBtools.fieldvalue(drr.Item("erledigt"))))
-
+                    'dokuskip = makeDokuskip(CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG"))),
+                    '                        CDate(clsDBtools.fieldvalueDate(drr.Item("AUFNAHME"))),
+                    '                                  CStr(clsDBtools.fieldvalue(drr.Item("erledigt"))))
+                    dokuskip = 0
                     aktenstandort = CStr(clsDBtools.fieldvalue(drr.Item("STORAUMNR")))
                     stotitel = CStr(clsDBtools.fieldvalue(drr.Item("STOTITEL"))).Trim
 
@@ -3153,7 +3161,7 @@ Public Class Form1
                         Vorhabensmerkmal = "999"
                     End If
                     If verwandteString.Count > 0 Then
-                        Notiz = Notiz & " " & verwandteString & ") "
+                        Notiz = Notiz & " (" & verwandteString & ") "
                     End If
                     zusatz1 = az2 '.Substring(0, 16) 'vid 'CStr(clsDBtools.fieldvalue(drr.Item("az2")))
                     zusatz2 = CStr(clsDBtools.fieldvalue(drr.Item("bemerkung")))
@@ -3194,10 +3202,10 @@ Public Class Form1
                     ws.Cells("q" & row).Value = sachbearbeiter.TrimEnd("-").TrimEnd(";").TrimEnd(",")
                     ws.Cells("s" & row).Value = Hauptaktenzeichen
                     ws.Cells("t" & row).Value = "" 'hauptaktenjahr.ToString("dd.MM.yyyy")
-                    ws.Cells("x" & row).Value = Notiz
-                    ws.Cells("w" & row).Value = cleanString(zusatz1)
-                    ws.Cells("x" & row).Value = cleanString(zusatz2)
-                    ws.Cells("y" & row).Value = cleanString(zusatz3)
+                    ws.Cells("v" & row).Value = Notiz  'spalte v heisst NOTIZ im original
+                    ws.Cells("w" & row).Value = cleanString(zusatz1) 'w=zusatz1
+                    ws.Cells("x" & row).Value = cleanString(zusatz2) 'x=zusatz2
+                    ws.Cells("y" & row).Value = cleanString(zusatz3) 'y=zusatz3
                     ws.Cells("z" & row).Value = (dokuskip)
 
                     idok += 1
@@ -3297,24 +3305,24 @@ Public Class Form1
         End Try
     End Function
 
-    Private Function makeDokuskip(letztebearbeitung As Date, aufnahme As Date, erledigt As String) As Integer
-        Try
+    'Private Function makeDokuskip(letztebearbeitung As Date, aufnahme As Date, erledigt As String) As Integer
+    '    Try
 
-            If letztebearbeitung <= Today.AddYears(-10) And aufnahme <= Today.AddYears(-10) Then
-                If erledigt = "1" Then
-                    Return 1 'doku kann übersprungen werden, da erledigt und älter als 10 Jahre
-                Else
-                    Return 0 'doku könnte übersprungen werden, da älter als 10 Jahre, aber nicht erledigt
-                End If
-            Else
-                Return 0 'doku nicht überspringen, da jünger als 10 Jahre
-            End If
+    '        If letztebearbeitung <= Today.AddYears(-10) And aufnahme <= Today.AddYears(-10) Then
+    '            If erledigt = "1" Then
+    '                Return 1 'doku kann übersprungen werden, da erledigt und älter als 10 Jahre
+    '            Else
+    '                Return 0 'doku könnte übersprungen werden, da älter als 10 Jahre, aber nicht erledigt
+    '            End If
+    '        Else
+    '            Return 0 'doku nicht überspringen, da jünger als 10 Jahre
+    '        End If
 
-        Catch ex As Exception
-            l("fehler inmakeDokuskip  " & ex.ToString)
-            Return 0
-        End Try
-    End Function
+    '    Catch ex As Exception
+    '        l("fehler inmakeDokuskip  " & ex.ToString)
+    '        Return 0
+    '    End Try
+    'End Function
 
     Private Shared Sub writeCollectionKontrollfile(kontrollfile As StreamWriter, coll As List(Of zeile))
         For Each str As zeile In coll
@@ -3538,11 +3546,11 @@ Public Class Form1
             altaz = altaz.Trim
             interne = interne.Trim
             beschreibung = beschreibung.Trim
-            beschreibung = ""
+            beschreibung = "" ' kommt schon woanders hin
             bemerkung = bemerkung.Trim
-            If vid = 44124 Then
-                Debug.Print("bemeerkung " & bemerkung)
-            End If
+            'If vid = 44124 Then
+            '    Debug.Print("bemeerkung " & bemerkung)
+            'End If
             If altaz.Length < 1 Then
                 altaz = ""
             Else
@@ -3554,7 +3562,7 @@ Public Class Form1
                 interne = " IntNr: " & interne
             End If
             'Return az & altaz & interne & t & " " & beschreibung & " " & verw & "#" & vid & "#"
-            Return altaz & interne & t & " " & beschreibung & " " & stotitel '& " " & bemerkung
+            Return altaz & interne & t & " " & beschreibung & " " & stotitel & " " & verw
 
         Catch ex As Exception
             l("fehler  " & ex.ToString)
@@ -4288,7 +4296,7 @@ Public Class Form1
             a.Append(perso.Kontakt.Anschrift.PLZ & t)
             a.Append(perso.Kontakt.Anschrift.Gemeindename & t)
             a.Append(perso.Bemerkung & t)
-            a.Append("pf: " & perso.Kontakt.Anschrift.Postfach & t)
+            a.Append("" & perso.Kontakt.Anschrift.Postfach & t)
             a.Append(perso.Kontakt.elektr.Telefon1 & t)
             a.Append(perso.Kontakt.elektr.Fax1 & t)
             a.Append(perso.Kontakt.elektr.MobilFon & t)
@@ -4743,7 +4751,7 @@ Public Class Form1
         ws.Cells("q" & row).Value = perso.Kontakt.Anschrift.PLZ
         ws.Cells("r" & row).Value = perso.Kontakt.Anschrift.Gemeindename
         ws.Cells("s" & row).Value = perso.Bemerkung
-        ws.Cells("t" & row).Value = "pf: " & perso.Kontakt.Anschrift.Postfach
+        ws.Cells("t" & row).Value = "" & perso.Kontakt.Anschrift.Postfach
         ws.Cells("u" & row).Value = perso.Kontakt.elektr.Telefon1
         ws.Cells("x" & row).Value = perso.Kontakt.elektr.Fax1
         ws.Cells("w" & row).Value = perso.Kontakt.elektr.MobilFon
@@ -4801,7 +4809,7 @@ Public Class Form1
         ws.Cells("q" & row).Value = perso.Kontakt.Anschrift.Gemeindename
         ws.Cells("r" & row).Value = perso.Bemerkung
         If perso.Kontakt.Anschrift.Postfach IsNot Nothing AndAlso perso.Kontakt.Anschrift.Postfach <> String.Empty Then
-            ws.Cells("s" & row).Value = "pf: " & perso.Kontakt.Anschrift.Postfach
+            ws.Cells("s" & row).Value = " " & perso.Kontakt.Anschrift.Postfach
         Else
             ws.Cells("s" & row).Value = ""
         End If
