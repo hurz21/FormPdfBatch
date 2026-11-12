@@ -3136,7 +3136,7 @@ Public Class Form1
 
                         If treffer.Length > 0 Then
                             naturegresult = " (Natureg: "
-                            naturegresult = naturegresult & "Art: " & treffer(0)("Art").ToString()
+                            naturegresult = naturegresult & "Natnr: " & treffer(0)("Nummer").ToString()
                             naturegresult = naturegresult & ",Typ: " & treffer(0)("Typ").ToString()
                             naturegresult = naturegresult & ",Qul: " & treffer(0)("Quelle").ToString()
                             naturegresult = naturegresult & ",Maßn: " & treffer(0)("MASSNAHMENNR").ToString()
