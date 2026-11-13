@@ -3028,7 +3028,7 @@ Public Class Form1
 #If DEBUG Then
 
                     If vid <> 31576 Then
-                        Continue For
+                        'Continue For
                     Else
                         Debug.Print("")
                     End If
@@ -3107,6 +3107,11 @@ Public Class Form1
                     geschlossen = CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))
 
                     verwandteString = makeVerwandteString(vid, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR, jump).Trim
+                    If verwandteString = "(Verwandte:" Then
+                        verwandteString = ""
+                    Else
+                        verwandteString = verwandteString.Trim & ")"
+                    End If
                     'If vid = 48217 Then
                     '    Debug.Print("")
                     'End If
@@ -3128,6 +3133,7 @@ Public Class Form1
                                                  CStr(clsDBtools.fieldvalue(drr.Item("PARAGRAF"))),
                                                  CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSGEGENSTAND"))),
                                                  CStr(clsDBtools.fieldvalue(drr.Item("az2"))))) 'az2 wird nicht verwendet
+                    Notiz = Notiz.Trim
                     'natureg
                     Dim naturegresult As String = ""
                     If Verfahrensart.StartsWith("3") Then
@@ -3160,12 +3166,19 @@ Public Class Form1
                     Else
                         Vorhabensmerkmal = "999"
                     End If
-                    If verwandteString.Count > 0 Then
-                        Notiz = Notiz & " (" & verwandteString & ") "
-                    End If
+                    'If verwandteString.Count > 0 Then
+                    '    Notiz = Notiz & verwandteString & ") "
+                    'End If
                     zusatz1 = az2 '.Substring(0, 16) 'vid 'CStr(clsDBtools.fieldvalue(drr.Item("az2")))
                     zusatz2 = CStr(clsDBtools.fieldvalue(drr.Item("bemerkung")))
-                    zusatz3 = CStr(clsDBtools.fieldvalue(drr.Item("probaugaz")))
+                    zusatz3 = "" ' CStr(clsDBtools.fieldvalue(drr.Item("probaugaz")))
+                    If clsDBtools.fieldvalue(drr.Item("probaugaz")) = String.Empty Then
+                        zusatz3 = ""
+                    Else
+                        zusatz3 = "(Aaz: " & CStr(clsDBtools.fieldvalue(drr.Item("probaugaz"))) & ")"
+                    End If
+                    zusatz3 = zusatz3 & " " & Notiz
+
                     If umlautwandeln Then
                         sgnr = clsString.removeSemikolon(sgnr)
                         Hauptaktenzeichen = clsString.removeSemikolon(Hauptaktenzeichen)
@@ -3202,7 +3215,7 @@ Public Class Form1
                     ws.Cells("q" & row).Value = sachbearbeiter.TrimEnd("-").TrimEnd(";").TrimEnd(",")
                     ws.Cells("s" & row).Value = Hauptaktenzeichen
                     ws.Cells("t" & row).Value = "" 'hauptaktenjahr.ToString("dd.MM.yyyy")
-                    ws.Cells("v" & row).Value = Notiz  'spalte v heisst NOTIZ im original
+                    ws.Cells("v" & row).Value = verwandteString  'spalte v heisst NOTIZ im original
                     ws.Cells("w" & row).Value = cleanString(zusatz1) 'w=zusatz1
                     ws.Cells("x" & row).Value = cleanString(zusatz2) 'x=zusatz2
                     ws.Cells("y" & row).Value = cleanString(zusatz3) 'y=zusatz3
@@ -3414,13 +3427,13 @@ Public Class Form1
         Dim verw As String
         Dim summe As New Text.StringBuilder
         Dim sachg As String
-        summe.Append(",Verwandte-Sachgebiet: ")
+        summe.Append("(Verwandte: ")
         Try
             For i = jump To alleVIDmitVerwandten.Rows.Count - 1
                 If CStr(clsDBtools.fieldvalue(alleVIDmitVerwandten(i).Item("VORGANGSID"))) < vid Then
                     jump = i - 10
                     If jump < 1 Then jump = 0
-                    If summe.ToString = ",Verwandte-Sachgebiet: " Then
+                    If summe.ToString = ",Verwandte: " Then
                         Return " "
                     Else
                         Return summe.ToString
