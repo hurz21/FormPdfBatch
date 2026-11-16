@@ -20,7 +20,7 @@ Imports Microsoft.VisualBasic.Logging
 Imports Mono.Security.Protocol
 Imports OfficeOpenXml
 Public Class Form1
-    Private grunddaten As List(Of primekey)
+    Private grunddaten As List(Of PrimeKey)
     'Public wordVorlagen As New Microsoft.Office.Interop.Word.Application 'habe hier new ergänzt ????
     'Public docVorlagen As New Microsoft.Office.Interop.Word.Document
     Private immerUeberschreiben As Boolean
@@ -2927,10 +2927,18 @@ Public Class Form1
             writeCollectionKontrollfile(kontrollstream, sachgebietCollection)
             kontrollstream.Close()
         End If
+        '########################  raumbezugabstrakt  ############
+        Dim sql_Raumbezugabstrakt = "SELECT vorgangsid, CONCAT('(', [TITEL], ', ', [ABSTRACT], ', ', [FREITEXT], '. ', [FLAECHEQM], ' qm)')  as RaumbezugabstraktText_spalteV " &
+                                        "FROM [Paradigma].[dbo].[raumbezugplus]  " &
+                                        "WHERE [FREITEXT] <> '' " &
+                                        "ORDER BY [VORGANGSID] DESC;"
+        Dim RaumbezugabstraktText_spalteV As String
+        Dim raumbezugDT As System.Data.DataTable
+        raumbezugDT = alleDokumentDatenHolen(sql_Raumbezugabstrakt)
+
 
         'illegale #########################################
-        Dim sql_illegale = "SELECT * FROM [Paradigma].[dbo].[t17] " &
-            " order by vorgangsid desc  "
+        Dim sql_illegale = "SELECT * FROM [Paradigma].[dbo].[t17] " & " order by vorgangsid desc  "
         Dim illStatus, illText As String
         Dim illegaleDT As System.Data.DataTable
         illegaleDT = alleDokumentDatenHolen(sql_illegale)
@@ -3050,7 +3058,7 @@ Public Class Form1
                     End If
 
 
-                        az2 = CStr(clsDBtools.fieldvalue(drr.Item("az2")))
+                    az2 = CStr(clsDBtools.fieldvalue(drr.Item("az2")))
                     eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                     antrag = CDate(clsDBtools.fieldvalueDate(drr.Item("aufnahme")))
                     vollstaendigS = "" '"CDate(clsDBtools.fieldvalueDate(drr.Item("LETZTEBEARBEITUNG")))
@@ -3106,6 +3114,20 @@ Public Class Form1
                     'hauptaktenjahr = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
                     geschlossen = CStr(clsDBtools.fieldvalue(drr.Item("erledigt")))
 
+
+                    'raumbezugabstrakt
+                    RaumbezugabstraktText_spalteV = ""
+                    Dim raumbezugtreffer() As DataRow = raumbezugDT.Select("VORGANGSID = '" & vid & "'")
+                    If raumbezugtreffer.Length > 0 Then
+                        For i = 0 To raumbezugtreffer.Length - 1
+                            Debug.Print("")
+                            RaumbezugabstraktText_spalteV = RaumbezugabstraktText_spalteV & ", " & cleanString(raumbezugtreffer(i)("RaumbezugabstraktText_spalteV").ToString())
+                            Debug.Print("")
+                            'RaumbezugabstraktText_spalteV = cleanString(RaumbezugabstraktText_spalteV) 
+                        Next
+                    Else
+                        RaumbezugabstraktText_spalteV = ""
+                    End If
                     verwandteString = makeVerwandteString(vid, alleVIDmitVerwandten, alleFremdvorgaengeMitSGNR, jump).Trim
                     If verwandteString = "(Verwandte:" Then
                         verwandteString = ""
@@ -3215,7 +3237,7 @@ Public Class Form1
                     ws.Cells("q" & row).Value = sachbearbeiter.TrimEnd("-").TrimEnd(";").TrimEnd(",")
                     ws.Cells("s" & row).Value = Hauptaktenzeichen
                     ws.Cells("t" & row).Value = "" 'hauptaktenjahr.ToString("dd.MM.yyyy")
-                    ws.Cells("v" & row).Value = verwandteString  'spalte v heisst NOTIZ im original
+                    ws.Cells("v" & row).Value = RaumbezugabstraktText_spalteV 'verwandteString  'spalte v heisst NOTIZ im original
                     ws.Cells("w" & row).Value = cleanString(zusatz1) 'w=zusatz1
                     ws.Cells("x" & row).Value = cleanString(zusatz2) 'x=zusatz2
                     ws.Cells("y" & row).Value = cleanString(zusatz3) 'y=zusatz3
@@ -3713,8 +3735,8 @@ Public Class Form1
                     vid = CStr(clsDBtools.fieldvalue(drr.Item("VORGANGSID")))
                     eingang = CDate(clsDBtools.fieldvalueDate(drr.Item("eingang")))
 
-                    neuEingang = getNeueingang4vid(vid)
-                    If neuEingang = String.Empty Then
+                    neueingang = getNeueingang4vid(vid)
+                    If neueingang = String.Empty Then
                         'keine grunddaten gefunden upps
                         l(vid & "lageadr keine grunddaten gefunden upps " & vid)
                         Continue For
@@ -3955,13 +3977,13 @@ Public Class Form1
                     'If gemparms.gemarkungstext2gemeindetext(gemarkung.ToString) <> "ERROR" Then
 
                     bauort = gemparms.gemarkungstext2gemeindetext(gemarkung.ToString)
-                        'Else
-                        '    bauort = "Dietzenbach000"
-                        'End If
+                    'Else
+                    '    bauort = "Dietzenbach000"
+                    'End If
 
 
 
-                        flur = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("flur"))))
+                    flur = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("flur"))))
                     flurstueck = cleanString((clsDBtools.fieldvalue(drr.Item("znkombi"))))
                     ost = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("rechts"))))
                     nord = cleanString(CStr(clsDBtools.fieldvalue(drr.Item("hoch"))))
