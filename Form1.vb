@@ -7311,6 +7311,10 @@ Public Class Form1
 
     End Sub
 
+    Private Sub Button31_Click(sender As Object, e As EventArgs) Handles Button31.Click
+        SqlToWktExportModule.ExportDatabaseToWktFile("C:\kreisoffenbach\geopolygone.wkt")
+    End Sub
+
     Private Sub schreibeTabelle(
     dateiname As String,
     tabellenname As String,
