@@ -7312,7 +7312,13 @@ Public Class Form1
     End Sub
 
     Private Sub Button31_Click(sender As Object, e As EventArgs) Handles Button31.Click
-        SqlToWktExportModule.ExportDatabaseToWktFile("C:\kreisoffenbach\geopolygone.wkt")
+        SqlToWktExportModule.ExportDatabaseToWktFile("Z:\SDF\geopolygon\geopolygone.wkt")
+        End
+    End Sub
+
+    Private Sub Button18_Click_1(sender As Object, e As EventArgs) Handles Button18.Click
+        bplanpdfhtml.makeHtml4Gemarkung("l:\fkat", "Z:\data\upload\planung-bauen\bebauungsplaene")
+        End
     End Sub
 
     Private Sub schreibeTabelle(

@@ -69,6 +69,7 @@ Partial Class Form1
         Me.Button24 = New System.Windows.Forms.Button()
         Me.Button23 = New System.Windows.Forms.Button()
         Me.Button22 = New System.Windows.Forms.Button()
+        Me.Button18 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -537,11 +538,21 @@ Partial Class Form1
         Me.Button22.Text = "5.Lage-Adresse"
         Me.Button22.UseVisualStyleBackColor = True
         '
+        'Button18
+        '
+        Me.Button18.Location = New System.Drawing.Point(868, 252)
+        Me.Button18.Name = "Button18"
+        Me.Button18.Size = New System.Drawing.Size(193, 23)
+        Me.Button18.TabIndex = 27
+        Me.Button18.Text = "bplan4pdfHtml"
+        Me.Button18.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1251, 489)
+        Me.Controls.Add(Me.Button18)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.Button17)
         Me.Controls.Add(Me.Button15)
@@ -619,4 +630,5 @@ End Sub
     Friend WithEvents Button38 As Button
     Friend WithEvents Button39 As Button
     Friend WithEvents TextBox5 As TextBox
+    Friend WithEvents Button18 As Button
 End Class
