@@ -7317,7 +7317,13 @@ Public Class Form1
     End Sub
 
     Private Sub Button18_Click_1(sender As Object, e As EventArgs) Handles Button18.Click
-        bplanpdfhtml.makeHtml4Gemarkung("l:\fkat", "Z:\data\upload\planung-bauen\bebauungsplaene")
+        Dim sql As String =
+            "(SELECT * FROM planung.beb_ueberlager_f union SELECT * FROM planung.beb_unterlager_f)" &
+            "ORDER BY gruppe2, gruppe, name_sort ASC;"
+        Dim bplanunten As System.Data.DataTable
+        bplanunten = PostGisExport.GetBebUeberlagerDataTable(sql)
+        'bplanpdfhtml.makeHtml4Gemarkung("l:\fkat", "Z:\data\upload\planung-bauen\bebauungsplaene", bplanunten)
+        bplanpdfhtml.makeMasterIndexHtml("Z:\data\upload\planung-bauen\bebauungsplaene")
         End
     End Sub
 
