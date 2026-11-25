@@ -116,7 +116,7 @@ ByRef initial As String, ByRef eid As String, ByRef beschreibung As String, ByRe
 
             beschreibung = clsDBtools.fieldvalue((drr.Item("Beschreibung")))
             fullfilename = clsDBtools.fieldvalue((drr.Item("tooltip")))
-            typ = CStr(drr.Item("typ"))
+            typ = clsDBtools.fieldvalue((drr.Item("typ")))
         Catch ex As Exception
             l("fehler in DbMetaDatenDokumentHolen:" & vid & ex.ToString)
             'vid = ""

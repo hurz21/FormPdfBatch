@@ -2664,7 +2664,7 @@ Public Class Form1
                     ws.Cells("b" & row).Value = neuEingang 'neueingang.ToString("yyyy")
                     ws.Cells("c" & row).Value = ""
                     ws.Cells("d" & row).Value = dbdatum.ToString("dd.MM.yyyy")
-                    ws.Cells("e" & row).Value = clsString.removeSemikolon(typ)
+                    ws.Cells("e" & row).Value = clsString.removeSemikolon(typ.ToLower.Trim)
                     ws.Cells("f" & row).Value = (cleanString(beschreibung))
                     ws.Cells("g" & row).Value = clsString.removeSemikolon(newdir)
                     'ws.Cells("h" & row).Value = dbdatum.ToString("yyyyMMdd") & "_" & cleanString(dateinameext).Trim
@@ -7322,8 +7322,8 @@ Public Class Form1
             "ORDER BY gruppe2, gruppe, name_sort ASC;"
         Dim bplanunten As System.Data.DataTable
         bplanunten = PostGisExport.GetBebUeberlagerDataTable(sql)
-        'bplanpdfhtml.makeHtml4Gemarkung("l:\fkat", "Z:\data\upload\planung-bauen\bebauungsplaene", bplanunten)
-        bplanpdfhtml.makeMasterIndexHtml("Z:\data\upload\planung-bauen\bebauungsplaene")
+        bplanpdfhtml.makeHtml4Gemarkung("l:\fkat", "Z:\data\upload\planung-bauen\bebauungsplaene", bplanunten)
+        ' bplanpdfhtml.makeMasterIndexHtml("Z:\data\upload\planung-bauen\bebauungsplaene")
         End
     End Sub
 

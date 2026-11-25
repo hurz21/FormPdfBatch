@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Imports System.Text
 Imports System.Text.RegularExpressions
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 
 Module bplanpdfhtml
 
@@ -72,7 +73,9 @@ Module bplanpdfhtml
                     sb.AppendLine($"    <h3>Gemarkung: {gemarkungName}</h3>")
                     sb.AppendLine($"    <p>B-Plan-Nr: {planName}: {name3}</p>")
                     Dim tabelle = BuildBebUeberlagerHtmlByPdf(bplandatatable, subDirName)
+
                     sb.AppendLine(tabelle)
+                    'sb.AppendLine($" Link zum B-Plan im GIS (Intranet): {planName}: {name3}</p>")
                     sb.AppendLine("    <ul>")
 
                     For Each filePath As String In copiedFiles
@@ -196,6 +199,8 @@ Module bplanpdfhtml
             jsonBuilder.AppendLine("{")
             Dim gIndex As Integer = 0
             For Each gemarkung In gemarkungenDict
+
+
                 If gIndex > 0 Then jsonBuilder.AppendLine(",")
                 jsonBuilder.AppendLine($"  ""{EscapeJson(gemarkung.Key)}"": [")
 
@@ -386,10 +391,16 @@ Module bplanpdfhtml
 
             Dim foundAny As Boolean = False
 
+
+
             For Each row As DataRow In dtSource.Rows
                 If row.IsNull(pdfColumnName) Then
                     Continue For
                 End If
+
+                Dim html = row.Item("pdf").ToString()
+                'Dim rechts = row.Item("rechts").ToString()
+                'Dim hoch = row.Item("hoch").ToString()
 
                 If Not String.Equals(row(pdfColumnName).ToString().Trim(), pdfName.Trim(), StringComparison.OrdinalIgnoreCase) Then
                     Continue For
@@ -406,6 +417,9 @@ Module bplanpdfhtml
                     sb.Append($"<td style=""width:165px; border:1px solid #ccc; padding:4px 6px; vertical-align:top; word-wrap:break-word; overflow-wrap:break-word;"">{valueText}</td>")
                     sb.Append("</tr>")
                 Next
+
+                sb.Append($"<td style=""border:1px solid #ccc; padding:4px 6px; vertical-align:top; word-wrap:break-word; overflow-wrap:break-word;""><a href=""https://gis.kreis-of.de/LKOF/asp/main.asp?app=sp_mdat&lay=beb_unterlager&fld=pdf&typ=string&val={Uri.EscapeDataString(html)}.html&theme=Aktuell,B-Pl%C3%A4ne,Liegenschaften&skipwelcome=true"" target=""_blank"" rel=""noopener noreferrer"">B-Plan im GIS öffnen (Intranet)</a></td>")
+
 
                 sb.Append("<tr><td colspan=""2"" style=""height:8px; border:none;""></td></tr>")
             Next
